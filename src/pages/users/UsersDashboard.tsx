@@ -1,14 +1,24 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import CreateIndentModal from '@/components/modals/CreateIndentModal';
 
 const UsersDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Mock data - these would come from an API
+  const stats = {
+    totalIndents: 12,
+    approvedIndents: 8,
+    pendingIndents: 3,
+    rejectedIndents: 1
+  };
 
   const recentIndents = [
     { id: 'IND001', title: 'Laboratory Equipment', status: 'pending_hod', date: '2024-01-15', amount: '₹25,000' },
@@ -36,6 +46,11 @@ const UsersDashboard: React.FC = () => {
     }
   };
 
+  const handleCreateIndent = (data: any) => {
+    console.log('Creating indent:', data);
+    // Handle indent creation logic here
+  };
+
   return (
     <DashboardLayout>
       <PageHeader
@@ -43,8 +58,8 @@ const UsersDashboard: React.FC = () => {
         subtitle="Welcome to your procurement dashboard"
         action={
           <Button 
-            className="dpu-button-primary"
-            onClick={() => navigate('/users/create-indent')}
+            className="bg-dpu-red hover:bg-dpu-red-dark text-white"
+            onClick={() => setIsCreateModalOpen(true)}
           >
             Create New Indent
           </Button>
@@ -53,34 +68,44 @@ const UsersDashboard: React.FC = () => {
       
       <div className="p-6 space-y-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Total Indents</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900">12</div>
-              <p className="text-xs text-gray-500 mt-1">+2 this month</p>
+              <div className="text-2xl font-bold text-gray-900">{stats.totalIndents}</div>
+              <p className="text-xs text-gray-500 mt-1">All time</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Pending Approval</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Approved Indents</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">3</div>
-              <p className="text-xs text-gray-500 mt-1">Awaiting action</p>
+              <div className="text-2xl font-bold text-green-600">{stats.approvedIndents}</div>
+              <p className="text-xs text-gray-500 mt-1">Successfully processed</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Approved This Month</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Pending Indents</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">8</div>
-              <p className="text-xs text-gray-500 mt-1">₹1,45,000 value</p>
+              <div className="text-2xl font-bold text-yellow-600">{stats.pendingIndents}</div>
+              <p className="text-xs text-gray-500 mt-1">Awaiting approval</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Rejected</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">{stats.rejectedIndents}</div>
+              <p className="text-xs text-gray-500 mt-1">Need revision</p>
             </CardContent>
           </Card>
         </div>
@@ -88,8 +113,18 @@ const UsersDashboard: React.FC = () => {
         {/* Recent Indents */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Indents</CardTitle>
-            <CardDescription>Your latest procurement requests</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Recent Indents</CardTitle>
+                <CardDescription>Your latest procurement requests</CardDescription>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/users/indents')}
+              >
+                View All
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -128,7 +163,7 @@ const UsersDashboard: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="h-16 justify-start"
-                onClick={() => navigate('/users/create-indent')}
+                onClick={() => setIsCreateModalOpen(true)}
               >
                 <div className="text-left">
                   <div className="font-medium">📝 Create Indent</div>
@@ -139,17 +174,45 @@ const UsersDashboard: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="h-16 justify-start"
-                onClick={() => navigate('/users/my-indents')}
+                onClick={() => navigate('/users/indents')}
               >
                 <div className="text-left">
                   <div className="font-medium">📋 View All Indents</div>
                   <div className="text-sm text-gray-500">Track your requests</div>
                 </div>
               </Button>
+
+              <Button 
+                variant="outline" 
+                className="h-16 justify-start"
+                onClick={() => navigate('/users/profile')}
+              >
+                <div className="text-left">
+                  <div className="font-medium">👤 Update Profile</div>
+                  <div className="text-sm text-gray-500">Manage your information</div>
+                </div>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="h-16 justify-start"
+                disabled
+              >
+                <div className="text-left">
+                  <div className="font-medium">📊 Reports</div>
+                  <div className="text-sm text-gray-500">View procurement analytics</div>
+                </div>
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      <CreateIndentModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateIndent}
+      />
     </DashboardLayout>
   );
 };

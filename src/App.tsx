@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +7,8 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
 import Login from "@/pages/Login";
 import UsersDashboard from "@/pages/users/UsersDashboard";
-import CreateIndent from "@/pages/users/CreateIndent";
+import Indents from "@/pages/users/Indents";
+import Profile from "@/pages/users/Profile";
 import HODDashboard from "@/pages/hod/HODDashboard";
 import CPDDashboard from "@/pages/cpd/CPDDashboard";
 import { USER_ROLES } from "@/constants/roles";
@@ -37,9 +37,14 @@ const AppRoutes = () => {
           <UsersDashboard />
         </ProtectedRoute>
       } />
-      <Route path="/users/create-indent" element={
+      <Route path="/users/indents" element={
         <ProtectedRoute allowedRoles={[USER_ROLES.USER_DEPT]}>
-          <CreateIndent />
+          <Indents />
+        </ProtectedRoute>
+      } />
+      <Route path="/users/profile" element={
+        <ProtectedRoute allowedRoles={[USER_ROLES.USER_DEPT]}>
+          <Profile />
         </ProtectedRoute>
       } />
       

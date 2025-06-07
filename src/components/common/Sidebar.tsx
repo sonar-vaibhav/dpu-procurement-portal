@@ -22,8 +22,8 @@ const getSidebarItems = (role: string): SidebarItem[] => {
     case USER_ROLES.USER_DEPT:
       return [
         ...baseItems,
-        { id: 'create-indent', label: 'Create Indent', path: '/create-indent', icon: '📝' },
-        { id: 'my-indents', label: 'My Indents', path: '/my-indents', icon: '📋' }
+        { id: 'indents', label: 'Indents', path: '/indents', icon: '📋' },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     case USER_ROLES.HOD:
       return [
@@ -88,7 +88,7 @@ const Sidebar: React.FC = () => {
         <div className="flex items-center space-x-3">
           <DPULogo size="md" />
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">DPU Procurement</h1>
+            <h1 className="text-lg font-semibold text-gray-900">Procurement</h1>
             <p className="text-sm text-gray-500">System</p>
           </div>
         </div>
