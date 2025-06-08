@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +11,10 @@ import UsersDashboard from "@/pages/users/UsersDashboard";
 import Indents from "@/pages/users/Indents";
 import Profile from "@/pages/users/Profile";
 import HODDashboard from "@/pages/hod/HODDashboard";
+import StoreDashboard from "@/pages/store/StoreDashboard";
+import RegistrarDashboard from "@/pages/registrar/RegistrarDashboard";
 import CPDDashboard from "@/pages/cpd/CPDDashboard";
+import ManagementDashboard from "@/pages/management/ManagementDashboard";
 import { USER_ROLES } from "@/constants/roles";
 
 const queryClient = new QueryClient();
@@ -58,24 +62,14 @@ const AppRoutes = () => {
       {/* Store Routes */}
       <Route path="/store" element={
         <ProtectedRoute allowedRoles={[USER_ROLES.STORE]}>
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">Store Dashboard</h1>
-              <p className="text-gray-600">Coming Soon - Store Department functionality</p>
-            </div>
-          </div>
+          <StoreDashboard />
         </ProtectedRoute>
       } />
       
       {/* Registrar Routes */}
       <Route path="/registrar" element={
         <ProtectedRoute allowedRoles={[USER_ROLES.REGISTRAR]}>
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">Registrar Dashboard</h1>
-              <p className="text-gray-600">Coming Soon - Registrar functionality</p>
-            </div>
-          </div>
+          <RegistrarDashboard />
         </ProtectedRoute>
       } />
       
@@ -89,12 +83,7 @@ const AppRoutes = () => {
       {/* Management Routes */}
       <Route path="/management" element={
         <ProtectedRoute allowedRoles={[USER_ROLES.MANAGEMENT]}>
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">Management Dashboard</h1>
-              <p className="text-gray-600">Coming Soon - Management functionality</p>
-            </div>
-          </div>
+          <ManagementDashboard />
         </ProtectedRoute>
       } />
       

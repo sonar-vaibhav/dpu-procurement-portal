@@ -28,33 +28,33 @@ const getSidebarItems = (role: string): SidebarItem[] => {
     case USER_ROLES.HOD:
       return [
         ...baseItems,
-        { id: 'pending-approvals', label: 'Pending Approvals', path: '/pending-approvals', icon: '⏳' },
-        { id: 'approved-indents', label: 'Approved Indents', path: '/approved-indents', icon: '✅' }
+        { id: 'indents', label: 'All Indents', path: '/indents', icon: '📋' },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     case USER_ROLES.STORE:
       return [
         ...baseItems,
-        { id: 'pending-verification', label: 'Pending Verification', path: '/pending-verification', icon: '🔍' },
-        { id: 'stock-management', label: 'Stock Management', path: '/stock-management', icon: '📦' }
+        { id: 'indents', label: 'Stock Verification', path: '/indents', icon: '📦' },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     case USER_ROLES.REGISTRAR:
       return [
         ...baseItems,
-        { id: 'pending-approvals', label: 'Pending Approvals', path: '/pending-approvals', icon: '⏳' },
-        { id: 'budget-overview', label: 'Budget Overview', path: '/budget-overview', icon: '💰' }
+        { id: 'indents', label: 'Budget & Approvals', path: '/indents', icon: '💰' },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     case USER_ROLES.CPD:
       return [
         ...baseItems,
         { id: 'vendor-management', label: 'Vendor Management', path: '/vendor-management', icon: '🏢' },
         { id: 'quote-comparison', label: 'Quote Comparison', path: '/quote-comparison', icon: '📊' },
-        { id: 'rfq-management', label: 'RFQ Management', path: '/rfq-management', icon: '📄' }
+        { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     case USER_ROLES.MANAGEMENT:
       return [
         ...baseItems,
-        { id: 'final-approvals', label: 'Final Approvals', path: '/final-approvals', icon: '🎯' },
-        { id: 'reports', label: 'Reports', path: '/reports', icon: '📈' }
+        { id: 'reports', label: 'Reports & Analytics', path: '/reports', icon: '📈' },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     default:
       return baseItems;
