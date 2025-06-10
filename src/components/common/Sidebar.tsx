@@ -46,14 +46,12 @@ const getSidebarItems = (role: string): SidebarItem[] => {
     case USER_ROLES.CPD:
       return [
         ...baseItems,
-        { id: 'vendor-management', label: 'Vendor Management', path: '/vendor-management', icon: '🏢' },
-        { id: 'quote-comparison', label: 'Quote Comparison', path: '/quote-comparison', icon: '📊' },
+        { id: 'quotes', label: 'Quote Management', path: '/quotes', icon: '📊' },
         { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     case USER_ROLES.MANAGEMENT:
       return [
         ...baseItems,
-        { id: 'reports', label: 'Reports & Analytics', path: '/reports', icon: '📈' },
         { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     default:
