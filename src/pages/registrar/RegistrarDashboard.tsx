@@ -220,7 +220,7 @@ const RegistrarDashboard: React.FC = () => {
         indent={selectedIndent}
         onApprove={handleApprove}
         onReject={handleReject}
-        showActions={true}
+        userRole="registrar"
       />
 
       <RejectionRemarksModal
