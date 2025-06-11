@@ -91,25 +91,6 @@ const ManagementDashboard: React.FC = () => {
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Savings Achieved</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">₹45K</div>
-              <p className="text-xs text-gray-500 mt-1">Through negotiations</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Active Vendors</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">28</div>
-              <p className="text-xs text-gray-500 mt-1">Registered and active</p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Final Approvals */}
@@ -206,51 +187,17 @@ const ManagementDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Computer Science</span>
-                  <span className="text-sm font-semibold">₹6.2L (41%)</span>
+                  <span className="text-sm font-medium">Dr. D. Y. Patil Institute of Technology</span>
+                  <span className="text-sm font-semibold">₹6.2L</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Biology</span>
-                  <span className="text-sm font-semibold">₹4.8L (32%)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Administration</span>
-                  <span className="text-sm font-semibold">₹2.1L (14%)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Others</span>
-                  <span className="text-sm font-semibold">₹2.1L (13%)</span>
-                </div>
+                
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Latest management decisions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-600">Approved procurement for ₹28,000</span>
-                  <span className="text-gray-400">1 hour ago</span>
-                </div>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-gray-600">Reviewed vendor selection by CPD</span>
-                  <span className="text-gray-400">3 hours ago</span>
-                </div>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-600">Approved infrastructure upgrade</span>
-                  <span className="text-gray-400">5 hours ago</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          
         </div>
       </div>
     </DashboardLayout>

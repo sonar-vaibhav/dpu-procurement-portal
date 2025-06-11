@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -8,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { User, Mail, Phone, Building2, Briefcase } from 'lucide-react';
 
 const StoreProfile: React.FC = () => {
   const { toast } = useToast();
@@ -42,39 +42,54 @@ const StoreProfile: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
+              <div className="space-y-2">
+                <Label htmlFor="name" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Full Name
+                </Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  placeholder="Enter your full name"
                 />
               </div>
               
-              <div>
-                <Label htmlFor="email">Email</Label>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  placeholder="Enter your email"
                 />
               </div>
               
-              <div>
-                <Label htmlFor="contact">Contact Number</Label>
+              <div className="space-y-2">
+                <Label htmlFor="contact" className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  Contact Number
+                </Label>
                 <Input
                   id="contact"
                   value={formData.contact}
                   onChange={(e) => setFormData({...formData, contact: e.target.value})}
+                  placeholder="Enter your contact number"
                 />
               </div>
               
-              <div>
-                <Label htmlFor="designation">Designation</Label>
+              <div className="space-y-2">
+                <Label htmlFor="designation" className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  Designation
+                </Label>
                 <Select value={formData.designation} onValueChange={(value) => setFormData({...formData, designation: value})}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select designation" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Store Manager">Store Manager</SelectItem>
@@ -84,11 +99,14 @@ const StoreProfile: React.FC = () => {
                 </Select>
               </div>
               
-              <div>
-                <Label htmlFor="college">Campus</Label>
+              <div className="space-y-2">
+                <Label htmlFor="college" className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Campus
+                </Label>
                 <Select value={formData.college} onValueChange={(value) => setFormData({...formData, college: value})}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select campus" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="DPU Main Campus">DPU Main Campus</SelectItem>
@@ -98,11 +116,14 @@ const StoreProfile: React.FC = () => {
                 </Select>
               </div>
               
-              <div>
-                <Label htmlFor="department">Department</Label>
+              <div className="space-y-2">
+                <Label htmlFor="department" className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Department
+                </Label>
                 <Select value={formData.department} onValueChange={(value) => setFormData({...formData, department: value})}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select department" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Store Department">Store Department</SelectItem>
@@ -113,8 +134,11 @@ const StoreProfile: React.FC = () => {
               </div>
             </div>
             
-            <div className="mt-6">
-              <Button onClick={handleSave} className="dpu-button-primary">
+            <div className="mt-6 flex justify-end">
+              <Button 
+                onClick={handleSave} 
+                className="bg-dpu-red hover:bg-dpu-red-dark text-white"
+              >
                 Save Changes
               </Button>
             </div>

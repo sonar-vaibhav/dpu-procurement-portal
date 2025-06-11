@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserRole, ROLE_ROUTES } from '@/constants/roles';
 
@@ -37,7 +36,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check for stored user session
     const storedUser = localStorage.getItem('dpu_user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('dpu_user');
+      }
     }
     setIsLoading(false);
   }, []);
@@ -45,18 +50,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
-    // Mock authentication
-    const foundUser = MOCK_USERS.find(u => u.email === email);
-    
-    if (foundUser && password === 'dpu123') {
-      setUser(foundUser);
-      localStorage.setItem('dpu_user', JSON.stringify(foundUser));
+    try {
+      // Mock authentication
+      const foundUser = MOCK_USERS.find(u => u.email === email);
+      
+      if (foundUser && password === 'dpu123') {
+        setUser(foundUser);
+        localStorage.setItem('dpu_user', JSON.stringify(foundUser));
+        setIsLoading(false);
+        return true;
+      }
+      
       setIsLoading(false);
-      return true;
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      setIsLoading(false);
+      return false;
     }
-    
-    setIsLoading(false);
-    return false;
   };
 
   const logout = () => {
@@ -64,8 +75,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('dpu_user');
   };
 
+  const value = {
+    user,
+    login,
+    logout,
+    isLoading
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
