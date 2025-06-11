@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { USER_ROLES, ROLE_NAMES } from '@/constants/roles';
@@ -33,6 +34,7 @@ const getSidebarItems = (role: string): SidebarItem[] => {
     case USER_ROLES.STORE:
       return [
         ...baseItems,
+        { id: 'indents', label: 'Indents', path: '/indents', icon: '📋' },
         { id: 'stock', label: 'Stock Management', path: '/stock', icon: '📦' },
         { id: 'track', label: 'Delivery Tracking', path: '/track', icon: '🚚' },
         { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
@@ -46,7 +48,9 @@ const getSidebarItems = (role: string): SidebarItem[] => {
     case USER_ROLES.CPD:
       return [
         ...baseItems,
-        { id: 'quotes', label: 'Quote Management', path: '/quotes', icon: '📊' },
+        { id: 'indents', label: 'All Indents', path: '/indents', icon: '📋' },
+        { id: 'vendors', label: 'Vendor Directory', path: '/vendors', icon: '🏢' },
+        { id: 'track', label: 'Indent Tracker', path: '/track', icon: '📊' },
         { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
     case USER_ROLES.MANAGEMENT:

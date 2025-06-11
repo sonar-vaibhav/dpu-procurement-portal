@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from '@/pages/auth/Login';
@@ -9,6 +10,7 @@ import HODDashboard from '@/pages/hod/HODDashboard';
 import HODIndents from '@/pages/hod/HODIndents';
 import HODProfile from '@/pages/hod/HODProfile';
 import StoreDashboard from '@/pages/store/StoreDashboard';
+import StoreIndents from '@/pages/store/StoreIndents';
 import StoreStock from '@/pages/store/StoreStock';
 import StoreTrack from '@/pages/store/StoreTrack';
 import StoreProfile from '@/pages/store/StoreProfile';
@@ -16,7 +18,9 @@ import RegistrarDashboard from '@/pages/registrar/RegistrarDashboard';
 import RegistrarIndents from '@/pages/registrar/RegistrarIndents';
 import RegistrarProfile from '@/pages/registrar/RegistrarProfile';
 import CPDDashboard from '@/pages/cpd/CPDDashboard';
-import CPDQuotes from '@/pages/cpd/CPDQuotes';
+import CPDIndents from '@/pages/cpd/CPDIndents';
+import CPDVendors from '@/pages/cpd/CPDVendors';
+import CPDTrack from '@/pages/cpd/CPDTrack';
 import CPDProfile from '@/pages/cpd/CPDProfile';
 import ManagementDashboard from '@/pages/management/ManagementDashboard';
 import ManagementProfile from '@/pages/management/ManagementProfile';
@@ -74,6 +78,7 @@ const App: React.FC = () => {
             <ProtectedRoute allowedRoles={[USER_ROLES.STORE]}>
               <Routes>
                 <Route index element={<StoreDashboard />} />
+                <Route path="indents" element={<StoreIndents />} />
                 <Route path="stock" element={<StoreStock />} />
                 <Route path="track" element={<StoreTrack />} />
                 <Route path="profile" element={<StoreProfile />} />
@@ -105,7 +110,9 @@ const App: React.FC = () => {
             <ProtectedRoute allowedRoles={[USER_ROLES.CPD]}>
               <Routes>
                 <Route index element={<CPDDashboard />} />
-                <Route path="quotes" element={<CPDQuotes />} />
+                <Route path="indents" element={<CPDIndents />} />
+                <Route path="vendors" element={<CPDVendors />} />
+                <Route path="track" element={<CPDTrack />} />
                 <Route path="profile" element={<CPDProfile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

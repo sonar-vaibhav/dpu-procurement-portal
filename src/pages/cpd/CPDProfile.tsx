@@ -12,12 +12,12 @@ import { useToast } from '@/hooks/use-toast';
 const CPDProfile: React.FC = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: 'CPD Officer',
+    name: 'CPD Admin Officer',
     email: 'cpd@dpu.edu.in',
     contact: '+91 9876543213',
-    designation: 'CPD Officer',
-    college: 'DPU Central Purchase Department',
-    department: 'Central Purchase Department'
+    designation: 'CPD Admin',
+    department: 'Central Purchase Department',
+    role: 'CPD Admin'
   });
 
   const handleSave = () => {
@@ -38,7 +38,7 @@ const CPDProfile: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
-            <CardDescription>Update your profile details</CardDescription>
+            <CardDescription>Update your profile details (Department and Role are non-editable)</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -77,39 +77,33 @@ const CPDProfile: React.FC = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="CPD Officer">CPD Officer</SelectItem>
-                    <SelectItem value="Senior CPD Officer">Senior CPD Officer</SelectItem>
-                    <SelectItem value="CPD Manager">CPD Manager</SelectItem>
+                    <SelectItem value="CPD Admin">CPD Admin</SelectItem>
+                    <SelectItem value="Senior CPD Admin">Senior CPD Admin</SelectItem>
+                    <SelectItem value="CPD Head">CPD Head</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               
               <div>
-                <Label htmlFor="college">Department</Label>
-                <Select value={formData.college} onValueChange={(value) => setFormData({...formData, college: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="DPU Central Purchase Department">DPU Central Purchase Department</SelectItem>
-                    <SelectItem value="DPU Procurement Office">DPU Procurement Office</SelectItem>
-                    <SelectItem value="DPU Vendor Management">DPU Vendor Management</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="department">Department</Label>
+                <Input
+                  id="department"
+                  value={formData.department}
+                  disabled
+                  className="bg-gray-100"
+                />
+                <p className="text-xs text-gray-500 mt-1">Department cannot be changed</p>
               </div>
               
               <div>
-                <Label htmlFor="department">Specialization</Label>
-                <Select value={formData.department} onValueChange={(value) => setFormData({...formData, department: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Central Purchase Department">General Procurement</SelectItem>
-                    <SelectItem value="IT Procurement">IT Procurement</SelectItem>
-                    <SelectItem value="Lab Equipment">Lab Equipment</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="role">Role</Label>
+                <Input
+                  id="role"
+                  value={formData.role}
+                  disabled
+                  className="bg-gray-100"
+                />
+                <p className="text-xs text-gray-500 mt-1">Role cannot be changed</p>
               </div>
             </div>
             
