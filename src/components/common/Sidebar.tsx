@@ -53,6 +53,13 @@ const getSidebarItems = (role: string): SidebarItem[] => {
         { id: 'track', label: 'Indent Tracker', path: '/track', icon: '📊' },
         { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
+    case USER_ROLES.OFFICER:
+      return [
+        ...baseItems,
+        { id: 'indents', label: 'Assigned Indents', path: '/indents', icon: '📋' },
+        { id: 'vendors', label: 'Vendor List', path: '/vendors', icon: '🏢' },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
+      ];
     case USER_ROLES.MANAGEMENT:
       return [
         ...baseItems,

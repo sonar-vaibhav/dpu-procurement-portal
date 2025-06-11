@@ -5,6 +5,7 @@ export const USER_ROLES = {
   STORE: 'store',
   REGISTRAR: 'registrar',
   CPD: 'cpd',
+  OFFICER: 'officer',
   MANAGEMENT: 'management'
 } as const;
 
@@ -16,6 +17,7 @@ export const ROLE_ROUTES = {
   [USER_ROLES.STORE]: '/store',
   [USER_ROLES.REGISTRAR]: '/registrar',
   [USER_ROLES.CPD]: '/cpd',
+  [USER_ROLES.OFFICER]: '/officer',
   [USER_ROLES.MANAGEMENT]: '/management'
 };
 
@@ -25,6 +27,7 @@ export const ROLE_NAMES = {
   [USER_ROLES.STORE]: 'Store Department',
   [USER_ROLES.REGISTRAR]: 'Registrar/Principal',
   [USER_ROLES.CPD]: 'CPD Officer',
+  [USER_ROLES.OFFICER]: 'Purchase Officer',
   [USER_ROLES.MANAGEMENT]: 'Management'
 };
 

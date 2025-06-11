@@ -22,6 +22,11 @@ import CPDIndents from '@/pages/cpd/CPDIndents';
 import CPDVendors from '@/pages/cpd/CPDVendors';
 import CPDTrack from '@/pages/cpd/CPDTrack';
 import CPDProfile from '@/pages/cpd/CPDProfile';
+import OfficerDashboard from '@/pages/officer/OfficerDashboard';
+import OfficerIndents from '@/pages/officer/OfficerIndents';
+import OfficerVendors from '@/pages/officer/OfficerVendors';
+import OfficerQuotes from '@/pages/officer/OfficerQuotes';
+import OfficerProfile from '@/pages/officer/OfficerProfile';
 import ManagementDashboard from '@/pages/management/ManagementDashboard';
 import ManagementProfile from '@/pages/management/ManagementProfile';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
@@ -114,6 +119,23 @@ const App: React.FC = () => {
                 <Route path="vendors" element={<CPDVendors />} />
                 <Route path="track" element={<CPDTrack />} />
                 <Route path="profile" element={<CPDProfile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Purchase Officer Routes */}
+        <Route
+          path="/officer/*"
+          element={
+            <ProtectedRoute allowedRoles={[USER_ROLES.OFFICER]}>
+              <Routes>
+                <Route index element={<OfficerDashboard />} />
+                <Route path="indents" element={<OfficerIndents />} />
+                <Route path="vendors" element={<OfficerVendors />} />
+                <Route path="quotes/:indentId" element={<OfficerQuotes />} />
+                <Route path="profile" element={<OfficerProfile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </ProtectedRoute>
