@@ -65,6 +65,13 @@ const getSidebarItems = (role: string): SidebarItem[] => {
         ...baseItems,
         { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
       ];
+    case USER_ROLES.VENDOR:
+      return [
+        ...baseItems,
+        { id: 'enquiries', label: 'New Enquiries', path: '/enquiries', icon: '📨' },
+        { id: 'quotes', label: 'Quote History', path: '/quotes', icon: '📄' },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: '👤' }
+      ];
     default:
       return baseItems;
   }

@@ -1,4 +1,3 @@
-
 export const USER_ROLES = {
   USER_DEPT: 'user_dept',
   HOD: 'hod',
@@ -6,7 +5,8 @@ export const USER_ROLES = {
   REGISTRAR: 'registrar',
   CPD: 'cpd',
   OFFICER: 'officer',
-  MANAGEMENT: 'management'
+  MANAGEMENT: 'management',
+  VENDOR: 'vendor'
 } as const;
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
@@ -18,7 +18,8 @@ export const ROLE_ROUTES = {
   [USER_ROLES.REGISTRAR]: '/registrar',
   [USER_ROLES.CPD]: '/cpd',
   [USER_ROLES.OFFICER]: '/officer',
-  [USER_ROLES.MANAGEMENT]: '/management'
+  [USER_ROLES.MANAGEMENT]: '/management',
+  [USER_ROLES.VENDOR]: '/vendor'
 };
 
 export const ROLE_NAMES = {
@@ -28,7 +29,8 @@ export const ROLE_NAMES = {
   [USER_ROLES.REGISTRAR]: 'Registrar/Principal',
   [USER_ROLES.CPD]: 'CPD Officer',
   [USER_ROLES.OFFICER]: 'Purchase Officer',
-  [USER_ROLES.MANAGEMENT]: 'Management'
+  [USER_ROLES.MANAGEMENT]: 'Management',
+  [USER_ROLES.VENDOR]: 'Vendor'
 };
 
 export const INDENT_STATUS = {

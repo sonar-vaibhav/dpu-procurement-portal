@@ -26,7 +26,8 @@ const MOCK_USERS: User[] = [
   { id: '4', name: 'Dr. Registrar', email: 'registrar@dpu.edu.in', role: 'registrar' },
   { id: '5', name: 'CPD Officer', email: 'cpd@dpu.edu.in', role: 'cpd' },
   { id: '6', name: 'Purchase Officer', email: 'officer@dpu.edu.in', role: 'officer', department: 'Electronics & Lab Equipment' },
-  { id: '7', name: 'Management Head', email: 'management@dpu.edu.in', role: 'management' }
+  { id: '7', name: 'Management Head', email: 'management@dpu.edu.in', role: 'management' },
+  { id: '8', name: 'TechCorp Solutions', email: 'vendor@techcorp.com', role: 'vendor', department: 'Electronics' }
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

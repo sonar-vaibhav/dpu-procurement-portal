@@ -29,6 +29,12 @@ import OfficerQuotes from '@/pages/officer/OfficerQuotes';
 import OfficerProfile from '@/pages/officer/OfficerProfile';
 import ManagementDashboard from '@/pages/management/ManagementDashboard';
 import ManagementProfile from '@/pages/management/ManagementProfile';
+import VendorDashboard from '@/pages/vendor/VendorDashboard';
+import VendorEnquiries from '@/pages/vendor/VendorEnquiries';
+import VendorRespond from '@/pages/vendor/VendorRespond';
+import VendorRevise from '@/pages/vendor/VendorRevise';
+import VendorQuotes from '@/pages/vendor/VendorQuotes';
+import VendorProfile from '@/pages/vendor/VendorProfile';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts/AuthContext';
@@ -150,6 +156,24 @@ const App: React.FC = () => {
               <Routes>
                 <Route index element={<ManagementDashboard />} />
                 <Route path="profile" element={<ManagementProfile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Vendor Routes */}
+        <Route
+          path="/vendor/*"
+          element={
+            <ProtectedRoute allowedRoles={[USER_ROLES.VENDOR]}>
+              <Routes>
+                <Route index element={<VendorDashboard />} />
+                <Route path="enquiries" element={<VendorEnquiries />} />
+                <Route path="respond/:enquiryId" element={<VendorRespond />} />
+                <Route path="revise/:enquiryId" element={<VendorRevise />} />
+                <Route path="quotes" element={<VendorQuotes />} />
+                <Route path="profile" element={<VendorProfile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </ProtectedRoute>
