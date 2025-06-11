@@ -1,14 +1,29 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+
+interface IndentDetails {
+  id: string;
+  title: string;
+  status: string;
+  date: string;
+  amount: string;
+  department: string;
+  budgetHead: string;
+  priority: string;
+  justification: string;
+  requestedBy: string;
+  items: any[];
+}
 
 const HODDashboard: React.FC = () => {
   const { toast } = useToast();
+  const [selectedIndent, setSelectedIndent] = useState<IndentDetails | null>(null);
 
   const pendingApprovals = [
     {
@@ -18,7 +33,22 @@ const HODDashboard: React.FC = () => {
       department: 'Biology',
       amount: '₹25,000',
       date: '2024-01-15',
-      priority: 'high'
+      priority: 'high',
+      status: 'pending_hod',
+      budgetHead: 'Research Equipment',
+      justification: 'Required for advanced research in cell biology',
+      items: [
+        {
+          itemName: 'Microscope',
+          description: 'High-resolution microscope for cell research',
+          quantity: '2',
+          make: 'Olympus',
+          uom: 'Nos',
+          stockInHand: '0',
+          approxValue: '25000',
+          purpose: 'Research'
+        }
+      ]
     },
     {
       id: 'IND002',
@@ -27,16 +57,22 @@ const HODDashboard: React.FC = () => {
       department: 'Computer Science',
       amount: '₹45,000',
       date: '2024-01-14',
-      priority: 'medium'
-    },
-    {
-      id: 'IND003',
-      title: 'Office Supplies',
-      requestedBy: 'Admin Staff',
-      department: 'Administration',
-      amount: '₹5,000',
-      date: '2024-01-13',
-      priority: 'low'
+      priority: 'medium',
+      status: 'pending_hod',
+      budgetHead: 'IT Infrastructure',
+      justification: 'Upgrading computer lab equipment for new courses',
+      items: [
+        {
+          itemName: 'Desktop Computers',
+          description: 'High-performance workstations',
+          quantity: '5',
+          make: 'Dell',
+          uom: 'Nos',
+          stockInHand: '2',
+          approxValue: '45000',
+          purpose: 'Teaching'
+        }
+      ]
     }
   ];
 
@@ -45,6 +81,7 @@ const HODDashboard: React.FC = () => {
       title: "Indent Approved",
       description: `Indent ${indentId} has been approved and forwarded to Store Department`,
     });
+    setSelectedIndent(null);
   };
 
   const handleReject = (indentId: string) => {
@@ -53,6 +90,7 @@ const HODDashboard: React.FC = () => {
       description: `Indent ${indentId} has been rejected`,
       variant: "destructive",
     });
+    setSelectedIndent(null);
   };
 
   const getPriorityColor = (priority: string) => {
@@ -76,31 +114,30 @@ const HODDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Requests</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">18</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Pending Approvals</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">3</div>
+              <div className="text-2xl font-bold text-yellow-600">{pendingApprovals.length}</div>
               <p className="text-xs text-gray-500 mt-1">Require your action</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Approved This Month</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Approved</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">15</div>
-              <p className="text-xs text-gray-500 mt-1">₹2,45,000 value</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Budget Utilization</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">68%</div>
-              <p className="text-xs text-gray-500 mt-1">₹6,80,000 of ₹10,00,000</p>
+              <p className="text-xs text-gray-500 mt-1">Approx ₹2,45,000 value</p>
             </CardContent>
           </Card>
         </div>
@@ -146,16 +183,9 @@ const HODDashboard: React.FC = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleReject(indent.id)}
+                        onClick={() => setSelectedIndent(indent)}
                       >
-                        Reject
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="dpu-button-primary"
-                        onClick={() => handleApprove(indent.id)}
-                      >
-                        Approve
+                        View Details
                       </Button>
                     </div>
                   </div>
@@ -164,34 +194,16 @@ const HODDashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest actions and updates</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-gray-600">Approved indent IND004 for ₹12,000</span>
-                <span className="text-gray-400">2 hours ago</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                <span className="text-gray-600">Rejected indent IND005 - insufficient justification</span>
-                <span className="text-gray-400">4 hours ago</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-gray-600">New indent IND006 received from Dr. Brown</span>
-                <span className="text-gray-400">6 hours ago</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      <IndentDetailsModal
+        isOpen={!!selectedIndent}
+        onClose={() => setSelectedIndent(null)}
+        indent={selectedIndent}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        showActions={true}
+      />
     </DashboardLayout>
   );
 };

@@ -1,0 +1,245 @@
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+
+interface IndentItem {
+  itemName: string;
+  description: string;
+  quantity: string;
+  make: string;
+  uom: string;
+  stockInHand: string;
+  approxValue: string;
+  purpose: string;
+}
+
+interface IndentDetails {
+  id: string;
+  title: string;
+  status: string;
+  date: string;
+  amount: string;
+  department: string;
+  budgetHead: string;
+  priority: string;
+  justification: string;
+  requestedBy: string;
+  items: IndentItem[];
+  approvalTrail?: string[];
+}
+
+interface IndentDetailsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  indent: IndentDetails | null;
+  onApprove?: (indentId: string) => void;
+  onReject?: (indentId: string, remarks: string) => void;
+  userRole?: 'hod' | 'store' | 'registrar' | 'management';
+}
+
+const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
+  isOpen,
+  onClose,
+  indent,
+  onApprove,
+  onReject,
+  userRole
+}) => {
+  const canApprove = () => {
+    if (!indent || !userRole) return true;
+    
+    switch (userRole) {
+      case 'hod':
+        return indent.status === 'pending_hod';
+      case 'store':
+        return indent.status === 'pending_store';
+      case 'registrar':
+        return indent.status === 'pending_registrar';
+      case 'management':
+        return indent.status === 'pending_management';
+      default:
+        return false;
+    }
+  };
+
+  const [showRejectionInput, setShowRejectionInput] = useState(false);
+  const [rejectionRemarks, setRejectionRemarks] = useState('');
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending_hod': return 'bg-yellow-100 text-yellow-800';
+      case 'pending_store': return 'bg-blue-100 text-blue-800';
+      case 'pending_registrar': return 'bg-purple-100 text-purple-800';
+      case 'pending_management': return 'bg-orange-100 text-orange-800';
+      case 'approved': return 'bg-green-100 text-green-800';
+      case 'rejected': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending_hod': return 'Pending HOD Approval';
+      case 'pending_store': return 'Pending Store Approval';
+      case 'pending_registrar': return 'Pending Registrar Approval';
+      case 'pending_management': return 'Pending Management Approval';
+      case 'approved': return 'Approved';
+      case 'rejected': return 'Rejected';
+      default: return status;
+    }
+  };
+
+  const handleReject = () => {
+    if (!showRejectionInput) {
+      setShowRejectionInput(true);
+      return;
+    }
+
+    if (!rejectionRemarks.trim()) {
+      toast.error('Please provide rejection remarks');
+      return;
+    }
+
+    if (onReject && indent) {
+      onReject(indent.id, rejectionRemarks);
+      setShowRejectionInput(false);
+      setRejectionRemarks('');
+      onClose();
+    }
+  };
+
+  const handleCancelReject = () => {
+    setShowRejectionInput(false);
+    setRejectionRemarks('');
+  };
+
+  
+
+  if (!indent) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">{indent.title}</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Status and Amount */}
+          <div className="flex items-center justify-between">
+            <Badge className={getStatusColor(indent.status)}>
+              {getStatusText(indent.status)}
+            </Badge>
+            <div className="text-lg font-semibold text-gray-900">
+              Amount: {indent.amount}
+            </div>
+          </div>
+
+          {/* Approval Trail */}
+          {indent.approvalTrail && (
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium mb-2">Approval Trail</h3>
+              <div className="flex items-center space-x-2">
+                {indent.approvalTrail.map((step, index) => (
+                  <React.Fragment key={step}>
+                    <Badge variant="outline">{step}</Badge>
+                    {index < indent.approvalTrail.length - 1 && (
+                      <span className="text-gray-400">→</span>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Basic Details */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-medium mb-2">Request Details</h3>
+              <div className="space-y-2 text-sm">
+                <p><span className="font-medium">Date Requested:</span> {indent.date}</p>
+                <p><span className="font-medium">Department:</span> {indent.department}</p>
+                <p><span className="font-medium">Budget Head:</span> {indent.budgetHead}</p>
+                <p><span className="font-medium">Priority:</span> {indent.priority}</p>
+                <p><span className="font-medium">Requested By:</span> {indent.requestedBy}</p>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-medium mb-2">Justification</h3>
+              <p className="text-sm text-gray-600">{indent.justification}</p>
+            </div>
+          </div>
+
+          {/* Items List */}
+          <div>
+            <h3 className="font-medium mb-4">Requested Items</h3>
+            <div className="space-y-4">
+              {indent.items.map((item, index) => (
+                <div key={index} className="border rounded-lg p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="font-medium">{item.itemName}</p>
+                      <p className="text-sm text-gray-600">{item.description}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <p><span className="font-medium">Quantity:</span> {item.quantity}</p>
+                      <p><span className="font-medium">Make:</span> {item.make}</p>
+                      <p><span className="font-medium">UOM:</span> {item.uom}</p>
+                      <p><span className="font-medium">Stock in Hand:</span> {item.stockInHand}</p>
+                      <p><span className="font-medium">Approx. Value:</span> ₹{item.approxValue}</p>
+                      <p><span className="font-medium">Purpose:</span> {item.purpose}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          
+
+          {/* Action Buttons */}
+          {!showRejectionInput && canApprove() && (
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={handleReject}>
+                Reject
+              </Button>
+              <Button onClick={() => onApprove && onApprove(indent.id)}>
+                Approve
+              </Button>
+            </div>
+          )}
+
+          {/* Rejection Remarks Input */}
+          {showRejectionInput && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="rejectionRemarks">Rejection Remarks</Label>
+                <Textarea
+                  id="rejectionRemarks"
+                  placeholder="Enter remarks for rejection or return for clarification..."
+                  value={rejectionRemarks}
+                  onChange={(e) => setRejectionRemarks(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={handleCancelReject}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleReject}>
+                  Confirm Rejection
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default IndentDetailsModal; 

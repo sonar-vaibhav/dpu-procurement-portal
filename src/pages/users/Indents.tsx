@@ -1,16 +1,34 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CreateIndentModal from '@/components/modals/CreateIndentModal';
+import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+
+interface IndentDetails {
+  id: string;
+  title: string;
+  status: string;
+  date: string;
+  amount: string;
+  department: string;
+  budgetHead: string;
+  priority: string;
+  justification: string;
+  requestedBy: string;
+  items: any[];
+}
 
 const Indents: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedIndent, setSelectedIndent] = useState<any>(null);
+  const [selectedIndent, setSelectedIndent] = useState<IndentDetails | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
 
   const indents = [
     { 
@@ -19,7 +37,23 @@ const Indents: React.FC = () => {
       status: 'pending_hod', 
       date: '2024-01-15', 
       amount: '₹25,000',
-      description: 'Microscopes and lab apparatus for Biology department'
+      department: 'Biology',
+      budgetHead: 'Research Equipment',
+      priority: 'high',
+      justification: 'Required for advanced research in cell biology',
+      requestedBy: 'Dr. John Smith',
+      items: [
+        {
+          itemName: 'Microscope',
+          description: 'High-resolution microscope for cell research',
+          quantity: '2',
+          make: 'Olympus',
+          uom: 'Nos',
+          stockInHand: '0',
+          approxValue: '25000',
+          purpose: 'Research'
+        }
+      ]
     },
     { 
       id: 'IND002', 
@@ -27,7 +61,23 @@ const Indents: React.FC = () => {
       status: 'approved', 
       date: '2024-01-10', 
       amount: '₹5,000',
-      description: 'Stationery and office equipment'
+      department: 'Administration',
+      budgetHead: 'Office Supplies',
+      priority: 'low',
+      justification: 'Regular office supplies replenishment',
+      requestedBy: 'Admin Staff',
+      items: [
+        {
+          itemName: 'Stationery',
+          description: 'Office stationery items',
+          quantity: '1',
+          make: 'Local',
+          uom: 'Lot',
+          stockInHand: '0',
+          approxValue: '5000',
+          purpose: 'Office Use'
+        }
+      ]
     },
     { 
       id: 'IND003', 
@@ -35,7 +85,23 @@ const Indents: React.FC = () => {
       status: 'pending_store', 
       date: '2024-01-08', 
       amount: '₹45,000',
-      description: 'Laptops and accessories for computer lab'
+      department: 'Computer Science',
+      budgetHead: 'IT Infrastructure',
+      priority: 'medium',
+      justification: 'Upgrading computer lab equipment for new courses',
+      requestedBy: 'Prof. Sarah Wilson',
+      items: [
+        {
+          itemName: 'Desktop Computers',
+          description: 'High-performance workstations',
+          quantity: '5',
+          make: 'Dell',
+          uom: 'Nos',
+          stockInHand: '2',
+          approxValue: '45000',
+          purpose: 'Teaching'
+        }
+      ]
     }
   ];
 
@@ -64,6 +130,14 @@ const Indents: React.FC = () => {
     // Handle indent creation logic here
   };
 
+  const filteredIndents = indents.filter(indent => {
+    const matchesSearch = indent.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         indent.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || indent.status === statusFilter;
+    const matchesPriority = priorityFilter === 'all' || indent.priority === priorityFilter;
+    return matchesSearch && matchesStatus && matchesPriority;
+  });
+
   return (
     <DashboardLayout>
       <PageHeader
@@ -80,39 +154,85 @@ const Indents: React.FC = () => {
       />
       
       <div className="p-6 space-y-6">
-        <div className="grid gap-4">
-          {indents.map((indent) => (
-            <Card key={indent.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">{indent.title}</CardTitle>
-                    <CardDescription className="mt-1">{indent.description}</CardDescription>
+        <Card>
+          <CardHeader>
+            <CardTitle>My Indents</CardTitle>
+            <CardDescription>View and track all your procurement requests</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Input
+                placeholder="Search by title or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="pending_hod">Pending HOD</SelectItem>
+                  <SelectItem value="pending_store">Pending Store</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Priorities</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-4">
+              {filteredIndents.map((indent) => (
+                <div key={indent.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h4 className="font-medium text-gray-900">{indent.title}</h4>
+                        <Badge className={getStatusColor(indent.status)}>
+                          {getStatusText(indent.status)}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                        <div>
+                          <span className="font-medium">ID:</span> {indent.id}
+                        </div>
+                        <div>
+                          <span className="font-medium">Amount:</span> {indent.amount}
+                        </div>
+                        <div>
+                          <span className="font-medium">Date:</span> {indent.date}
+                        </div>
+                        <div>
+                          <span className="font-medium">Priority:</span> {indent.priority}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedIndent(indent)}
+                    >
+                      View Details
+                    </Button>
                   </div>
-                  <Badge className={getStatusColor(indent.status)}>
-                    {getStatusText(indent.status)}
-                  </Badge>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-6 text-sm text-gray-500">
-                    <span>ID: {indent.id}</span>
-                    <span>Date: {indent.date}</span>
-                    <span>Amount: {indent.amount}</span>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedIndent(indent)}
-                  >
-                    View Details
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <CreateIndentModal
@@ -121,45 +241,11 @@ const Indents: React.FC = () => {
         onSubmit={handleCreateIndent}
       />
 
-      {/* Indent Details Modal */}
-      <Dialog open={!!selectedIndent} onOpenChange={() => setSelectedIndent(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{selectedIndent?.title}</DialogTitle>
-            <DialogDescription>Indent Details - {selectedIndent?.id}</DialogDescription>
-          </DialogHeader>
-          {selectedIndent && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Status</label>
-                  <div className="mt-1">
-                    <Badge className={getStatusColor(selectedIndent.status)}>
-                      {getStatusText(selectedIndent.status)}
-                    </Badge>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Amount</label>
-                  <p className="mt-1 text-lg font-semibold">{selectedIndent.amount}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Date Requested</label>
-                  <p className="mt-1">{selectedIndent.date}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Indent ID</label>
-                  <p className="mt-1 font-mono">{selectedIndent.id}</p>
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Description</label>
-                <p className="mt-1">{selectedIndent.description}</p>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <IndentDetailsModal
+        isOpen={!!selectedIndent}
+        onClose={() => setSelectedIndent(null)}
+        indent={selectedIndent}
+      />
     </DashboardLayout>
   );
 };

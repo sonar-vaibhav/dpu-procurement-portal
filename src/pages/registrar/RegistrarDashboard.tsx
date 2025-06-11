@@ -1,14 +1,33 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+import RejectionRemarksModal from '@/components/modals/RejectionRemarksModal';
+
+interface IndentDetails {
+  id: string;
+  title: string;
+  status: string;
+  date: string;
+  amount: string;
+  department: string;
+  budgetHead: string;
+  priority: string;
+  justification: string;
+  requestedBy: string;
+  items: any[];
+  approvalTrail: string[];
+}
 
 const RegistrarDashboard: React.FC = () => {
   const { toast } = useToast();
+  const [selectedIndent, setSelectedIndent] = useState<IndentDetails | null>(null);
+  const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
+  const [indentToReject, setIndentToReject] = useState<string | null>(null);
 
   const pendingApprovals = [
     {
@@ -17,9 +36,24 @@ const RegistrarDashboard: React.FC = () => {
       requestedBy: 'Dr. John Smith',
       department: 'Biology',
       amount: '₹25,000',
+      date: '2024-01-15',
+      status: 'pending_registrar',
+      priority: 'high',
       budgetHead: 'Lab Equipment Fund',
+      justification: 'Required for advanced research in cell biology',
       approvalTrail: ['User', 'HOD', 'Store'],
-      urgency: 'Medium'
+      items: [
+        {
+          itemName: 'Microscope',
+          description: 'High-resolution microscope for cell research',
+          quantity: '2',
+          make: 'Olympus',
+          uom: 'Nos',
+          stockInHand: '0',
+          approxValue: '25000',
+          purpose: 'Research'
+        }
+      ]
     },
     {
       id: 'IND003',
@@ -27,9 +61,24 @@ const RegistrarDashboard: React.FC = () => {
       requestedBy: 'Prof. Sarah Wilson',
       department: 'Computer Science',
       amount: '₹45,000',
+      date: '2024-01-14',
+      status: 'pending_registrar',
+      priority: 'high',
       budgetHead: 'Infrastructure Fund',
+      justification: 'Upgrading computer lab equipment for new courses',
       approvalTrail: ['User', 'HOD', 'Store'],
-      urgency: 'High'
+      items: [
+        {
+          itemName: 'Desktop Computers',
+          description: 'High-performance workstations',
+          quantity: '5',
+          make: 'Dell',
+          uom: 'Nos',
+          stockInHand: '2',
+          approxValue: '45000',
+          purpose: 'Teaching'
+        }
+      ]
     }
   ];
 
@@ -38,21 +87,32 @@ const RegistrarDashboard: React.FC = () => {
       title: "Indent Approved",
       description: `Indent ${indentId} has been approved and forwarded to CPD for vendor process`,
     });
+    setSelectedIndent(null);
   };
 
-  const handleReturnForClarification = (indentId: string) => {
-    toast({
-      title: "Returned for Clarification",
-      description: `Indent ${indentId} has been returned for additional information`,
-      variant: "destructive",
-    });
+  const handleReject = (indentId: string) => {
+    setIndentToReject(indentId);
+    setRejectionModalOpen(true);
   };
 
-  const getUrgencyColor = (urgency: string) => {
-    switch (urgency) {
-      case 'High': return 'bg-red-100 text-red-800';
-      case 'Medium': return 'bg-yellow-100 text-yellow-800';
-      case 'Low': return 'bg-green-100 text-green-800';
+  const handleRejectionConfirm = (remarks: string) => {
+    if (indentToReject) {
+      toast({
+        title: "Indent Rejected",
+        description: `Indent ${indentToReject} has been rejected with remarks: ${remarks}`,
+        variant: "destructive",
+      });
+      setRejectionModalOpen(false);
+      setIndentToReject(null);
+      setSelectedIndent(null);
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'bg-red-100 text-red-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'low': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -72,18 +132,8 @@ const RegistrarDashboard: React.FC = () => {
               <CardTitle className="text-sm font-medium text-gray-600">Pending Approvals</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">2</div>
+              <div className="text-2xl font-bold text-blue-600">{pendingApprovals.length}</div>
               <p className="text-xs text-gray-500 mt-1">Require your approval</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Monthly Budget Utilization</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">72%</div>
-              <p className="text-xs text-gray-500 mt-1">₹7,20,000 of ₹10,00,000</p>
             </CardContent>
           </Card>
           
@@ -94,16 +144,6 @@ const RegistrarDashboard: React.FC = () => {
             <CardContent>
               <div className="text-2xl font-bold text-green-600">22</div>
               <p className="text-xs text-gray-500 mt-1">₹4,85,000 value</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Budget Alerts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">1</div>
-              <p className="text-xs text-gray-500 mt-1">Approaching limit</p>
             </CardContent>
           </Card>
         </div>
@@ -122,8 +162,8 @@ const RegistrarDashboard: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <h4 className="font-medium text-gray-900">{indent.title}</h4>
-                        <Badge className={getUrgencyColor(indent.urgency)}>
-                          {indent.urgency} Priority
+                        <Badge className={getPriorityColor(indent.priority)}>
+                          {indent.priority.toUpperCase()} Priority
                         </Badge>
                       </div>
                       
@@ -161,16 +201,9 @@ const RegistrarDashboard: React.FC = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleReturnForClarification(indent.id)}
+                        onClick={() => setSelectedIndent(indent)}
                       >
-                        Return for Clarification
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="dpu-button-primary"
-                        onClick={() => handleApprove(indent.id)}
-                      >
-                        Approve
+                        View Details
                       </Button>
                     </div>
                   </div>
@@ -179,49 +212,26 @@ const RegistrarDashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Budget Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Budget Overview</CardTitle>
-            <CardDescription>Department-wise budget allocation and utilization</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">Computer Science</p>
-                  <p className="text-sm text-gray-500">₹1,20,000 / ₹2,00,000</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-semibold text-gray-900">60%</p>
-                  <p className="text-sm text-gray-500">Utilized</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">Biology</p>
-                  <p className="text-sm text-gray-500">₹85,000 / ₹1,50,000</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-semibold text-gray-900">57%</p>
-                  <p className="text-sm text-gray-500">Utilized</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">Administration</p>
-                  <p className="text-sm text-gray-500">₹45,000 / ₹75,000</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-semibold text-yellow-600">60%</p>
-                  <p className="text-sm text-gray-500">Utilized</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      <IndentDetailsModal
+        isOpen={!!selectedIndent}
+        onClose={() => setSelectedIndent(null)}
+        indent={selectedIndent}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        showActions={true}
+      />
+
+      <RejectionRemarksModal
+        isOpen={rejectionModalOpen}
+        onClose={() => {
+          setRejectionModalOpen(false);
+          setIndentToReject(null);
+        }}
+        onConfirm={handleRejectionConfirm}
+        indentId={indentToReject || ''}
+      />
     </DashboardLayout>
   );
 };

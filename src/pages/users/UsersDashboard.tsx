@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -7,10 +6,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import CreateIndentModal from '@/components/modals/CreateIndentModal';
+import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+
+interface IndentDetails {
+  id: string;
+  title: string;
+  status: string;
+  date: string;
+  amount: string;
+  department: string;
+  budgetHead: string;
+  priority: string;
+  justification: string;
+  requestedBy: string;
+  items: any[];
+}
 
 const UsersDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedIndent, setSelectedIndent] = useState<IndentDetails | null>(null);
 
   // Mock data - these would come from an API
   const stats = {
@@ -21,9 +36,78 @@ const UsersDashboard: React.FC = () => {
   };
 
   const recentIndents = [
-    { id: 'IND001', title: 'Laboratory Equipment', status: 'pending_hod', date: '2024-01-15', amount: '₹25,000' },
-    { id: 'IND002', title: 'Office Supplies', status: 'approved', date: '2024-01-10', amount: '₹5,000' },
-    { id: 'IND003', title: 'Computer Hardware', status: 'pending_store', date: '2024-01-08', amount: '₹45,000' }
+    { 
+      id: 'IND001', 
+      title: 'Laboratory Equipment', 
+      status: 'pending_hod', 
+      date: '2024-01-15', 
+      amount: '₹25,000',
+      department: 'Biology',
+      budgetHead: 'Research Equipment',
+      priority: 'high',
+      justification: 'Required for advanced research in cell biology',
+      requestedBy: 'Dr. John Smith',
+      items: [
+        {
+          itemName: 'Microscope',
+          description: 'High-resolution microscope for cell research',
+          quantity: '2',
+          make: 'Olympus',
+          uom: 'Nos',
+          stockInHand: '0',
+          approxValue: '25000',
+          purpose: 'Research'
+        }
+      ]
+    },
+    { 
+      id: 'IND002', 
+      title: 'Office Supplies', 
+      status: 'approved', 
+      date: '2024-01-10', 
+      amount: '₹5,000',
+      department: 'Administration',
+      budgetHead: 'Office Supplies',
+      priority: 'low',
+      justification: 'Regular office supplies replenishment',
+      requestedBy: 'Admin Staff',
+      items: [
+        {
+          itemName: 'Stationery',
+          description: 'Office stationery items',
+          quantity: '1',
+          make: 'Local',
+          uom: 'Lot',
+          stockInHand: '0',
+          approxValue: '5000',
+          purpose: 'Office Use'
+        }
+      ]
+    },
+    { 
+      id: 'IND003', 
+      title: 'Computer Hardware', 
+      status: 'pending_store', 
+      date: '2024-01-08', 
+      amount: '₹45,000',
+      department: 'Computer Science',
+      budgetHead: 'IT Infrastructure',
+      priority: 'medium',
+      justification: 'Upgrading computer lab equipment for new courses',
+      requestedBy: 'Prof. Sarah Wilson',
+      items: [
+        {
+          itemName: 'Desktop Computers',
+          description: 'High-performance workstations',
+          quantity: '5',
+          make: 'Dell',
+          uom: 'Nos',
+          stockInHand: '2',
+          approxValue: '45000',
+          purpose: 'Teaching'
+        }
+      ]
+    }
   ];
 
   const getStatusColor = (status: string) => {
@@ -143,66 +227,15 @@ const UsersDashboard: React.FC = () => {
                       <span>Amount: {indent.amount}</span>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSelectedIndent(indent)}
+                  >
                     View Details
                   </Button>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks and shortcuts</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button 
-                variant="outline" 
-                className="h-16 justify-start"
-                onClick={() => setIsCreateModalOpen(true)}
-              >
-                <div className="text-left">
-                  <div className="font-medium">📝 Create Indent</div>
-                  <div className="text-sm text-gray-500">Start a new procurement request</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="h-16 justify-start"
-                onClick={() => navigate('/users/indents')}
-              >
-                <div className="text-left">
-                  <div className="font-medium">📋 View All Indents</div>
-                  <div className="text-sm text-gray-500">Track your requests</div>
-                </div>
-              </Button>
-
-              <Button 
-                variant="outline" 
-                className="h-16 justify-start"
-                onClick={() => navigate('/users/profile')}
-              >
-                <div className="text-left">
-                  <div className="font-medium">👤 Update Profile</div>
-                  <div className="text-sm text-gray-500">Manage your information</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="h-16 justify-start"
-                disabled
-              >
-                <div className="text-left">
-                  <div className="font-medium">📊 Reports</div>
-                  <div className="text-sm text-gray-500">View procurement analytics</div>
-                </div>
-              </Button>
             </div>
           </CardContent>
         </Card>
@@ -212,6 +245,12 @@ const UsersDashboard: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateIndent}
+      />
+
+      <IndentDetailsModal
+        isOpen={!!selectedIndent}
+        onClose={() => setSelectedIndent(null)}
+        indent={selectedIndent}
       />
     </DashboardLayout>
   );

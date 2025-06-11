@@ -86,7 +86,7 @@ const Profile: React.FC = () => {
         subtitle="Manage your personal information"
       />
       
-      <div className="p-6 max-w-2xl">
+      <div className="p-6">
         <Card>
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>

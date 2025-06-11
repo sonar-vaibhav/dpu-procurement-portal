@@ -67,7 +67,7 @@ const Sidebar: React.FC = () => {
   if (!user) return null;
 
   const sidebarItems = getSidebarItems(user.role);
-  const currentBasePath = `/${user.role.replace('_', '')}`;
+  const currentBasePath = user.role === USER_ROLES.USER_DEPT ? "/users" : `/${user.role.replace('_', '')}`;
 
   const handleNavigation = (item: SidebarItem) => {
     const fullPath = item.path === '' ? currentBasePath : `${currentBasePath}${item.path}`;
@@ -102,7 +102,6 @@ const Sidebar: React.FC = () => {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-            <p className="text-xs text-gray-500 truncate">{ROLE_NAMES[user.role]}</p>
           </div>
         </div>
       </div>
