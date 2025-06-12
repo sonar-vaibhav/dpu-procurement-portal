@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -186,7 +185,11 @@ const VendorQuotes: React.FC = () => {
                             Revise
                           </Button>
                         )}
-                        <Button size="sm" variant="ghost">
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => navigate(`/vendor/quotes/${quote.id}`)}
+                        >
                           View
                         </Button>
                       </div>

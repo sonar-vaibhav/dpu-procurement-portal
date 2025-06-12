@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 interface Vendor {
@@ -22,7 +22,8 @@ interface Vendor {
 
 const OfficerVendors: React.FC = () => {
   const { toast } = useToast();
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const vendors: Vendor[] = [
     {
@@ -60,26 +61,25 @@ const OfficerVendors: React.FC = () => {
     }
   ];
 
-  const categories = ['all', ...Array.from(new Set(vendors.map(v => v.category)))];
-
-  const filteredVendors = selectedCategory === 'all' 
-    ? vendors 
-    : vendors.filter(vendor => vendor.category === selectedCategory);
+  const filteredVendors = vendors.filter(vendor => {
+    const matchesCategory = filterCategory === 'all' || vendor.category === filterCategory;
+    const matchesSearch = searchTerm === '' || 
+      vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vendor.id.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesCategory && matchesSearch;
+  });
 
   const handleSendEmail = (vendor: Vendor) => {
     toast({
       title: "Email Initiated",
       description: `Opening email client to contact ${vendor.name}`,
     });
-    // In a real app, this would open the email client
     window.location.href = `mailto:${vendor.email}?subject=Procurement Inquiry`;
   };
 
-  const getRatingColor = (rating: number) => {
-    if (rating >= 4.5) return 'text-green-600';
-    if (rating >= 4.0) return 'text-blue-600';
-    if (rating >= 3.5) return 'text-yellow-600';
-    return 'text-red-600';
+  const getRatingStars = (rating: number) => {
+    return '⭐'.repeat(Math.floor(rating)) + (rating % 1 ? '⭐' : '');
   };
 
   return (
@@ -92,74 +92,84 @@ const OfficerVendors: React.FC = () => {
       <div className="p-6">
         <Card>
           <CardHeader>
-            <CardTitle>Category-Based Vendors</CardTitle>
-            <CardDescription>Vendors assigned to your procurement category</CardDescription>
-            
-            <div className="flex space-x-2 mt-4">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category === 'all' ? 'All Categories' : category}
-                </Button>
-              ))}
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Category-Based Vendors</CardTitle>
+                <CardDescription>Vendors assigned to your procurement category</CardDescription>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Vendor Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Contact Info</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Rating</TableHead>
-                  <TableHead>Total Orders</TableHead>
-                  <TableHead>On-Time %</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredVendors.map((vendor) => (
-                  <TableRow key={vendor.id}>
-                    <TableCell className="font-medium">{vendor.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{vendor.category}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <div>{vendor.email}</div>
-                        <div className="text-gray-500">{vendor.phone}</div>
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <Input
+                placeholder="Search vendors by name or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="md:max-w-sm"
+              />
+              
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="md:w-48">
+                  <SelectValue placeholder="Filter by Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="Electronics">Electronics</SelectItem>
+                  <SelectItem value="Lab Equipment">Lab Equipment</SelectItem>
+                  <SelectItem value="Furniture">Furniture</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Vendors Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredVendors.map((vendor) => (
+                <Card key={vendor.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg">{vendor.name}</CardTitle>
+                        <p className="text-sm text-gray-500">ID: {vendor.id}</p>
                       </div>
-                    </TableCell>
-                    <TableCell>{vendor.location}</TableCell>
-                    <TableCell>
-                      <span className={`font-medium ${getRatingColor(vendor.rating)}`}>
-                        ⭐ {vendor.rating}
-                      </span>
-                    </TableCell>
-                    <TableCell>{vendor.totalOrders}</TableCell>
-                    <TableCell>
-                      <span className={vendor.onTimeDelivery >= 90 ? 'text-green-600' : 'text-yellow-600'}>
-                        {vendor.onTimeDelivery}%
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleSendEmail(vendor)}
-                      >
-                        Send Email
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </div>
+                    <Badge variant="outline" className="w-fit">
+                      {vendor.category}
+                    </Badge>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Contact Info */}
+                    <div className="space-y-2">
+                      <div className="text-sm text-gray-600">
+                        📍 {vendor.location}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        📞 {vendor.phone}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        ✉️ {vendor.email}
+                      </div>
+                    </div>
+
+                    {/* Performance Metrics */}
+                    <div className="grid grid-cols-1 gap-4 pt-3 border-t">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-blue-600">{vendor.totalOrders}</div>
+                        <div className="text-xs text-gray-500">Total Orders</div>
+                      </div>
+                    </div>
+
+                    
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {filteredVendors.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No vendors found matching your criteria.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

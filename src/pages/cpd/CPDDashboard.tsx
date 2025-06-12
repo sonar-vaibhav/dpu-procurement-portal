@@ -240,46 +240,6 @@ const CPDDashboard: React.FC = () => {
           </Card>
         </div>
 
-        {/* Recent Indents */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Indents</CardTitle>
-            <CardDescription>Latest indent requests requiring attention</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentIndents.map((indent) => (
-                <div key={indent.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium">{indent.title}</h4>
-                      {getPriorityBadge(indent.priority)}
-                    </div>
-                    <div className="text-sm text-gray-600 space-x-2">
-                      <span>{indent.id}</span>
-                      <span>•</span>
-                      <span>{indent.department}</span>
-                      <span>•</span>
-                      <span>{indent.date}</span>
-                      <span>•</span>
-                      <span className="font-medium">{indent.amount}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {getStatusBadge(indent.status)}
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleViewDetails(indent)}
-                    >
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Indent Details Modal */}

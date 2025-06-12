@@ -219,30 +219,24 @@ const CPDVendors: React.FC = () => {
                     </div>
 
                     {/* Performance Metrics */}
-                    <div className="grid grid-cols-2 gap-4 pt-3 border-t">
+                    <div className="grid grid-cols-1 gap-4 pt-3 border-t">
                       <div className="text-center">
                         <div className="text-lg font-semibold text-blue-600">{vendor.totalOrders}</div>
                         <div className="text-xs text-gray-500">Total Orders</div>
                       </div>
-                      <div className="text-center">
-                        <div className={`text-lg font-semibold ${getPerformanceColor(vendor.onTimeDelivery)}`}>
-                          {vendor.onTimeDelivery}%
-                        </div>
-                        <div className="text-xs text-gray-500">On-Time Delivery</div>
-                      </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2">
+                    {/* <div className="flex justify-between items-center pt-2">
                       <div className="text-sm">
                         <span className="font-medium">Rating:</span> {getRatingStars(vendor.rating)} {vendor.rating}
                       </div>
                       <div className="text-sm text-gray-600">
                         {vendor.completedOrders}/{vendor.totalOrders} completed
                       </div>
-                    </div>
+                    </div> */}
 
                     {/* Actions */}
-                    <div className="flex gap-2 pt-3 border-t">
+                    {/* <div className="flex gap-2 pt-3 border-t">
                       <Button 
                         variant="outline" 
                         size="sm" 
@@ -258,7 +252,7 @@ const CPDVendors: React.FC = () => {
                       >
                         Send RFQ
                       </Button>
-                    </div>
+                    </div> */}
                   </CardContent>
                 </Card>
               ))}

@@ -92,28 +92,6 @@ const OfficerDashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Frequently used functions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {quickActions.map((action, index) => (
-                <div key={index} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onClick={action.action}>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-2xl">{action.icon}</span>
-                    <div>
-                      <h3 className="font-medium text-gray-900">{action.title}</h3>
-                      <p className="text-sm text-gray-600">{action.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Recent Indents */}
         <Card>

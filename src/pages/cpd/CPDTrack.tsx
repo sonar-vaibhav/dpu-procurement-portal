@@ -272,15 +272,12 @@ const CPDTrack: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            Track
-                          </Button>
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={() => handleSeeDetails(indent)}
                           >
-                            See Details
+                            Tracking Details
                           </Button>
                         </div>
                       </TableCell>

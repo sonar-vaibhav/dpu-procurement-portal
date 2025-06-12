@@ -1,0 +1,259 @@
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import PageHeader from '@/components/common/PageHeader';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+
+const VendorQuoteDetails: React.FC = () => {
+  const { quoteId } = useParams();
+  const navigate = useNavigate();
+
+  // Mock data - In a real app, this would come from an API
+  const quoteDetails = {
+    id: quoteId,
+    enquiryId: 'ENQ001',
+    title: 'Laboratory Equipment - Microscopes',
+    status: 'rejected',
+    submittedDate: '2024-01-15',
+    lastUpdated: '2024-01-20',
+    
+    // Indent Details
+    indent: {
+      department: 'Biology',
+      quantity: '2 Units',
+      specifications: 'High-resolution microscope for cell research with 1000x magnification',
+      requestedBy: 'Dr. Sarah Johnson',
+      requestDate: '2024-01-10',
+      requiredBy: '2024-01-25'
+    },
+
+    // Quotation Details
+    quotation: {
+      originalPrice: 28000,
+      discountedPrice: 25000,
+      deliveryTime: '15 working days',
+      warranty: '2 years comprehensive warranty with free servicing',
+      termsAndConditions: 'Payment: 50% advance, 50% on delivery. Installation included. Training provided.',
+      paymentTerms: '50% advance, 50% on delivery',
+      specifications: 'Olympus CX23 Binocular Microscope - 1000x magnification, LED illumination, coarse and fine focusing, mechanical stage',
+      validUntil: '2024-01-30'
+    },
+
+    // Status Information
+    statusInfo: {
+      rejectionReason: 'Competitor offered better terms and faster delivery time',
+      acceptanceNotes: null,
+      revisionHistory: [
+        {
+          date: '2024-01-15',
+          type: 'initial',
+          price: 28000,
+          deliveryTime: '15 working days'
+        },
+        {
+          date: '2024-01-18',
+          type: 'revised',
+          price: 25000,
+          deliveryTime: '12 working days'
+        }
+      ]
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'accepted': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'rejected': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <DashboardLayout>
+      <PageHeader
+        title="Quotation Details"
+        subtitle={`View complete details for quotation ${quoteDetails.id}`}
+      />
+      
+      <div className="p-6 space-y-6">
+        {/* Status Overview */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">{quoteDetails.title}</h2>
+                <p className="text-sm text-gray-500">Enquiry ID: {quoteDetails.enquiryId}</p>
+              </div>
+              <Badge className={getStatusColor(quoteDetails.status)}>
+                {quoteDetails.status.toUpperCase()}
+              </Badge>
+            </div>
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500">Submitted:</span>
+                <p className="font-medium">{quoteDetails.submittedDate}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Last Updated:</span>
+                <p className="font-medium">{quoteDetails.lastUpdated}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Valid Until:</span>
+                <p className="font-medium">{quoteDetails.quotation.validUntil}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Delivery Time:</span>
+                <p className="font-medium">{quoteDetails.quotation.deliveryTime}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Indent Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Indent Details</CardTitle>
+              <CardDescription>Original requirements from the department</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm text-gray-500">Department</span>
+                  <p className="font-medium">{quoteDetails.indent.department}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Quantity</span>
+                  <p className="font-medium">{quoteDetails.indent.quantity}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Requested By</span>
+                  <p className="font-medium">{quoteDetails.indent.requestedBy}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Required By</span>
+                  <p className="font-medium">{quoteDetails.indent.requiredBy}</p>
+                </div>
+              </div>
+              <div>
+                <span className="text-sm text-gray-500">Specifications</span>
+                <p className="mt-1">{quoteDetails.indent.specifications}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quotation Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quotation Details</CardTitle>
+              <CardDescription>Your submitted quotation information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm text-gray-500">Original Price</span>
+                  <p className="font-medium line-through text-gray-500">₹{quoteDetails.quotation.originalPrice.toLocaleString()}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Discounted Price</span>
+                  <p className="font-medium text-green-600">₹{quoteDetails.quotation.discountedPrice.toLocaleString()}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Warranty</span>
+                  <p className="font-medium">{quoteDetails.quotation.warranty}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Payment Terms</span>
+                  <p className="font-medium">{quoteDetails.quotation.paymentTerms}</p>
+                </div>
+              </div>
+              <div>
+                <span className="text-sm text-gray-500">Terms & Conditions</span>
+                <p className="mt-1">{quoteDetails.quotation.termsAndConditions}</p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-500">Your Specifications</span>
+                <p className="mt-1">{quoteDetails.quotation.specifications}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Status Information */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Status Information</CardTitle>
+              <CardDescription>Details about the quotation status and history</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {quoteDetails.status === 'rejected' && (
+                <div className="bg-red-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-red-800 mb-2">Rejection Reason</h4>
+                  <p className="text-red-700">{quoteDetails.statusInfo.rejectionReason}</p>
+                </div>
+              )}
+
+              {quoteDetails.status === 'accepted' && quoteDetails.statusInfo.acceptanceNotes && (
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-green-800 mb-2">Acceptance Notes</h4>
+                  <p className="text-green-700">{quoteDetails.statusInfo.acceptanceNotes}</p>
+                </div>
+              )}
+
+              <div>
+                <h4 className="font-medium mb-4">Revision History</h4>
+                <div className="space-y-4">
+                  {quoteDetails.statusInfo.revisionHistory.map((revision, index) => (
+                    <div key={index} className="flex items-start space-x-4">
+                      <div className="w-24 flex-shrink-0">
+                        <p className="text-sm text-gray-500">{revision.date}</p>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline">
+                            {revision.type === 'initial' ? 'Initial Quote' : 'Revised Quote'}
+                          </Badge>
+                        </div>
+                        <div className="mt-2 grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-500">Price:</span>
+                            <p className="font-medium">₹{revision.price.toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Delivery:</span>
+                            <p className="font-medium">{revision.deliveryTime}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/vendor/quotes')}
+          >
+            Back to Quotes
+          </Button>
+          {quoteDetails.status === 'pending' && (
+            <Button 
+              onClick={() => navigate(`/vendor/revise/${quoteDetails.enquiryId}`)}
+            >
+              Revise Quote
+            </Button>
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default VendorQuoteDetails; 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from '@/pages/auth/Login';
@@ -34,6 +33,7 @@ import VendorEnquiries from '@/pages/vendor/VendorEnquiries';
 import VendorRespond from '@/pages/vendor/VendorRespond';
 import VendorRevise from '@/pages/vendor/VendorRevise';
 import VendorQuotes from '@/pages/vendor/VendorQuotes';
+import VendorQuoteDetails from '@/pages/vendor/VendorQuoteDetails';
 import VendorProfile from '@/pages/vendor/VendorProfile';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { USER_ROLES } from '@/constants/roles';
@@ -173,6 +173,7 @@ const App: React.FC = () => {
                 <Route path="respond/:enquiryId" element={<VendorRespond />} />
                 <Route path="revise/:enquiryId" element={<VendorRevise />} />
                 <Route path="quotes" element={<VendorQuotes />} />
+                <Route path="quotes/:quoteId" element={<VendorQuoteDetails />} />
                 <Route path="profile" element={<VendorProfile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

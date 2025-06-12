@@ -60,35 +60,6 @@ const VendorDashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4">
-              <Button 
-                onClick={() => navigate('/vendor/enquiries')}
-                className="dpu-button-primary"
-              >
-                View New Enquiries
-              </Button>
-              <Button 
-                onClick={() => navigate('/vendor/quotes')}
-                variant="outline"
-              >
-                Quote History
-              </Button>
-              <Button 
-                onClick={() => navigate('/vendor/profile')}
-                variant="outline"
-              >
-                Update Profile
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Recent Enquiries */}
         <Card>
           <CardHeader>
