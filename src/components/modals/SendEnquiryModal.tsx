@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { generateEnquiryPDF } from '@/utils/pdfGenerator';
 
 interface SendEnquiryModalProps {
   isOpen: boolean;
@@ -44,8 +45,21 @@ const SendEnquiryModal: React.FC<SendEnquiryModalProps> = ({
       return;
     }
 
-    // In a real app, this would generate and send the enquiry PDF
-    onEnquirySent();
+    // Generate and download PDF
+    try {
+      generateEnquiryPDF(indent, selectedVendors);
+      toast({
+        title: "Enquiry PDF Generated",
+        description: `Enquiry PDF has been downloaded for ${selectedVendors.length} vendor(s)`,
+      });
+      onEnquirySent();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF",
+        variant: "destructive"
+      });
+    }
   };
 
   if (!indent) return null;
@@ -85,6 +99,10 @@ const SendEnquiryModal: React.FC<SendEnquiryModalProps> = ({
               ))}
             </div>
           </div>
+
+          <div className="text-sm text-muted-foreground bg-blue-50 p-3 rounded">
+            💡 A formal enquiry PDF will be generated and downloaded for the selected vendors.
+          </div>
         </div>
 
         <DialogFooter>
@@ -92,7 +110,7 @@ const SendEnquiryModal: React.FC<SendEnquiryModalProps> = ({
             Cancel
           </Button>
           <Button onClick={handleSendEnquiry}>
-            Send Enquiry ({selectedVendors.length} vendors)
+            Generate & Download PDF ({selectedVendors.length} vendors)
           </Button>
         </DialogFooter>
       </DialogContent>

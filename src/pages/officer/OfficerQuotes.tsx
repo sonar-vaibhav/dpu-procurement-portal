@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
@@ -8,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { generatePurchaseOrderPDF } from '@/utils/pdfGenerator';
 
 interface VendorQuote {
   vendorId: string;
@@ -57,7 +57,7 @@ const OfficerQuotes: React.FC = () => {
       deliveryTime: '15 working days',
       warranty: '2 years comprehensive warranty with free servicing',
       termsAndConditions: 'Payment: 50% advance, 50% on delivery. Installation included. Training provided.',
-      paymentTerms: '50% advance, balance on delivery',
+      paymentTerms: '50% advance, 50% on delivery',
       rating: 4.8,
       submittedDate: '2024-01-16',
       validUntil: '2024-01-30'
@@ -99,11 +99,26 @@ const OfficerQuotes: React.FC = () => {
   ];
 
   const handleFinalizeVendor = (vendorId: string, vendorName: string) => {
-    setSelectedVendor(vendorId);
-    toast({
-      title: "Vendor Finalized",
-      description: `${vendorName} has been selected for indent ${indentId}. Purchase order will be generated.`,
-    });
+    const selectedQuote = quotes.find(q => q.vendorId === vendorId);
+    
+    if (selectedQuote) {
+      setSelectedVendor(vendorId);
+      
+      // Generate Purchase Order PDF
+      try {
+        generatePurchaseOrderPDF(indentDetails, selectedQuote);
+        toast({
+          title: "Vendor Finalized & Purchase Order Generated",
+          description: `${vendorName} has been selected. Purchase order PDF has been downloaded.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Vendor Selected",
+          description: `${vendorName} has been selected but failed to generate PDF.`,
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const getBestPrice = () => {
