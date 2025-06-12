@@ -160,42 +160,6 @@ const OfficerDashboard: React.FC = () => {
           })}
         </div>
 
-        {/* Quick Actions */}
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <TrendingUp className="w-5 h-5 text-dpu-red" />
-              Quick Actions
-            </CardTitle>
-            <CardDescription>Access frequently used features</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {quickActions.map((action, index) => {
-                const IconComponent = action.icon;
-                return (
-                  <div key={index} className="group">
-                    <Button
-                      onClick={action.action}
-                      className={`w-full h-auto p-6 ${action.color} text-white hover:scale-105 transition-all duration-200 shadow-lg`}
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="p-2 bg-white/20 rounded-lg">
-                          <IconComponent className="w-6 h-6" />
-                        </div>
-                        <div className="text-left">
-                          <h4 className="font-semibold text-lg">{action.title}</h4>
-                          <p className="text-sm opacity-90">{action.description}</p>
-                        </div>
-                      </div>
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Recent Indents */}
         <Card className="shadow-lg">
           <CardHeader>

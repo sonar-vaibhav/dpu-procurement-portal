@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -45,15 +44,32 @@ const SendEnquiryModal: React.FC<SendEnquiryModalProps> = ({
       return;
     }
 
+    // Format indent data for PDF generation
+    const indentDetails = {
+      id: indent.id,
+      title: indent.title,
+      department: indent.department,
+      quantity: indent.quantity,
+      specifications: `Technical specifications for ${indent.title}:\n\n` +
+        `• Category: ${indent.category}\n` +
+        `• Quantity Required: ${indent.quantity}\n` +
+        `• Department: ${indent.department}\n` +
+        `• Required by: ${indent.deadline}`,
+      requestedBy: 'Department Head',
+      requestDate: new Date().toLocaleDateString('en-IN'),
+      requiredBy: indent.deadline
+    };
+
     // Generate and download PDF
     try {
-      generateEnquiryPDF(indent, selectedVendors);
+      generateEnquiryPDF(indentDetails, selectedVendors);
       toast({
         title: "Enquiry PDF Generated",
         description: `Enquiry PDF has been downloaded for ${selectedVendors.length} vendor(s)`,
       });
       onEnquirySent();
     } catch (error) {
+      console.error('PDF Generation Error:', error);
       toast({
         title: "Error",
         description: "Failed to generate PDF",

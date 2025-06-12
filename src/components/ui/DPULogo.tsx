@@ -34,7 +34,7 @@ const DPULogo: React.FC<DPULogoProps> = ({
   if (variant === 'full') {
     return (
       <div className={`${className} flex items-center space-x-3`}>
-        <div className={`${sizeClasses[size].circle} bg-dpu-red rounded-full flex items-center justify-center shadow-lg`}>
+        <div className={`${sizeClasses[size].circle} bg-dpu-red rounded-full flex items-center justify-center shadow-lg p-4`}>
           <span className={`text-white font-bold font-inter ${sizeClasses[size].font}`}>
             DPU
           </span>
