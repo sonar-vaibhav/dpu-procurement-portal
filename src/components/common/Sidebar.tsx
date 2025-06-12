@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { USER_ROLES, ROLE_NAMES } from '@/constants/roles';
@@ -111,47 +110,44 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="bg-white border-r border-gray-200 h-screen w-64 flex flex-col">
+    <div className="bg-white border-r border-gray-200 h-screen w-64 flex flex-col shadow-lg">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <DPULogo size="md" />
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">Procurement</h1>
-            <p className="text-sm text-gray-500">System</p>
-          </div>
-        </div>
+      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-dpu-red-light to-white">
+        <DPULogo size="md" variant="full" />
       </div>
 
       {/* User Info */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-dpu-red rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-medium">
+          <div className="w-10 h-10 bg-gradient-to-br from-dpu-red to-dpu-red-dark rounded-full flex items-center justify-center shadow-md">
+            <span className="text-white text-sm font-bold">
               {user.name.split(' ').map(n => n[0]).join('')}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+            <p className="text-sm font-semibold text-gray-900 truncate">{user.name}</p>
+            <p className="text-xs text-gray-600 font-medium">{ROLE_NAMES[user.role as keyof typeof ROLE_NAMES]}</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {sidebarItems.map((item) => {
           const IconComponent = item.icon;
           return (
             <button
               key={item.id}
               onClick={() => handleNavigation(item)}
-              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-colors duration-200 ${
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 group ${
                 isActive(item)
-                  ? 'bg-dpu-red text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-dpu-red to-dpu-red-dark text-white shadow-lg transform scale-105'
+                  : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:text-dpu-red hover:shadow-md'
               }`}
             >
-              <IconComponent className="w-5 h-5" />
+              <IconComponent className={`w-5 h-5 transition-colors duration-200 ${
+                isActive(item) ? 'text-white' : 'text-gray-500 group-hover:text-dpu-red'
+              }`} />
               <span className="font-medium">{item.label}</span>
             </button>
           );
@@ -159,14 +155,14 @@ const Sidebar: React.FC = () => {
       </nav>
 
       {/* Logout */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-white">
         <Button
           onClick={logout}
           variant="outline"
-          className="w-full flex items-center justify-center space-x-2"
+          className="w-full flex items-center justify-center space-x-2 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all duration-200"
         >
           <LogOut className="w-4 h-4" />
-          <span>Logout</span>
+          <span className="font-medium">Logout</span>
         </Button>
       </div>
     </div>
