@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -9,12 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
+import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 
 const CPDIndents: React.FC = () => {
   const { toast } = useToast();
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIndent, setSelectedIndent] = useState(null);
+  const [isIndentModalOpen, setIsIndentModalOpen] = useState(false);
 
   const indents = [
     {
@@ -27,7 +29,22 @@ const CPDIndents: React.FC = () => {
       priority: 'high',
       amount: '₹2,50,000',
       dateReceived: '2024-01-15',
-      assignedTo: null
+      assignedTo: null,
+      budgetHead: 'Equipment Purchase',
+      justification: 'Required for advanced research in computer vision and image processing.',
+      requestedBy: 'Dr. John Smith',
+      items: [
+        {
+          itemName: 'Digital Microscope',
+          description: 'High-resolution digital microscope for research',
+          quantity: '2',
+          make: 'Olympus',
+          uom: 'Pieces',
+          stockInHand: '0',
+          approxValue: '125000',
+          purpose: 'Research'
+        }
+      ]
     },
     {
       id: 'IND002',
@@ -39,7 +56,22 @@ const CPDIndents: React.FC = () => {
       priority: 'medium',
       amount: '₹1,80,000',
       dateReceived: '2024-01-14',
-      assignedTo: 'Rajesh Kumar'
+      assignedTo: 'Rajesh Kumar',
+      budgetHead: 'Lab Infrastructure',
+      justification: 'Upgrading computer lab with latest hardware for student projects.',
+      requestedBy: 'Prof. Sarah Johnson',
+      items: [
+        {
+          itemName: 'Desktop Computers',
+          description: 'High-performance desktop computers',
+          quantity: '10',
+          make: 'Dell',
+          uom: 'Pieces',
+          stockInHand: '2',
+          approxValue: '180000',
+          purpose: 'Teaching'
+        }
+      ]
     },
     {
       id: 'IND003',
@@ -51,7 +83,22 @@ const CPDIndents: React.FC = () => {
       priority: 'low',
       amount: '₹25,000',
       dateReceived: '2024-01-13',
-      assignedTo: 'Amit Patel'
+      assignedTo: 'Amit Patel',
+      budgetHead: 'Office Supplies',
+      justification: 'Monthly office stationery requirements for all departments.',
+      requestedBy: 'Admin Office',
+      items: [
+        {
+          itemName: 'Office Supplies',
+          description: 'Various office stationery items',
+          quantity: '1',
+          make: 'Multiple',
+          uom: 'Lot',
+          stockInHand: '0',
+          approxValue: '25000',
+          purpose: 'Administrative'
+        }
+      ]
     },
     {
       id: 'IND004',
@@ -63,7 +110,22 @@ const CPDIndents: React.FC = () => {
       priority: 'medium',
       amount: '₹75,000',
       dateReceived: '2024-01-10',
-      assignedTo: 'Priya Sharma'
+      assignedTo: 'Priya Sharma',
+      budgetHead: 'Research Materials',
+      justification: 'Essential chemicals for ongoing research projects.',
+      requestedBy: 'Dr. Priya Patel',
+      items: [
+        {
+          itemName: 'Chemical Reagents',
+          description: 'Various research grade chemicals',
+          quantity: '1',
+          make: 'Multiple',
+          uom: 'Lot',
+          stockInHand: '0',
+          approxValue: '75000',
+          purpose: 'Research'
+        }
+      ]
     }
   ];
 
@@ -80,6 +142,11 @@ const CPDIndents: React.FC = () => {
       title: "Indent Assigned",
       description: `Indent ${indentId} has been assigned to ${officerName}`,
     });
+  };
+
+  const handleViewDetails = (indent: any) => {
+    setSelectedIndent(indent);
+    setIsIndentModalOpen(true);
   };
 
   const filteredIndents = indents.filter(indent => {
@@ -232,7 +299,11 @@ const CPDIndents: React.FC = () => {
                               </SelectContent>
                             </Select>
                           )}
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewDetails(indent)}
+                          >
                             View
                           </Button>
                         </div>
@@ -251,6 +322,14 @@ const CPDIndents: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Indent Details Modal */}
+      <IndentDetailsModal
+        isOpen={isIndentModalOpen}
+        onClose={() => setIsIndentModalOpen(false)}
+        indent={selectedIndent}
+        userRole="management"
+      />
     </DashboardLayout>
   );
 };

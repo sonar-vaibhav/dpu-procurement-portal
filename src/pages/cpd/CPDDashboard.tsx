@@ -1,242 +1,294 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 
 const CPDDashboard: React.FC = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const [selectedIndent, setSelectedIndent] = useState(null);
+  const [isIndentModalOpen, setIsIndentModalOpen] = useState(false);
 
   const recentIndents = [
     {
       id: 'IND001',
       title: 'Laboratory Equipment - Microscopes',
-      category: 'Laboratory',
-      requester: 'Dr. John Smith - Computer Science',
+      department: 'Computer Science',
       status: 'pending_assignment',
-      priority: 'high'
+      amount: '₹2,50,000',
+      date: '2024-01-15',
+      priority: 'high',
+      budgetHead: 'Equipment Purchase',
+      justification: 'Required for advanced research in computer vision and image processing.',
+      requestedBy: 'Dr. John Smith',
+      items: [
+        {
+          itemName: 'Digital Microscope',
+          description: 'High-resolution digital microscope for research',
+          quantity: '2',
+          make: 'Olympus',
+          uom: 'Pieces',
+          stockInHand: '0',
+          approxValue: '125000',
+          purpose: 'Research'
+        }
+      ]
     },
     {
       id: 'IND002',
       title: 'Computer Lab Hardware',
-      category: 'IT Equipment',
-      requester: 'Prof. Sarah Johnson - Electronics',
+      department: 'Electronics',
       status: 'assigned',
-      priority: 'medium'
+      amount: '₹1,80,000',
+      date: '2024-01-14',
+      priority: 'medium',
+      budgetHead: 'Lab Infrastructure',
+      justification: 'Upgrading computer lab with latest hardware for student projects.',
+      requestedBy: 'Prof. Sarah Johnson',
+      items: [
+        {
+          itemName: 'Desktop Computers',
+          description: 'High-performance desktop computers',
+          quantity: '10',
+          make: 'Dell',
+          uom: 'Pieces',
+          stockInHand: '2',
+          approxValue: '180000',
+          purpose: 'Teaching'
+        }
+      ]
     },
     {
       id: 'IND003',
       title: 'Office Stationery Bulk Order',
-      category: 'Stationery',
-      requester: 'Admin Office',
+      department: 'Administration',
       status: 'in_progress',
-      priority: 'low'
+      amount: '₹25,000',
+      date: '2024-01-13',
+      priority: 'low',
+      budgetHead: 'Office Supplies',
+      justification: 'Monthly office stationery requirements for all departments.',
+      requestedBy: 'Admin Office',
+      items: [
+        {
+          itemName: 'Office Supplies',
+          description: 'Various office stationery items',
+          quantity: '1',
+          make: 'Multiple',
+          uom: 'Lot',
+          stockInHand: '0',
+          approxValue: '25000',
+          purpose: 'Administrative'
+        }
+      ]
     }
   ];
 
-  const purchaseOfficers = [
-    { id: 'PO001', name: 'Rajesh Kumar', activeIndents: 8, category: 'IT Equipment' },
-    { id: 'PO002', name: 'Priya Sharma', activeIndents: 5, category: 'Laboratory' },
-    { id: 'PO003', name: 'Amit Patel', activeIndents: 3, category: 'Stationery' }
+  const monthlyData = [
+    { month: 'Jan', indents: 45, completed: 38 },
+    { month: 'Feb', indents: 52, completed: 41 },
+    { month: 'Mar', indents: 48, completed: 45 },
+    { month: 'Apr', indents: 61, completed: 52 },
+    { month: 'May', indents: 55, completed: 48 },
+    { month: 'Jun', indents: 67, completed: 58 }
   ];
 
-  const handleAssignIndent = (indentId: string) => {
-    toast({
-      title: "Indent Assignment",
-      description: `Opening assignment dialog for ${indentId}`,
-    });
+  const statusData = [
+    { name: 'Completed', value: 45, color: '#10B981' },
+    { name: 'In Progress', value: 23, color: '#3B82F6' },
+    { name: 'Pending', value: 12, color: '#F59E0B' },
+    { name: 'On Hold', value: 8, color: '#EF4444' }
+  ];
+
+  const handleViewDetails = (indent: any) => {
+    setSelectedIndent(indent);
+    setIsIndentModalOpen(true);
   };
 
-  const handleQuickAssign = () => {
-    navigate('/cpd/indents');
+  const getStatusBadge = (status: string) => {
+    const statusColors = {
+      'pending_assignment': 'bg-yellow-100 text-yellow-800',
+      'assigned': 'bg-blue-100 text-blue-800',
+      'in_progress': 'bg-purple-100 text-purple-800',
+      'completed': 'bg-green-100 text-green-800'
+    };
+    
+    return (
+      <Badge className={statusColors[status as keyof typeof statusColors]}>
+        {status.replace('_', ' ').toUpperCase()}
+      </Badge>
+    );
   };
 
-  const handleViewVendors = () => {
-    navigate('/cpd/vendors');
+  const getPriorityBadge = (priority: string) => {
+    const priorityColors = {
+      'high': 'border-red-200 text-red-600',
+      'medium': 'border-yellow-200 text-yellow-600',
+      'low': 'border-green-200 text-green-600'
+    };
+    
+    return (
+      <Badge variant="outline" className={priorityColors[priority as keyof typeof priorityColors]}>
+        {priority.toUpperCase()}
+      </Badge>
+    );
   };
 
   return (
     <DashboardLayout>
       <PageHeader
-        title="CPD Admin Dashboard"
-        subtitle="Central Purchase Department - Manage indents, vendors, and purchase officers"
+        title="CPD Dashboard"
+        subtitle="Central Purchase Department overview and analytics"
       />
       
       <div className="p-6 space-y-6">
-        {/* Summary Cards */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Indents Received</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Indents</CardTitle>
+              <div className="h-4 w-4 text-muted-foreground">📋</div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">24</div>
-              <p className="text-xs text-gray-500 mt-1">+3 from last week</p>
+              <div className="text-2xl font-bold">88</div>
+              <p className="text-xs text-muted-foreground">+12% from last month</p>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Indents Assigned</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Assignment</CardTitle>
+              <div className="h-4 w-4 text-muted-foreground">⏳</div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">16</div>
-              <p className="text-xs text-gray-500 mt-1">8 pending assignment</p>
+              <div className="text-2xl font-bold">12</div>
+              <p className="text-xs text-muted-foreground">Requires immediate attention</p>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Vendors Active</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Vendors</CardTitle>
+              <div className="h-4 w-4 text-muted-foreground">🏢</div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">48</div>
-              <p className="text-xs text-gray-500 mt-1">12 new this month</p>
+              <div className="text-2xl font-bold">24</div>
+              <p className="text-xs text-muted-foreground">+3 new this month</p>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Delivered Orders</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Monthly Budget</CardTitle>
+              <div className="h-4 w-4 text-muted-foreground">💰</div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">32</div>
-              <p className="text-xs text-gray-500 mt-1">This month</p>
+              <div className="text-2xl font-bold">₹45.2L</div>
+              <p className="text-xs text-muted-foreground">68% utilized</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Fast access to common CPD admin tasks</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button 
-                onClick={handleQuickAssign}
-                className="h-16 justify-start dpu-button-primary"
-              >
-                <div className="text-left">
-                  <div className="font-medium">📋 Assign Indents</div>
-                  <div className="text-sm opacity-80">Assign indents to purchase officers</div>
-                </div>
-              </Button>
-              
-              <Button 
-                onClick={handleViewVendors}
-                variant="outline" 
-                className="h-16 justify-start"
-              >
-                <div className="text-left">
-                  <div className="font-medium">🏢 View Vendor Summary</div>
-                  <div className="text-sm text-gray-500">Manage vendor directory and performance</div>
-                </div>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Monthly Indent Statistics</CardTitle>
+              <CardDescription>Indents received vs completed over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="indents" fill="#3B82F6" name="Received" />
+                  <Bar dataKey="completed" fill="#10B981" name="Completed" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Indent Status Distribution</CardTitle>
+              <CardDescription>Current status of all indents</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}`}
+                  >
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Recent Indents */}
         <Card>
           <CardHeader>
             <CardTitle>Recent Indents</CardTitle>
-            <CardDescription>Latest indents received from Registrar</CardDescription>
+            <CardDescription>Latest indent requests requiring attention</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {recentIndents.map((indent) => (
-                <div key={indent.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h4 className="font-medium text-gray-900">{indent.title}</h4>
-                        <Badge className={
-                          indent.status === 'pending_assignment' ? 'bg-yellow-100 text-yellow-800' :
-                          indent.status === 'assigned' ? 'bg-blue-100 text-blue-800' :
-                          'bg-green-100 text-green-800'
-                        }>
-                          {indent.status.replace('_', ' ').toUpperCase()}
-                        </Badge>
-                        <Badge variant="outline" className={
-                          indent.priority === 'high' ? 'border-red-200 text-red-600' :
-                          indent.priority === 'medium' ? 'border-yellow-200 text-yellow-600' :
-                          'border-green-200 text-green-600'
-                        }>
-                          {indent.priority.toUpperCase()}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
-                        <div>
-                          <span className="font-medium">ID:</span> {indent.id}
-                        </div>
-                        <div>
-                          <span className="font-medium">Category:</span> {indent.category}
-                        </div>
-                        <div>
-                          <span className="font-medium">Requester:</span> {indent.requester}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex space-x-2 ml-4">
-                      {indent.status === 'pending_assignment' && (
-                        <Button
-                          size="sm"
-                          className="dpu-button-primary"
-                          onClick={() => handleAssignIndent(indent.id)}
-                        >
-                          Assign
-                        </Button>
-                      )}
-                      <Button size="sm" variant="outline">
-                        View Details
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Purchase Officers Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Purchase Officers Workload</CardTitle>
-            <CardDescription>Current assignment status of purchase officers</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {purchaseOfficers.map((officer) => (
-                <div key={officer.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div key={indent.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{officer.name}</h4>
-                    <div className="flex items-center space-x-4 mt-1 text-sm text-gray-500">
-                      <span>ID: {officer.id}</span>
-                      <span>Specialization: {officer.category}</span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium">{indent.title}</h4>
+                      {getPriorityBadge(indent.priority)}
+                    </div>
+                    <div className="text-sm text-gray-600 space-x-2">
+                      <span>{indent.id}</span>
+                      <span>•</span>
+                      <span>{indent.department}</span>
+                      <span>•</span>
+                      <span>{indent.date}</span>
+                      <span>•</span>
+                      <span className="font-medium">{indent.amount}</span>
                     </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-blue-600">{officer.activeIndents}</div>
-                    <div className="text-xs text-gray-500">Active Indents</div>
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(indent.status)}
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewDetails(indent)}
+                    >
+                      View Details
+                    </Button>
                   </div>
-                  <Button variant="outline" size="sm" className="ml-4">
-                    View Details
-                  </Button>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Indent Details Modal */}
+      <IndentDetailsModal
+        isOpen={isIndentModalOpen}
+        onClose={() => setIsIndentModalOpen(false)}
+        indent={selectedIndent}
+        userRole="management"
+      />
     </DashboardLayout>
   );
 };

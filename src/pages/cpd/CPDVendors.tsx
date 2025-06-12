@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -8,13 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import RegisterVendorModal from '@/components/modals/RegisterVendorModal';
 
 const CPDVendors: React.FC = () => {
   const { toast } = useToast();
   const [filterCategory, setFilterCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-
-  const vendors = [
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [vendors, setVendors] = useState([
     {
       id: 'V001',
       name: 'Scientific Equipment Ltd',
@@ -93,7 +93,11 @@ const CPDVendors: React.FC = () => {
       rating: 4.1,
       status: 'active'
     }
-  ];
+  ]);
+
+  const handleVendorRegistered = (newVendor: any) => {
+    setVendors(prev => [...prev, newVendor]);
+  };
 
   const filteredVendors = vendors.filter(vendor => {
     const matchesCategory = filterCategory === 'all' || vendor.category === filterCategory;
@@ -152,7 +156,10 @@ const CPDVendors: React.FC = () => {
                 <CardTitle>Registered Vendors</CardTitle>
                 <CardDescription>View and manage all registered vendors</CardDescription>
               </div>
-              <Button className="dpu-button-primary">
+              <Button 
+                className="dpu-button-primary"
+                onClick={() => setIsRegisterModalOpen(true)}
+              >
                 Register New Vendor
               </Button>
             </div>
@@ -265,6 +272,13 @@ const CPDVendors: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Register Vendor Modal */}
+      <RegisterVendorModal
+        isOpen={isRegisterModalOpen}
+        onClose={() => setIsRegisterModalOpen(false)}
+        onVendorRegistered={handleVendorRegistered}
+      />
     </DashboardLayout>
   );
 };

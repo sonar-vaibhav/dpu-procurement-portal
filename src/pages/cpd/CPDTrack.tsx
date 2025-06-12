@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -8,10 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import IndentTrackerModal from '@/components/modals/IndentTrackerModal';
 
 const CPDTrack: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIndent, setSelectedIndent] = useState(null);
+  const [isTrackerModalOpen, setIsTrackerModalOpen] = useState(false);
 
   const finalizedIndents = [
     {
@@ -26,7 +28,8 @@ const CPDTrack: React.FC = () => {
       expectedDelivery: '2024-01-20',
       actualDelivery: '2024-01-18',
       purchaseOfficer: 'Priya Sharma',
-      trackingId: 'TRK001'
+      trackingId: 'TRK001',
+      managementApproved: true
     },
     {
       id: 'IND002',
@@ -40,7 +43,8 @@ const CPDTrack: React.FC = () => {
       expectedDelivery: '2024-01-22',
       actualDelivery: null,
       purchaseOfficer: 'Rajesh Kumar',
-      trackingId: 'TRK002'
+      trackingId: 'TRK002',
+      managementApproved: true
     },
     {
       id: 'IND003',
@@ -54,7 +58,8 @@ const CPDTrack: React.FC = () => {
       expectedDelivery: '2024-01-24',
       actualDelivery: null,
       purchaseOfficer: 'Amit Patel',
-      trackingId: 'TRK003'
+      trackingId: 'TRK003',
+      managementApproved: true
     },
     {
       id: 'IND004',
@@ -68,7 +73,9 @@ const CPDTrack: React.FC = () => {
       expectedDelivery: '2024-01-18',
       actualDelivery: null,
       purchaseOfficer: 'Priya Sharma',
-      trackingId: 'TRK004'
+      trackingId: 'TRK004',
+      managementApproved: true,
+      revisedDeliveryDate: '2024-01-25'
     },
     {
       id: 'IND005',
@@ -76,15 +83,21 @@ const CPDTrack: React.FC = () => {
       assignedVendor: 'Furniture Craftsmen',
       vendorContact: '+91 9876543215',
       amount: '₹1,20,000',
-      deliveryStatus: 'delivered',
+      deliveryStatus: 'partially_delivered',
       finalizedBy: 'Ms. Gupta - Management',
       dateFinalized: '2024-01-05',
       expectedDelivery: '2024-01-15',
       actualDelivery: '2024-01-14',
       purchaseOfficer: 'Sunita Verma',
-      trackingId: 'TRK005'
+      trackingId: 'TRK005',
+      managementApproved: true
     }
   ];
+
+  const handleSeeDetails = (indent: any) => {
+    setSelectedIndent(indent);
+    setIsTrackerModalOpen(true);
+  };
 
   const filteredIndents = finalizedIndents.filter(indent => {
     const matchesStatus = filterStatus === 'all' || indent.deliveryStatus === filterStatus;
@@ -102,7 +115,8 @@ const CPDTrack: React.FC = () => {
       'delivered': 'bg-green-100 text-green-800',
       'in_transit': 'bg-blue-100 text-blue-800',
       'processing': 'bg-yellow-100 text-yellow-800',
-      'delayed': 'bg-red-100 text-red-800'
+      'delayed': 'bg-red-100 text-red-800',
+      'partially_delivered': 'bg-orange-100 text-orange-800'
     };
     
     return (
@@ -153,7 +167,7 @@ const CPDTrack: React.FC = () => {
           </CardHeader>
           <CardContent>
             {/* Summary Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
               <div className="bg-green-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
                   {finalizedIndents.filter(i => i.deliveryStatus === 'delivered').length}
@@ -178,6 +192,12 @@ const CPDTrack: React.FC = () => {
                 </div>
                 <div className="text-sm text-red-700">Delayed</div>
               </div>
+              <div className="bg-orange-50 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-orange-600">
+                  {finalizedIndents.filter(i => i.deliveryStatus === 'partially_delivered').length}
+                </div>
+                <div className="text-sm text-orange-700">Partial</div>
+              </div>
             </div>
 
             {/* Filters */}
@@ -199,6 +219,7 @@ const CPDTrack: React.FC = () => {
                   <SelectItem value="in_transit">In Transit</SelectItem>
                   <SelectItem value="processing">Processing</SelectItem>
                   <SelectItem value="delayed">Delayed</SelectItem>
+                  <SelectItem value="partially_delivered">Partially Delivered</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -254,8 +275,12 @@ const CPDTrack: React.FC = () => {
                           <Button variant="outline" size="sm">
                             Track
                           </Button>
-                          <Button variant="outline" size="sm">
-                            Details
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleSeeDetails(indent)}
+                          >
+                            See Details
                           </Button>
                         </div>
                       </TableCell>
@@ -273,6 +298,13 @@ const CPDTrack: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Indent Tracker Modal */}
+      <IndentTrackerModal
+        isOpen={isTrackerModalOpen}
+        onClose={() => setIsTrackerModalOpen(false)}
+        indent={selectedIndent}
+      />
     </DashboardLayout>
   );
 };
