@@ -7,10 +7,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import ComparisonChartReport from '@/components/ComparisonChartReport';
 
 interface AssignedIndent {
   id: string;
@@ -29,6 +30,7 @@ const OfficerIndents: React.FC = () => {
   const { toast } = useToast();
   const [selectedIndent, setSelectedIndent] = useState<AssignedIndent | null>(null);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [showComparisonChart, setShowComparisonChart] = useState(false);
 
   const [enquiryForm, setEnquiryForm] = useState({
     enquiryNumber: '',
@@ -224,7 +226,7 @@ const OfficerIndents: React.FC = () => {
                           <Button size="sm" onClick={() => handleSendEnquiry(indent)}>Send Enquiry</Button>
                         )}
                         {indent.status === 'quotation_received' && (
-                          <Button size="sm" variant="outline" onClick={() => window.location.href = `/officer/quotes/${indent.id}`}>Compare Quotes</Button>
+                          <Button size="sm" variant="outline" onClick={() => setShowComparisonChart(true)}>Compare Quotes</Button>
                         )}
                       </div>
                     </TableCell>
@@ -235,6 +237,22 @@ const OfficerIndents: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Comparison Chart Modal */}
+      <Dialog open={showComparisonChart} onOpenChange={setShowComparisonChart}>
+        <DialogContent className="w-screen max-w-none h-screen max-h-none p-0">
+          <DialogHeader>
+            <DialogTitle>Compare Quotes</DialogTitle>
+            <DialogDescription className="sr-only">Comparison chart and work order details</DialogDescription>
+          </DialogHeader>
+          <div className="overflow-x-auto h-full">
+            <ComparisonChartReport />
+          </div>
+          <div className="flex justify-end mt-4 p-4">
+            <Button className='' variant="outline" onClick={() => setShowComparisonChart(false)}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showEnquiryModal} onOpenChange={setShowEnquiryModal}>
         <DialogContent className="max-w-3xl">

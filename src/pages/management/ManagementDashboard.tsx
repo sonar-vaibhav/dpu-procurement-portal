@@ -1,4 +1,3 @@
-
 import React from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -10,6 +9,8 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Eye, FileText, ListChecks } from 'lucide-react';
+import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+import PurchaseOrderPage from '@/components/PurchaseOrder';
 
 // Dummy data for Indents and POs grouped by college
 const indentData = [
@@ -53,6 +54,33 @@ const getSummary = (data) => {
   });
   return { approved, pending, approvedAmt, pendingAmt };
 };
+
+// Helper to map dashboard indent to IndentDetailsModal shape
+const mapToIndentDetails = (item: any) => ({
+  id: item.id,
+  title: item.title,
+  status: (item.status || '').toLowerCase().replace(' ', '_') || 'pending_management',
+  date: item.date || '2024-07-08',
+  amount: `₹${item.amount?.toLocaleString?.() ?? item.amount}`,
+  department: item.college || 'N/A',
+  budgetHead: item.budgetHead || 'General',
+  priority: item.priority || 'Medium',
+  justification: item.justification || 'N/A',
+  requestedBy: item.requestedBy || 'N/A',
+  items: item.items || [
+    {
+      itemName: item.title,
+      description: 'N/A',
+      quantity: '1',
+      make: 'N/A',
+      uom: 'pcs',
+      stockInHand: '0',
+      approxValue: `${item.amount}`,
+      purpose: 'N/A',
+    }
+  ],
+  approvalTrail: item.approvalTrail || ['User', 'HOD', 'Store', 'Registrar', 'Principal', 'Management'],
+});
 
 const ManagementDashboard: React.FC = () => {
   const { toast } = useToast();
@@ -126,7 +154,7 @@ const ManagementDashboard: React.FC = () => {
         title="Management Dashboard"
         subtitle="Final procurement approvals and institutional oversight"
       />
-      <div className="p-6 min-h-screen bg-gray-50 space-y-10 rounded-xl shadow-inner">
+      <div className="p-6 min-h-screen bg-gray-50 space-y-10 rounded-xl shadow-inner text-base md:text-lg">
         <Tabs defaultValue="indents">
           <TabsList className="mb-6">
             <TabsTrigger value="indents"><ListChecks className="w-4 h-4 mr-2" />Indents</TabsTrigger>
@@ -141,24 +169,44 @@ const ManagementDashboard: React.FC = () => {
               </div>
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><ListChecks className="w-5 h-5 text-green-600 mb-1" /><CardTitle className="text-xs">Total Approved Indents</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-green-700">{indentSummary.approved}</div></CardContent>
+                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <ListChecks className="w-8 h-8 text-green-600 mb-2" />
+                    <div className="text-2xl font-extrabold text-green-700 mb-1">{indentSummary.approved}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Approved Indents</CardTitle>
+                  </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><ListChecks className="w-5 h-5 text-yellow-600 mb-1" /><CardTitle className="text-xs">Total Pending Indents</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-yellow-700">{indentSummary.pending}</div></CardContent>
+                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <ListChecks className="w-8 h-8 text-yellow-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-yellow-700 mb-1">{indentSummary.pending}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Pending Indents</CardTitle>
+                  </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><FileText className="w-5 h-5 text-green-600 mb-1" /><CardTitle className="text-xs">Total Approved Amount</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-green-700">₹{indentSummary.approvedAmt.toLocaleString()}</div></CardContent>
+                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <FileText className="w-8 h-8 text-green-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-green-700 mb-1">₹{indentSummary.approvedAmt.toLocaleString()}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Approved Amount</CardTitle>
+                  </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><FileText className="w-5 h-5 text-yellow-600 mb-1" /><CardTitle className="text-xs">Total Pending Amount</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-yellow-700">₹{indentSummary.pendingAmt.toLocaleString()}</div></CardContent>
-                </Card>
-                <Card className="flex flex-col items-center justify-center bg-blue-50 border-blue-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><FileText className="w-5 h-5 text-blue-600 mb-1" /><CardTitle className="text-xs">Total Amount</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-blue-700">₹{(indentSummary.approvedAmt+indentSummary.pendingAmt).toLocaleString()}</div></CardContent>
-                </Card>
-              </div>
+                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <FileText className="w-8 h-8 text-yellow-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-yellow-700 mb-1">₹{indentSummary.pendingAmt.toLocaleString()}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Pending Amount</CardTitle>
+            </CardHeader>
+          </Card>
+                <Card className="flex flex-col items-center justify-center bg-blue-50 border-blue-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <FileText className="w-8 h-8 text-blue-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-blue-700 mb-1">₹{(indentSummary.approvedAmt+indentSummary.pendingAmt).toLocaleString()}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Amount</CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
               {/* Grouped List */}
-              <div className="space-y-6">
+            <div className="space-y-6">
                 {indentData.map(group => (
                   <div key={group.college} className="border rounded-lg p-4 bg-white/90 shadow-sm">
                     <h3 className="font-semibold text-gray-800 mb-2">{group.college}</h3>
@@ -178,21 +226,21 @@ const ManagementDashboard: React.FC = () => {
                             <td><input type="checkbox" checked={selectedIndents.includes(item.id)} onChange={() => handleIndentSelect(item.id)} /></td>
                             <td>{item.title} <span className="text-xs text-gray-400">({item.id})</span></td>
                             <td>₹{item.amount.toLocaleString()}</td>
-                            <td><Badge variant={item.status === 'Approved' ? 'success' : item.status === 'Pending' ? 'outline' : 'secondary'} className={item.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{item.status}</Badge></td>
-                            <td><Button size="icon" variant="ghost" onClick={() => setOpenIndent(item)} title="Preview"><Eye className="w-5 h-5" /></Button></td>
+                            <td><Badge variant={item.status === 'Approved' ? 'secondary' : item.status === 'Pending' ? 'outline' : 'secondary'} className={item.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{item.status}</Badge></td>
+                            <td><Button size="icon" variant="ghost" onClick={() => setOpenIndent(mapToIndentDetails(item))} title="Preview"><Eye className="w-5 h-5" /></Button></td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
-                  </div>
+                      </div>
                 ))}
-              </div>
+                        </div>
               {/* Bulk Approve & Live Total */}
               {selectedIndents.length > 0 && (
                 <div className="flex items-center justify-end mt-4 space-x-4">
                   <div className="text-sm font-medium">Selected Amount: <span className="text-blue-700 font-bold">₹{getSelectedAmount(indentData, selectedIndents).toLocaleString()}</span></div>
                   <Button className="dpu-button-primary" onClick={handleBulkIndentApprove}>Approve Selected</Button>
-                </div>
+                        </div>
               )}
             </section>
           </TabsContent>
@@ -202,25 +250,45 @@ const ManagementDashboard: React.FC = () => {
               <div className="flex items-center mb-4">
                 <FileText className="w-6 h-6 text-blue-600 mr-2" />
                 <h2 className="text-2xl font-bold text-gray-800">Purchase Orders (POs)</h2>
-              </div>
+                        </div>
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><FileText className="w-5 h-5 text-green-600 mb-1" /><CardTitle className="text-xs">Total Approved POs</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-green-700">{poSummary.approved}</div></CardContent>
+                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <FileText className="w-8 h-8 text-green-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-green-700 mb-1">{poSummary.approved}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Approved POs</CardTitle>
+                  </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><FileText className="w-5 h-5 text-yellow-600 mb-1" /><CardTitle className="text-xs">Total Pending POs</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-yellow-700">{poSummary.pending}</div></CardContent>
+                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <FileText className="w-8 h-8 text-yellow-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-yellow-700 mb-1">{poSummary.pending}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Pending POs</CardTitle>
+                  </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><FileText className="w-5 h-5 text-green-600 mb-1" /><CardTitle className="text-xs">Total Approved Amount</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-green-700">₹{poSummary.approvedAmt.toLocaleString()}</div></CardContent>
+                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <FileText className="w-8 h-8 text-green-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-green-700 mb-1">₹{poSummary.approvedAmt.toLocaleString()}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Approved Amount</CardTitle>
+                  </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><FileText className="w-5 h-5 text-yellow-600 mb-1" /><CardTitle className="text-xs">Total Pending Amount</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-yellow-700">₹{poSummary.pendingAmt.toLocaleString()}</div></CardContent>
+                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <FileText className="w-8 h-8 text-yellow-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-yellow-700 mb-1">₹{poSummary.pendingAmt.toLocaleString()}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Pending Amount</CardTitle>
+                  </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-blue-50 border-blue-200">
-                  <CardHeader className="pb-2 flex flex-col items-center"><FileText className="w-5 h-5 text-blue-600 mb-1" /><CardTitle className="text-xs">Total Amount</CardTitle></CardHeader><CardContent><div className="text-lg font-bold text-blue-700">₹{(poSummary.approvedAmt+poSummary.pendingAmt).toLocaleString()}</div></CardContent>
+                <Card className="flex flex-col items-center justify-center bg-blue-50 border-blue-200 py-6">
+                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
+                    <FileText className="w-8 h-8 text-blue-600 mb-2" />
+                    <div className="text-3xl font-extrabold text-blue-700 mb-1">₹{(poSummary.approvedAmt+poSummary.pendingAmt).toLocaleString()}</div>
+                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Amount</CardTitle>
+                  </CardHeader>
                 </Card>
-              </div>
+                        </div>
               {/* Grouped List */}
               <div className="space-y-6">
                 {poData.map(group => (
@@ -242,7 +310,7 @@ const ManagementDashboard: React.FC = () => {
                             <td><input type="checkbox" checked={selectedPOs.includes(item.id)} onChange={() => handlePOSelect(item.id)} /></td>
                             <td>{item.title} <span className="text-xs text-gray-400">({item.id})</span></td>
                             <td>₹{item.amount.toLocaleString()}</td>
-                            <td><Badge variant={item.status === 'Approved' ? 'success' : item.status === 'Pending' ? 'outline' : 'secondary'} className={item.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{item.status}</Badge></td>
+                            <td><Badge variant={item.status === 'Approved' ? 'secondary' : item.status === 'Pending' ? 'outline' : 'secondary'} className={item.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{item.status}</Badge></td>
                             <td><Button size="icon" variant="ghost" onClick={() => setOpenPO(item)} title="Preview"><Eye className="w-5 h-5" /></Button></td>
                           </tr>
                         ))}
@@ -263,74 +331,50 @@ const ManagementDashboard: React.FC = () => {
         </Tabs>
 
         {/* Indent Detail Modal */}
-        <Dialog open={!!openIndent} onOpenChange={v => !v && setOpenIndent(null)}>
-          <DialogContent className="max-w-xl">
-            {openIndent && (
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-lg">Indent Details</CardTitle>
-                  <CardDescription>ID: {openIndent.id}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-2"><span className="font-medium">Title:</span> {openIndent.title}</div>
-                  <div className="mb-2"><span className="font-medium">College:</span> {openIndent.college}</div>
-                  <div className="mb-2"><span className="font-medium">Requested Amount:</span> <span className="text-blue-700 font-semibold">₹{openIndent.amount.toLocaleString()}</span></div>
-                  <div className="mb-2"><span className="font-medium">Status:</span> <Badge variant={openIndent.status === 'Approved' ? 'success' : openIndent.status === 'Pending' ? 'outline' : 'secondary'} className={openIndent.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{openIndent.status}</Badge></div>
-                  {/* Approval Trail Example */}
-                  <div className="mt-4">
-                    <div className="font-medium mb-1 text-gray-700">Approval Trail:</div>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className="bg-gray-200 text-gray-700">User ✓</Badge>
-                      <Badge className="bg-gray-200 text-gray-700">HOD ✓</Badge>
-                      <Badge className="bg-gray-200 text-gray-700">Store ✓</Badge>
-                      <Badge className="bg-gray-200 text-gray-700">Registrar ✓</Badge>
-                      <Badge className="bg-gray-200 text-gray-700">Principal ✓</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="justify-end">
-                  <Button variant="outline" onClick={() => setOpenIndent(null)}>Close</Button>
-                </CardFooter>
-              </Card>
-            )}
-          </DialogContent>
-        </Dialog>
+        <IndentDetailsModal
+          isOpen={!!openIndent}
+          onClose={() => setOpenIndent(null)}
+          indent={openIndent}
+          userRole="management"
+        />
 
         {/* PO Detail Modal */}
         <Dialog open={!!openPO} onOpenChange={v => !v && setOpenPO(null)}>
           <DialogContent className="max-w-xl">
             {openPO && (
               <Card className="shadow-lg">
-                <CardHeader>
+            <CardHeader>
                   <CardTitle className="text-lg">Purchase Order Details</CardTitle>
                   <CardDescription>ID: {openPO.id}</CardDescription>
-                </CardHeader>
-                <CardContent>
+            </CardHeader>
+            <CardContent>
                   <div className="mb-2"><span className="font-medium">Title:</span> {openPO.title}</div>
                   <div className="mb-2"><span className="font-medium">College:</span> {openPO.college}</div>
                   <div className="mb-2"><span className="font-medium">Requested Amount:</span> <span className="text-blue-700 font-semibold">₹{openPO.amount.toLocaleString()}</span></div>
-                  <div className="mb-2"><span className="font-medium">Status:</span> <Badge variant={openPO.status === 'Approved' ? 'success' : openPO.status === 'Pending' ? 'outline' : 'secondary'} className={openPO.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{openPO.status}</Badge></div>
+                  <div className="mb-2"><span className="font-medium">Status:</span> <Badge variant={openPO.status === 'Approved' ? 'secondary' : openPO.status === 'Pending' ? 'outline' : 'secondary'} className={openPO.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{openPO.status}</Badge></div>
                   <div className="flex gap-2 mt-4">
                     <Button variant="outline" onClick={() => setOpenVendorChart(true)}><FileText className="w-4 h-4 mr-1" />Vendor Comparison Chart</Button>
                     <Button variant="outline" onClick={() => setOpenPODoc(true)}><FileText className="w-4 h-4 mr-1" />Final PO Document</Button>
-                  </div>
-                </CardContent>
+              </div>
+            </CardContent>
                 <CardFooter className="justify-end">
                   <Button variant="outline" onClick={() => setOpenPO(null)}>Close</Button>
                 </CardFooter>
-              </Card>
+          </Card>
             )}
           </DialogContent>
         </Dialog>
 
         {/* Vendor Comparison Chart Modal */}
         <Dialog open={openVendorChart} onOpenChange={setOpenVendorChart}>
-          <DialogContent>
+          <DialogContent className="max-w-5xl">
             <DialogHeader>
               <DialogTitle>Vendor Comparison Chart</DialogTitle>
               <DialogDescription>Preview of the vendor comparison chart for this PO.</DialogDescription>
             </DialogHeader>
-            <div className="py-4 text-center text-gray-500">[Vendor Comparison Chart Preview Here]</div>
+            <div className="max-h-[80vh] overflow-y-auto text-center text-gray-500 py-8">
+              [Vendor Comparison Chart Preview Here]
+            </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpenVendorChart(false)}>Close</Button>
             </DialogFooter>
@@ -339,12 +383,14 @@ const ManagementDashboard: React.FC = () => {
 
         {/* Final PO Document Modal */}
         <Dialog open={openPODoc} onOpenChange={setOpenPODoc}>
-          <DialogContent>
+          <DialogContent className="max-w-5xl">
             <DialogHeader>
               <DialogTitle>Final Purchase Order Document</DialogTitle>
               <DialogDescription>Preview of the final PO document for this order.</DialogDescription>
             </DialogHeader>
-            <div className="py-4 text-center text-gray-500">[Final PO Document Preview Here]</div>
+            <div className="max-h-[80vh] overflow-y-auto">
+              <PurchaseOrderPage />
+            </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpenPODoc(false)}>Close</Button>
             </DialogFooter>
