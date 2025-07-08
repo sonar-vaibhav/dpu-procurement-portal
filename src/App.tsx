@@ -38,6 +38,14 @@ import VendorProfile from '@/pages/vendor/VendorProfile';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts/AuthContext';
+import AccountDashboard from '@/pages/account/AccountDashboard';
+import AccountProfile from '@/pages/account/AccountProfile';
+import AccountIndents from '@/pages/account/AccountIndents';
+import PrincipalDashboard from '@/pages/principal/PrincipalDashboard';
+import PrincipalProfile from '@/pages/principal/PrincipalProfile';
+import PrincipalIndents from '@/pages/principal/PrincipalIndents';
+
+
 
 const App: React.FC = () => {
   const { user } = useAuth();
@@ -162,6 +170,35 @@ const App: React.FC = () => {
           }
         />
 
+        {/* Account Routes */}
+        <Route
+          path="/account/*"
+          element={
+            <ProtectedRoute allowedRoles={[USER_ROLES.ACCOUNT]}>
+              <Routes>
+                <Route index element={<AccountDashboard />} />
+                <Route path="profile" element={<AccountProfile />} />
+                <Route path="indents" element={<AccountIndents />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/principal/*"
+          element={
+            <ProtectedRoute allowedRoles={[USER_ROLES.PRINCIPAL]}>
+              <Routes>
+                <Route index element={<PrincipalDashboard />} />
+                <Route path="profile" element={<PrincipalProfile />} />
+                <Route path="indents" element={<PrincipalIndents/>} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ProtectedRoute>
+          }
+        />
+
         {/* Vendor Routes */}
         <Route
           path="/vendor/*"
@@ -181,7 +218,7 @@ const App: React.FC = () => {
           }
         />
 
-        {/* 404 Not Found Route */}
+        {/* 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

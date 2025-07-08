@@ -9,6 +9,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import CreateIndentModal from '@/components/modals/CreateIndentModal';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 
+interface IndentItem {
+  itemName: string;
+  specification?: string;
+  description: string;
+  quantity: string;
+  make: string;
+  uom: string;
+  stockInHand: string;
+  approxValue: string;
+  purpose: string;
+  similarItemPurchased?: string;
+  vendorQuotationUrl?: string;
+}
+
 interface IndentDetails {
   id: string;
   title: string;
@@ -20,7 +34,7 @@ interface IndentDetails {
   priority: string;
   justification: string;
   requestedBy: string;
-  items: any[];
+  items: IndentItem[];
 }
 
 const Indents: React.FC = () => {
@@ -30,22 +44,23 @@ const Indents: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
 
-  const indents = [
-    { 
-      id: 'IND001', 
-      title: 'Laboratory Equipment', 
-      status: 'pending_hod', 
-      date: '2024-01-15', 
+  const indents: IndentDetails[] = [
+    {
+      id: 'IND001',
+      title: 'Microscope Purchase',
+      status: 'pending_hod',
+      date: '2024-06-01',
       amount: '₹25,000',
       department: 'Biology',
-      budgetHead: 'Research Equipment',
+      budgetHead: 'Lab Equipment',
       priority: 'high',
-      justification: 'Required for advanced research in cell biology',
+      justification: 'For advanced cell studies',
       requestedBy: 'Dr. John Smith',
       items: [
         {
           itemName: 'Microscope',
-          description: 'High-resolution microscope for cell research',
+          specification: '40x Optical Zoom',
+          description: 'High-resolution microscope',
           quantity: '2',
           make: 'Olympus',
           uom: 'Nos',
@@ -55,84 +70,110 @@ const Indents: React.FC = () => {
         }
       ]
     },
-    { 
-      id: 'IND002', 
-      title: 'Office Supplies', 
-      status: 'approved', 
-      date: '2024-01-10', 
-      amount: '₹5,000',
-      department: 'Administration',
-      budgetHead: 'Office Supplies',
-      priority: 'low',
-      justification: 'Regular office supplies replenishment',
-      requestedBy: 'Admin Staff',
+    {
+      id: 'IND002',
+      title: 'Projector for Seminar Hall',
+      status: 'pending_principal',
+      date: '2024-06-05',
+      amount: '₹40,000',
+      department: 'IT',
+      budgetHead: 'Teaching Aids',
+      priority: 'medium',
+      justification: 'Need projector for seminar',
+      requestedBy: 'Prof. Sharma',
       items: [
         {
-          itemName: 'Stationery',
-          description: 'Office stationery items',
+          itemName: 'Epson Projector',
+          specification: 'Full HD, HDMI, 4000 Lumens',
+          description: 'For presentations',
           quantity: '1',
-          make: 'Local',
-          uom: 'Lot',
+          make: 'Epson',
+          uom: 'Nos',
           stockInHand: '0',
-          approxValue: '5000',
-          purpose: 'Office Use'
+          approxValue: '40000',
+          purpose: 'Seminar'
         }
       ]
     },
-    { 
-      id: 'IND003', 
-      title: 'Computer Hardware', 
-      status: 'pending_store', 
-      date: '2024-01-08', 
+    {
+      id: 'IND003',
+      title: 'Computer Hardware',
+      status: 'rejected_principal',
+      date: '2024-06-10',
       amount: '₹45,000',
       department: 'Computer Science',
       budgetHead: 'IT Infrastructure',
       priority: 'medium',
-      justification: 'Upgrading computer lab equipment for new courses',
+      justification: 'Upgrade lab',
       requestedBy: 'Prof. Sarah Wilson',
       items: [
         {
-          itemName: 'Desktop Computers',
-          description: 'High-performance workstations',
-          quantity: '5',
+          itemName: 'Desktop PC',
+          description: 'High-performance workstation',
+          quantity: '3',
           make: 'Dell',
           uom: 'Nos',
-          stockInHand: '2',
+          stockInHand: '1',
           approxValue: '45000',
           purpose: 'Teaching'
+        }
+      ]
+    },
+    {
+      id: 'IND004',
+      title: 'Whiteboard Markers',
+      status: 'approved',
+      date: '2024-06-02',
+      amount: '₹2,000',
+      department: 'Admin',
+      budgetHead: 'Office Supplies',
+      priority: 'low',
+      justification: 'Monthly stationery',
+      requestedBy: 'Admin Dept',
+      items: [
+        {
+          itemName: 'Markers',
+          description: 'Pack of 12',
+          quantity: '10',
+          make: 'Camlin',
+          uom: 'Box',
+          stockInHand: '2',
+          approxValue: '2000',
+          purpose: 'Office use'
         }
       ]
     }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending_hod': return 'bg-yellow-100 text-yellow-800';
-      case 'pending_store': return 'bg-blue-100 text-blue-800';
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const getStatusText = (status: string) => {
     switch (status) {
       case 'pending_hod': return 'Pending HOD';
+      case 'pending_principal': return 'Pending Principal';
       case 'pending_store': return 'Pending Store';
+      case 'rejected_hod': return 'Rejected by HOD';
+      case 'rejected_principal': return 'Rejected by Principal';
+      case 'rejected_store': return 'Rejected by Store';
       case 'approved': return 'Approved';
-      case 'rejected': return 'Rejected';
       default: return status;
     }
   };
 
-  const handleCreateIndent = (data: any) => {
-    console.log('Creating indent:', data);
-    // Handle indent creation logic here
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending_hod': return 'bg-yellow-100 text-yellow-800';
+      case 'pending_principal': return 'bg-orange-100 text-orange-800';
+      case 'pending_store': return 'bg-blue-100 text-blue-800';
+      case 'rejected_hod':
+      case 'rejected_principal':
+      case 'rejected_store':
+        return 'bg-red-100 text-red-800';
+      case 'approved': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   const filteredIndents = indents.filter(indent => {
-    const matchesSearch = indent.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         indent.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = indent.title.toLowerCase().includes(searchTerm.toLowerCase()) || indent.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || indent.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || indent.priority === priorityFilter;
     return matchesSearch && matchesStatus && matchesPriority;
@@ -144,20 +185,17 @@ const Indents: React.FC = () => {
         title="My Indents"
         subtitle="Track and manage your procurement requests"
         action={
-          <Button 
-            className="bg-dpu-red hover:bg-dpu-red-dark text-white"
-            onClick={() => setIsCreateModalOpen(true)}
-          >
+          <Button onClick={() => setIsCreateModalOpen(true)} className="bg-dpu-red text-white hover:bg-dpu-red-dark">
             Create New Indent
           </Button>
         }
       />
-      
+
       <div className="p-6 space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>My Indents</CardTitle>
-            <CardDescription>View and track all your procurement requests</CardDescription>
+            <CardDescription>View and manage your procurement requests</CardDescription>
           </CardHeader>
           <CardContent>
             {/* Filters */}
@@ -174,9 +212,12 @@ const Indents: React.FC = () => {
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="pending_hod">Pending HOD</SelectItem>
+                  <SelectItem value="pending_principal">Pending Principal</SelectItem>
                   <SelectItem value="pending_store">Pending Store</SelectItem>
+                  <SelectItem value="rejected_hod">Rejected by HOD</SelectItem>
+                  <SelectItem value="rejected_principal">Rejected by Principal</SelectItem>
+                  <SelectItem value="rejected_store">Rejected by Store</SelectItem>
                   <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
@@ -192,6 +233,7 @@ const Indents: React.FC = () => {
               </Select>
             </div>
 
+            {/* Indent Cards */}
             <div className="space-y-4">
               {filteredIndents.map((indent) => (
                 <div key={indent.id} className="border border-gray-200 rounded-lg p-4">
@@ -203,25 +245,15 @@ const Indents: React.FC = () => {
                           {getStatusText(indent.status)}
                         </Badge>
                       </div>
-                      
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
-                        <div>
-                          <span className="font-medium">ID:</span> {indent.id}
-                        </div>
-                        <div>
-                          <span className="font-medium">Amount:</span> {indent.amount}
-                        </div>
-                        <div>
-                          <span className="font-medium">Date:</span> {indent.date}
-                        </div>
-                        <div>
-                          <span className="font-medium">Priority:</span> {indent.priority}
-                        </div>
+                        <div><strong>ID:</strong> {indent.id}</div>
+                        <div><strong>Amount:</strong> {indent.amount}</div>
+                        <div><strong>Date:</strong> {indent.date}</div>
+                        <div><strong>Priority:</strong> {indent.priority}</div>
                       </div>
                     </div>
-                    
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => setSelectedIndent(indent)}
                     >
@@ -238,7 +270,7 @@ const Indents: React.FC = () => {
       <CreateIndentModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateIndent}
+        onSubmit={(data) => console.log('Indent Created:', data)}
       />
 
       <IndentDetailsModal

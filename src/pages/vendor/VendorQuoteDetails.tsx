@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -6,12 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea'; // 🆕 For remarks input
 
 const VendorQuoteDetails: React.FC = () => {
   const { quoteId } = useParams();
   const navigate = useNavigate();
 
-  // Mock data - In a real app, this would come from an API
+  // Mock data with vendorRemarks included
   const quoteDetails = {
     id: quoteId,
     enquiryId: 'ENQ001',
@@ -19,8 +20,7 @@ const VendorQuoteDetails: React.FC = () => {
     status: 'rejected',
     submittedDate: '2024-01-15',
     lastUpdated: '2024-01-20',
-    
-    // Indent Details
+
     indent: {
       department: 'Biology',
       quantity: '2 Units',
@@ -30,7 +30,6 @@ const VendorQuoteDetails: React.FC = () => {
       requiredBy: '2024-01-25'
     },
 
-    // Quotation Details
     quotation: {
       originalPrice: 28000,
       discountedPrice: 25000,
@@ -39,10 +38,10 @@ const VendorQuoteDetails: React.FC = () => {
       termsAndConditions: 'Payment: 50% advance, 50% on delivery. Installation included. Training provided.',
       paymentTerms: '50% advance, 50% on delivery',
       specifications: 'Olympus CX23 Binocular Microscope - 1000x magnification, LED illumination, coarse and fine focusing, mechanical stage',
-      validUntil: '2024-01-30'
+      validUntil: '2024-01-30',
+      vendorRemarks: 'Please ensure the product is stored in dry conditions and installed by certified personnel.'
     },
 
-    // Status Information
     statusInfo: {
       rejectionReason: 'Competitor offered better terms and faster delivery time',
       acceptanceNotes: null,
@@ -72,13 +71,16 @@ const VendorQuoteDetails: React.FC = () => {
     }
   };
 
+  // Optional: Local state to allow editing (simulated)
+  const [remarks, setRemarks] = useState(quoteDetails.quotation.vendorRemarks || '');
+
   return (
     <DashboardLayout>
       <PageHeader
         title="Quotation Details"
         subtitle={`View complete details for quotation ${quoteDetails.id}`}
       />
-      
+
       <div className="p-6 space-y-6">
         {/* Status Overview */}
         <Card>
@@ -171,18 +173,32 @@ const VendorQuoteDetails: React.FC = () => {
                   <p className="font-medium">{quoteDetails.quotation.paymentTerms}</p>
                 </div>
               </div>
+
               <div>
                 <span className="text-sm text-gray-500">Terms & Conditions</span>
                 <p className="mt-1">{quoteDetails.quotation.termsAndConditions}</p>
               </div>
+
               <div>
                 <span className="text-sm text-gray-500">Your Specifications</span>
                 <p className="mt-1">{quoteDetails.quotation.specifications}</p>
               </div>
+
+              {/* ✅ Vendor Remarks Section */}
+              <div>
+                <span className="text-sm text-gray-500">Vendor Remarks</span>
+                <Textarea
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  placeholder="Add any notes about product handling, delivery, etc."
+                  className="mt-1"
+                  disabled // remove this if you want to allow editing
+                />
+              </div>
             </CardContent>
           </Card>
 
-          {/* Status Information */}
+          {/* Status Info */}
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Status Information</CardTitle>
@@ -237,16 +253,11 @@ const VendorQuoteDetails: React.FC = () => {
         </div>
 
         <div className="flex justify-end space-x-4">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/vendor/quotes')}
-          >
+          <Button variant="outline" onClick={() => navigate('/vendor/quotes')}>
             Back to Quotes
           </Button>
           {quoteDetails.status === 'pending' && (
-            <Button 
-              onClick={() => navigate(`/vendor/revise/${quoteDetails.enquiryId}`)}
-            >
+            <Button onClick={() => navigate(`/vendor/revise/${quoteDetails.enquiryId}`)}>
               Revise Quote
             </Button>
           )}
@@ -256,4 +267,4 @@ const VendorQuoteDetails: React.FC = () => {
   );
 };
 
-export default VendorQuoteDetails; 
+export default VendorQuoteDetails;

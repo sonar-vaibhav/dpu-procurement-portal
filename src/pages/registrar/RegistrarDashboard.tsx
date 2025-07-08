@@ -29,7 +29,7 @@ const RegistrarDashboard: React.FC = () => {
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [indentToReject, setIndentToReject] = useState<string | null>(null);
 
-  const pendingApprovals = [
+  const [pendingApprovals, setPendingApprovals] = useState<IndentDetails[]>([
     {
       id: 'IND001',
       title: 'Laboratory Equipment - Microscopes',
@@ -51,9 +51,9 @@ const RegistrarDashboard: React.FC = () => {
           uom: 'Nos',
           stockInHand: '0',
           approxValue: '25000',
-          purpose: 'Research'
-        }
-      ]
+          purpose: 'Research',
+        },
+      ],
     },
     {
       id: 'IND003',
@@ -76,13 +76,17 @@ const RegistrarDashboard: React.FC = () => {
           uom: 'Nos',
           stockInHand: '2',
           approxValue: '45000',
-          purpose: 'Teaching'
-        }
-      ]
-    }
-  ];
+          purpose: 'Teaching',
+        },
+      ],
+    },
+  ]);
+
+  const [approvedCount, setApprovedCount] = useState(22); // Initial count
 
   const handleApprove = (indentId: string) => {
+    setPendingApprovals((prev) => prev.filter((indent) => indent.id !== indentId));
+    setApprovedCount((prev) => prev + 1);
     toast({
       title: "Indent Approved",
       description: `Indent ${indentId} has been approved and forwarded to CPD for vendor process`,
@@ -97,6 +101,7 @@ const RegistrarDashboard: React.FC = () => {
 
   const handleRejectionConfirm = (remarks: string) => {
     if (indentToReject) {
+      setPendingApprovals((prev) => prev.filter((i) => i.id !== indentToReject));
       toast({
         title: "Indent Rejected",
         description: `Indent ${indentToReject} has been rejected with remarks: ${remarks}`,
@@ -142,7 +147,7 @@ const RegistrarDashboard: React.FC = () => {
               <CardTitle className="text-sm font-medium text-gray-600">Approved This Month</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">22</div>
+              <div className="text-2xl font-bold text-green-600">{approvedCount}</div>
               <p className="text-xs text-gray-500 mt-1">₹4,85,000 value</p>
             </CardContent>
           </Card>
@@ -152,7 +157,9 @@ const RegistrarDashboard: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>Pending Institute Approvals</CardTitle>
-            <CardDescription>Indents verified by Store Department awaiting your approval</CardDescription>
+            <CardDescription>
+              Indents verified by Store Department awaiting your approval
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -209,6 +216,9 @@ const RegistrarDashboard: React.FC = () => {
                   </div>
                 </div>
               ))}
+              {pendingApprovals.length === 0 && (
+                <p className="text-sm text-gray-500">No pending approvals.</p>
+              )}
             </div>
           </CardContent>
         </Card>

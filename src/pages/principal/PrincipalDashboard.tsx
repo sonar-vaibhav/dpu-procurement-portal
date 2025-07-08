@@ -13,17 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 
-interface IndentItem {
-  itemName: string;
-  description: string;
-  quantity: string;
-  make: string;
-  uom: string;
-  stockInHand: string;
-  approxValue: string;
-  purpose: string;
-}
-
 interface IndentDetails {
   id: string;
   title: string;
@@ -35,14 +24,14 @@ interface IndentDetails {
   priority: string;
   justification: string;
   requestedBy: string;
-  items: IndentItem[];
+  items: any[];
 }
 
-const HODDashboard: React.FC = () => {
+const PrincipalDashboard: React.FC = () => {
   const { toast } = useToast();
   const [selectedIndent, setSelectedIndent] = useState<IndentDetails | null>(null);
 
-  const pendingApprovals: IndentDetails[] = [
+  const [pendingApprovals, setPendingApprovals] = useState<IndentDetails[]>([
     {
       id: 'IND001',
       title: 'Laboratory Equipment - Microscopes',
@@ -51,7 +40,7 @@ const HODDashboard: React.FC = () => {
       amount: '₹25,000',
       date: '2024-01-15',
       priority: 'high',
-      status: 'pending_hod',
+      status: 'pending_principal',
       budgetHead: 'Research Equipment',
       justification: 'Required for advanced research in cell biology',
       items: [
@@ -75,7 +64,7 @@ const HODDashboard: React.FC = () => {
       amount: '₹45,000',
       date: '2024-01-14',
       priority: 'medium',
-      status: 'pending_hod',
+      status: 'pending_principal',
       budgetHead: 'IT Infrastructure',
       justification: 'Upgrading computer lab equipment for new courses',
       items: [
@@ -91,19 +80,26 @@ const HODDashboard: React.FC = () => {
         },
       ],
     },
-  ];
+  ]);
 
-  const handleApprove = (indentId: string, updatedItems: IndentItem[]) => {
-    console.log('Approved Items:', updatedItems);
+  const [approvedCount, setApprovedCount] = useState(15); // Start from 15
+
+  const handleApprove = (indentId: string) => {
+    setPendingApprovals((prev) =>
+      prev.filter((indent) => indent.id !== indentId)
+    );
+    setApprovedCount((prev) => prev + 1);
     toast({
       title: 'Indent Approved',
-      description: `Indent ${indentId} has been approved and forwarded to Store Department`,
+      description: `Indent ${indentId} has been approved and forwarded to CPD`,
     });
     setSelectedIndent(null);
   };
 
-  const handleReject = (indentId: string, updatedItems: IndentItem[]) => {
-    console.log('Rejected Items:', updatedItems);
+  const handleReject = (indentId: string) => {
+    setPendingApprovals((prev) =>
+      prev.filter((indent) => indent.id !== indentId)
+    );
     toast({
       title: 'Indent Rejected',
       description: `Indent ${indentId} has been rejected`,
@@ -128,12 +124,12 @@ const HODDashboard: React.FC = () => {
   return (
     <DashboardLayout>
       <PageHeader
-        title="HOD Dashboard"
+        title="PRINCIPAL Dashboard"
         subtitle="Review and approve department procurement requests"
       />
 
       <div className="p-6 space-y-6">
-        {/* Stats Cards */}
+        {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader className="pb-2">
@@ -142,7 +138,9 @@ const HODDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">18</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {approvedCount + pendingApprovals.length}
+              </div>
             </CardContent>
           </Card>
 
@@ -167,15 +165,15 @@ const HODDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">15</div>
-              <p className="text-xs text-gray-500 mt-1">
-                Approx ₹2,45,000 value
-              </p>
+              <div className="text-2xl font-bold text-green-600">
+                {approvedCount}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Approx ₹2,45,000 value</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Pending Approvals List */}
+        {/* Pending Approvals */}
         <Card>
           <CardHeader>
             <CardTitle>Pending Approvals</CardTitle>
@@ -219,9 +217,7 @@ const HODDashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      <p className="text-sm text-gray-500">
-                        Date: {indent.date}
-                      </p>
+                      <p className="text-sm text-gray-500">Date: {indent.date}</p>
                     </div>
 
                     <div className="flex space-x-2 ml-4">
@@ -236,22 +232,25 @@ const HODDashboard: React.FC = () => {
                   </div>
                 </div>
               ))}
+              {pendingApprovals.length === 0 && (
+                <p className="text-sm text-gray-500">No pending requests.</p>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Editable Modal */}
+      {/* Modal */}
       <IndentDetailsModal
         isOpen={!!selectedIndent}
         onClose={() => setSelectedIndent(null)}
         indent={selectedIndent}
         onApprove={handleApprove}
         onReject={handleReject}
-        userRole="hod"
+        userRole="principal"
       />
     </DashboardLayout>
   );
 };
 
-export default HODDashboard;
+export default PrincipalDashboard;

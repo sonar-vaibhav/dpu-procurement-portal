@@ -20,16 +20,16 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 
-const HODProfile: React.FC = () => {
+const PrincipalProfile: React.FC = () => {
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
-    name: 'Dr. Smith Johnson',
-    email: 'hod@dpu.edu.in',
+    name: 'Dr. Anita Sharma',
+    email: 'principal@dpu.edu.in',
     contact: '+91 9876543210',
-    designation: 'Head of Department',
+    designation: 'Principal',
     college: 'DPU College of Engineering',
-    department: 'Computer Science',
+    department: 'Administration',
   });
 
   const handleSave = () => {
@@ -51,7 +51,6 @@ const HODProfile: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Full Name */}
               <div>
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -63,7 +62,6 @@ const HODProfile: React.FC = () => {
                 />
               </div>
 
-              {/* Email */}
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -76,7 +74,6 @@ const HODProfile: React.FC = () => {
                 />
               </div>
 
-              {/* Contact */}
               <div>
                 <Label htmlFor="contact">Contact Number</Label>
                 <Input
@@ -88,7 +85,6 @@ const HODProfile: React.FC = () => {
                 />
               </div>
 
-              {/* Designation */}
               <div>
                 <Label htmlFor="designation">Designation</Label>
                 <Select
@@ -101,16 +97,13 @@ const HODProfile: React.FC = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Head of Department">
-                      Head of Department
-                    </SelectItem>
-                    <SelectItem value="Associate HOD">Associate HOD</SelectItem>
-                    <SelectItem value="Acting HOD">Acting HOD</SelectItem>
+                    <SelectItem value="Principal">Principal</SelectItem>
+                    <SelectItem value="Vice Principal">Vice Principal</SelectItem>
+                    <SelectItem value="Dean">Dean</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* College */}
               <div>
                 <Label htmlFor="college">College</Label>
                 <Select
@@ -136,7 +129,6 @@ const HODProfile: React.FC = () => {
                 </Select>
               </div>
 
-              {/* Department */}
               <div>
                 <Label htmlFor="department">Department</Label>
                 <Select
@@ -149,11 +141,10 @@ const HODProfile: React.FC = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Computer Science">Computer Science</SelectItem>
-                    <SelectItem value="Biology">Biology</SelectItem>
-                    <SelectItem value="Chemistry">Chemistry</SelectItem>
-                    <SelectItem value="Physics">Physics</SelectItem>
-                    <SelectItem value="Mathematics">Mathematics</SelectItem>
+                    <SelectItem value="Administration">Administration</SelectItem>
+                    <SelectItem value="Academics">Academics</SelectItem>
+                    <SelectItem value="Research">Research</SelectItem>
+                    <SelectItem value="Development">Development</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -171,4 +162,4 @@ const HODProfile: React.FC = () => {
   );
 };
 
-export default HODProfile;
+export default PrincipalProfile;

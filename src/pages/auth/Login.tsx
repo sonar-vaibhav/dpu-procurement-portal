@@ -111,12 +111,19 @@ const Login: React.FC = () => {
             <div className="mt-6 p-4 bg-gray-50 rounded-md">
               <p className="text-sm text-gray-600 mb-2">Demo Credentials:</p>
               <div className="text-xs space-y-1 text-gray-500">
+
                 <p>• teacher@dpu.edu.in (User Dept)</p>
                 <p>• hod@dpu.edu.in (HOD)</p>
                 <p>• store@dpu.edu.in (Store)</p>
                 <p>• registrar@dpu.edu.in (Registrar)</p>
                 <p>• cpd@dpu.edu.in (CPD)</p>
                 <p>• management@dpu.edu.in (Management)</p>
+                <p>• principal@dpu.edu.in (Principal)</p>
+                <p>• vendor@techcorp.com (Vendor)</p>
+                <p>• officer@dpu.edu.in (CPD Officer)</p>
+                <p>• account@dpu.edu.in (Account Officer)</p>
+                
+                
                 <p className="mt-2 font-medium">Password: dpu123</p>
               </div>
             </div>

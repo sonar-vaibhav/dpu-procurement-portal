@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserRole, ROLE_ROUTES } from '@/constants/roles';
+import { UserRole } from '@/constants/roles';
 
 interface User {
   id: string;
@@ -18,7 +18,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock users for demonstration
+
 const MOCK_USERS: User[] = [
   { id: '1', name: 'John Teacher', email: 'teacher@dpu.edu.in', role: 'user_dept', department: 'Computer Science' },
   { id: '2', name: 'Dr. Smith', email: 'hod@dpu.edu.in', role: 'hod', department: 'Computer Science' },
@@ -27,7 +27,9 @@ const MOCK_USERS: User[] = [
   { id: '5', name: 'CPD Officer', email: 'cpd@dpu.edu.in', role: 'cpd' },
   { id: '6', name: 'Purchase Officer', email: 'officer@dpu.edu.in', role: 'officer', department: 'Electronics & Lab Equipment' },
   { id: '7', name: 'Management Head', email: 'management@dpu.edu.in', role: 'management' },
-  { id: '8', name: 'TechCorp Solutions', email: 'vendor@techcorp.com', role: 'vendor', department: 'Electronics' }
+  { id: '8', name: 'TechCorp Solutions', email: 'vendor@techcorp.com', role: 'vendor', department: 'Electronics' },
+  { id: '9', name: 'Principal', email: 'principal@dpu.edu.in', role: 'principal' },
+  { id: '10', name: 'Account Officer', email: 'account@dpu.edu.in', role: 'account' }
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -35,14 +37,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user session
     const storedUser = localStorage.getItem('dpu_user');
     if (storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error('Error parsing stored user:', error);
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
+      } catch (err) {
+        console.error("Failed to parse stored user:", err);
         localStorage.removeItem('dpu_user');
       }
     }
@@ -51,22 +52,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
-    
     try {
-      // Mock authentication
       const foundUser = MOCK_USERS.find(u => u.email === email);
-      
       if (foundUser && password === 'dpu123') {
         setUser(foundUser);
         localStorage.setItem('dpu_user', JSON.stringify(foundUser));
         setIsLoading(false);
         return true;
       }
-      
       setIsLoading(false);
       return false;
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (err) {
+      console.error("Login failed:", err);
       setIsLoading(false);
       return false;
     }
@@ -77,25 +74,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('dpu_user');
   };
 
-  const value = {
-    user,
-    login,
-    logout,
-    isLoading
-  };
+  const value = { user, login, logout, isLoading };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
 

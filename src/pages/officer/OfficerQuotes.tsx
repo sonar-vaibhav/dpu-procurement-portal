@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -31,7 +31,7 @@ const OfficerQuotes: React.FC = () => {
   const { indentId } = useParams<{ indentId: string }>();
   const { toast } = useToast();
   const [selectedVendor, setSelectedVendor] = useState<string | null>(null);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [activeDetails, setActiveDetails] = useState<string | null>(null);
 
   const indentDetails = {
     id: indentId,
@@ -41,7 +41,7 @@ const OfficerQuotes: React.FC = () => {
     specifications: 'High-resolution microscope for cell research with 1000x magnification',
     requestedBy: 'Dr. Sarah Johnson',
     requestDate: '2024-01-10',
-    requiredBy: '2024-01-25'
+    requiredBy: '2024-01-25',
   };
 
   const quotes: VendorQuote[] = [
@@ -51,12 +51,12 @@ const OfficerQuotes: React.FC = () => {
       contactPerson: 'John Smith',
       email: 'john@labequipmentpro.com',
       phone: '+91-9876543210',
-      specifications: 'Olympus CX23 Binocular Microscope - 1000x magnification, LED illumination, coarse and fine focusing, mechanical stage',
+      specifications: 'Olympus CX23 Binocular Microscope',
       originalPrice: 28000,
       discountedPrice: 25000,
-      deliveryTime: '15 working days',
-      warranty: '2 years comprehensive warranty with free servicing',
-      termsAndConditions: 'Payment: 50% advance, 50% on delivery. Installation included. Training provided.',
+      deliveryTime: '15',
+      warranty: '2 years warranty',
+      termsAndConditions: '50% advance, 50% on delivery. Installation included.',
       paymentTerms: '50% advance, 50% on delivery',
       rating: 4.8,
       submittedDate: '2024-01-16',
@@ -68,12 +68,12 @@ const OfficerQuotes: React.FC = () => {
       contactPerson: 'Dr. Priya Sharma',
       email: 'priya@sciinstruments.com',
       phone: '+91-9876543211',
-      specifications: 'Nikon Eclipse E100 Binocular Microscope - 1000x magnification, Halogen lamp, fine focusing, fixed stage',
+      specifications: 'Nikon Eclipse E100 Binocular Microscope',
       originalPrice: 30000,
       discountedPrice: 27000,
-      deliveryTime: '20 working days',
-      warranty: '1 year warranty + 6 months extended service',
-      termsAndConditions: 'Payment: 30% advance, 70% on delivery. Installation charges extra ₹2000.',
+      deliveryTime: '20',
+      warranty: '1.5 years warranty',
+      termsAndConditions: '30% advance, 70% on delivery.',
       paymentTerms: '30% advance, 70% on delivery',
       rating: 4.5,
       submittedDate: '2024-01-17',
@@ -85,12 +85,12 @@ const OfficerQuotes: React.FC = () => {
       contactPerson: 'Rajesh Kumar',
       email: 'rajesh@biotechsol.com',
       phone: '+91-9876543212',
-      specifications: 'Leica DM300 Binocular Microscope - 1000x magnification, LED illumination, ergonomic design, premium optics',
+      specifications: 'Leica DM300 Binocular Microscope',
       originalPrice: 26000,
       discountedPrice: 24000,
-      deliveryTime: '12 working days',
-      warranty: '18 months warranty with on-site support',
-      termsAndConditions: 'Payment: 40% advance, 60% on delivery. Free installation and 2 days training.',
+      deliveryTime: '12',
+      warranty: '18 months warranty',
+      termsAndConditions: '40% advance, 60% on delivery.',
       paymentTerms: '40% advance, 60% on delivery',
       rating: 4.3,
       submittedDate: '2024-01-15',
@@ -100,50 +100,26 @@ const OfficerQuotes: React.FC = () => {
 
   const handleFinalizeVendor = (vendorId: string, vendorName: string) => {
     const selectedQuote = quotes.find(q => q.vendorId === vendorId);
-    
     if (selectedQuote) {
       setSelectedVendor(vendorId);
-      
-      // Generate Purchase Order PDF
       try {
         generatePurchaseOrderPDF(indentDetails, selectedQuote);
         toast({
-          title: "Vendor Finalized & Purchase Order Generated",
-          description: `${vendorName} has been selected. Purchase order PDF has been downloaded.`,
+          title: 'Vendor Finalized & Purchase Order Generated',
+          description: `${vendorName} has been selected. Purchase order PDF downloaded.`,
         });
-      } catch (error) {
+      } catch {
         toast({
-          title: "Vendor Selected",
-          description: `${vendorName} has been selected but failed to generate PDF.`,
-          variant: "destructive"
+          title: 'Vendor Selected',
+          description: `${vendorName} selected, but PDF generation failed.`,
+          variant: 'destructive',
         });
       }
     }
   };
 
-  const getBestPrice = () => {
-    return Math.min(...quotes.map(q => q.discountedPrice));
-  };
-
-  const getBestDelivery = () => {
-    const deliveryDays = quotes.map(q => parseInt(q.deliveryTime));
-    return Math.min(...deliveryDays);
-  };
-
-  const getMaxDiscount = () => {
-    const discounts = quotes.map(q => ((q.originalPrice - q.discountedPrice) / q.originalPrice) * 100);
-    return Math.max(...discounts);
-  };
-
-  const toggleRowExpansion = (vendorId: string) => {
-    const newExpanded = new Set(expandedRows);
-    if (newExpanded.has(vendorId)) {
-      newExpanded.delete(vendorId);
-    } else {
-      newExpanded.add(vendorId);
-    }
-    setExpandedRows(newExpanded);
-  };
+  const getBestPrice = () => Math.min(...quotes.map(q => q.discountedPrice));
+  const getBestDelivery = () => Math.min(...quotes.map(q => parseInt(q.deliveryTime)));
 
   return (
     <DashboardLayout>
@@ -151,246 +127,121 @@ const OfficerQuotes: React.FC = () => {
         title={`Vendor Quotation Comparison - ${indentDetails.title}`}
         subtitle={`Compare and select the best vendor for ${indentDetails.department} department`}
       />
-      
       <div className="p-6 space-y-6">
-        {/* Indent Details */}
         <Card>
-          <CardHeader>
-            <CardTitle>Indent Details</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Indent Details</CardTitle></CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <div>
-                <span className="font-medium text-muted-foreground">Indent ID:</span>
-                <p className="text-sm">{indentDetails.id}</p>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Department:</span>
-                <p className="text-sm">{indentDetails.department}</p>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Quantity:</span>
-                <p className="text-sm">{indentDetails.quantity}</p>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Requested By:</span>
-                <p className="text-sm">{indentDetails.requestedBy}</p>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Request Date:</span>
-                <p className="text-sm">{indentDetails.requestDate}</p>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Required By:</span>
-                <p className="text-sm">{indentDetails.requiredBy}</p>
-              </div>
-              <div className="col-span-2">
-                <span className="font-medium text-muted-foreground">Specifications:</span>
-                <p className="text-sm">{indentDetails.specifications}</p>
-              </div>
+              {Object.entries(indentDetails).map(([key, value]) => (
+                <div key={key}>
+                  <span className="font-medium text-muted-foreground">{key.replace(/([A-Z])/g, ' $1')}:</span>
+                  <p className="text-sm">{value}</p>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Comparison Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-green-600">Best Price</h3>
-                <p className="text-2xl font-bold">₹{getBestPrice().toLocaleString()}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-blue-600">Fastest Delivery</h3>
-                <p className="text-2xl font-bold">{getBestDelivery()} days</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-purple-600">Max Discount</h3>
-                <p className="text-2xl font-bold">{getMaxDiscount().toFixed(1)}%</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Vendor Quotations Comparison Table */}
-        <Card>
+        <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>Vendor Quotations Comparison</CardTitle>
-            <CardDescription>
-              Compare all vendor quotations and select the best option ({quotes.length} quotations received)
-            </CardDescription>
+            <CardTitle>Vendor Quotations (Vertical View)</CardTitle>
+            <CardDescription>Scroll horizontally if more than 3 vendors.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Vendor Details</TableHead>
-                    <TableHead>Original Price</TableHead>
-                    <TableHead>Discounted Price</TableHead>
-                    <TableHead>Discount %</TableHead>
-                    <TableHead>Delivery Time</TableHead>
-                    <TableHead>Warranty</TableHead>
-                    <TableHead>Rating</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {quotes.map((quote) => (
-                    <React.Fragment key={quote.vendorId}>
-                      <TableRow 
-                        className={`${selectedVendor === quote.vendorId ? 'bg-green-50 border-green-200' : ''} cursor-pointer hover:bg-muted/50`}
-                        onClick={() => toggleRowExpansion(quote.vendorId)}
-                      >
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{quote.vendorName}</p>
-                            <p className="text-sm text-muted-foreground">{quote.contactPerson}</p>
-                            <p className="text-xs text-muted-foreground">{quote.email}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="line-through text-muted-foreground">
-                            ₹{quote.originalPrice.toLocaleString()}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <span className={`font-medium ${quote.discountedPrice === getBestPrice() ? 'text-green-600' : ''}`}>
-                              ₹{quote.discountedPrice.toLocaleString()}
-                            </span>
-                            {quote.discountedPrice === getBestPrice() && (
-                              <Badge className="bg-green-100 text-green-800 text-xs">Best Price</Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="text-sm font-medium text-orange-600">
-                            {(((quote.originalPrice - quote.discountedPrice) / quote.originalPrice) * 100).toFixed(1)}%
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <span className={parseInt(quote.deliveryTime) === getBestDelivery() ? 'text-blue-600 font-medium' : ''}>
-                              {quote.deliveryTime}
-                            </span>
-                            {parseInt(quote.deliveryTime) === getBestDelivery() && (
-                              <Badge className="bg-blue-100 text-blue-800 text-xs">Fastest</Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="text-sm">{quote.warranty}</span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <span className="text-yellow-500">⭐</span>
-                            <span className="text-sm font-medium">{quote.rating}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleRowExpansion(quote.vendorId);
-                              }}
-                            >
-                              {expandedRows.has(quote.vendorId) ? 'Hide' : 'View'} Details
-                            </Button>
-                            <Button
-                              size="sm"
-                              disabled={selectedVendor !== null}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFinalizeVendor(quote.vendorId, quote.vendorName);
-                              }}
-                              className={selectedVendor === quote.vendorId ? 'bg-green-600 hover:bg-green-700' : ''}
-                            >
-                              {selectedVendor === quote.vendorId ? 'Selected' : 'Select'}
-                            </Button>
+            <div className="overflow-auto max-h-[600px]">
+              <div
+                className={`overflow-x-auto ${quotes.length > 3 ? 'scrollbar-thin' : ''}`}
+                style={{ minWidth: `${quotes.length * 280 + 180}px` }}
+              >
+                <Table className="table-fixed border-spacing-x-6 w-full">
+                  <TableBody>
+                    <TableRow className="sticky top-0 bg-background z-10 shadow">
+                      <TableHead className="sticky left-0 z-20 bg-background">Field</TableHead>
+                      {quotes.map(q => (
+                        <TableHead key={q.vendorId} className="bg-white shadow-md">{q.vendorName}</TableHead>
+                      ))}
+                    </TableRow>
+
+                    {([
+                      ['Contact Person', (q: VendorQuote) => q.contactPerson],
+                      ['Email', q => q.email],
+                      ['Phone', q => q.phone],
+                      ['Original Price', q => <span className="line-through text-muted-foreground">₹{q.originalPrice.toLocaleString()}</span>],
+                      ['Discounted Price', q => (
+                        <span className={q.discountedPrice === getBestPrice() ? 'text-green-600 font-semibold' : ''}>
+                          ₹{q.discountedPrice.toLocaleString()}
+                          {q.discountedPrice === getBestPrice() && (
+                            <Badge className="ml-2 bg-green-100 text-green-800 text-xs">Best</Badge>
+                          )}
+                        </span>
+                      )],
+                      ['Delivery Time', q => (
+                        <span>
+                          {q.deliveryTime} days
+                          {parseInt(q.deliveryTime) === getBestDelivery() && (
+                            <Badge className="ml-2 bg-blue-100 text-blue-800 text-xs">Fastest</Badge>
+                          )}
+                        </span>
+                      )],
+                      ['Warranty', q => q.warranty],
+                      ['Rating', q => `⭐ ${q.rating}`],
+                      ['Specifications', q => <span className="text-sm text-muted-foreground">{q.specifications}</span>],
+                      ['Payment Terms', q => q.paymentTerms],
+                      ['Terms & Conditions', q => <span className="text-sm text-muted-foreground">{q.termsAndConditions}</span>],
+                      ['Submitted Date', q => q.submittedDate],
+                      ['Valid Until', q => q.validUntil],
+                      ['Actions', q => (
+                        <div className="flex flex-col space-y-2">
+                          <Button
+                            size="sm"
+                            disabled={selectedVendor !== null}
+                            onClick={() => handleFinalizeVendor(q.vendorId, q.vendorName)}
+                            className={selectedVendor === q.vendorId ? 'bg-green-600 hover:bg-green-700 text-white' : ''}
+                          >
+                            {selectedVendor === q.vendorId ? 'Selected' : 'Select'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setActiveDetails(prev => prev === q.vendorId ? null : q.vendorId)}
+                          >
+                            {activeDetails === q.vendorId ? 'Hide Details' : 'View Details'}
+                          </Button>
+                        </div>
+                      )]
+                    ] as [string, (q: VendorQuote) => React.ReactNode][]).map(([label, renderer]) => (
+                      <TableRow key={label}>
+                        <TableCell className="sticky left-0 z-10 bg-background font-medium text-sm">{label}</TableCell>
+                        {quotes.map(q => (
+                          <TableCell key={q.vendorId} className="bg-white shadow-sm">{renderer(q)}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+
+                    {activeDetails && (
+                      <TableRow key="vendor-detail-row">
+                        <TableCell colSpan={quotes.length + 1} className="bg-muted/40">
+                          <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <h4 className="font-medium mb-1">Contact Info</h4>
+                              <p><strong>Phone:</strong> {quotes.find(q => q.vendorId === activeDetails)?.phone}</p>
+                              <p><strong>Email:</strong> {quotes.find(q => q.vendorId === activeDetails)?.email}</p>
+                            </div>
+                            <div>
+                              <h4 className="font-medium mb-1">Other Info</h4>
+                              <p><strong>Submitted:</strong> {quotes.find(q => q.vendorId === activeDetails)?.submittedDate}</p>
+                              <p><strong>Valid Until:</strong> {quotes.find(q => q.vendorId === activeDetails)?.validUntil}</p>
+                            </div>
                           </div>
                         </TableCell>
                       </TableRow>
-                      
-                      {/* Expanded Row Details */}
-                      {expandedRows.has(quote.vendorId) && (
-                        <TableRow className="bg-muted/30">
-                          <TableCell colSpan={8}>
-                            <div className="p-4 space-y-4">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                  <h4 className="font-medium mb-2 text-primary">Contact Information</h4>
-                                  <div className="space-y-1 text-sm">
-                                    <p><span className="font-medium">Phone:</span> {quote.phone}</p>
-                                    <p><span className="font-medium">Submitted:</span> {quote.submittedDate}</p>
-                                    <p><span className="font-medium">Valid Until:</span> {quote.validUntil}</p>
-                                  </div>
-                                </div>
-                                <div>
-                                  <h4 className="font-medium mb-2 text-primary">Payment Terms</h4>
-                                  <p className="text-sm">{quote.paymentTerms}</p>
-                                </div>
-                              </div>
-                              
-                              <div>
-                                <h4 className="font-medium mb-2 text-primary">Detailed Specifications</h4>
-                                <p className="text-sm text-muted-foreground">{quote.specifications}</p>
-                              </div>
-                              
-                              <div>
-                                <h4 className="font-medium mb-2 text-primary">Terms and Conditions</h4>
-                                <p className="text-sm text-muted-foreground">{quote.termsAndConditions}</p>
-                              </div>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </CardContent>
         </Card>
-
-        {/* Selection Confirmation */}
-        {selectedVendor && (
-          <Card className="border-green-200 bg-green-50">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className="text-green-600 text-xl">✅</span>
-                  <div>
-                    <p className="font-medium text-green-800">
-                      Vendor Selected Successfully!
-                    </p>
-                    <p className="text-sm text-green-700">
-                      Purchase order will be generated and sent to {quotes.find(q => q.vendorId === selectedVendor)?.vendorName}
-                    </p>
-                  </div>
-                </div>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setSelectedVendor(null)}
-                  className="border-green-300 text-green-700 hover:bg-green-100"
-                >
-                  Change Selection
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </DashboardLayout>
   );

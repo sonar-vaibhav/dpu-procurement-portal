@@ -4,16 +4,16 @@ import { USER_ROLES, ROLE_NAMES } from '@/constants/roles';
 import DPULogo from '@/components/ui/DPULogo';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  FileText, 
-  User, 
-  Package, 
-  Truck, 
-  Wallet, 
-  Building, 
-  BarChart3, 
-  Mail, 
+import {
+  Home,
+  FileText,
+  User,
+  Package,
+  Truck,
+  Wallet,
+  Building,
+  BarChart3,
+  Mail,
   Clock,
   LogOut
 } from 'lucide-react';
@@ -38,6 +38,12 @@ const getSidebarItems = (role: string): SidebarItem[] => {
         { id: 'profile', label: 'Profile', path: '/profile', icon: User }
       ];
     case USER_ROLES.HOD:
+      return [
+        ...baseItems,
+        { id: 'indents', label: 'All Indents', path: '/indents', icon: FileText },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: User }
+      ];
+      case USER_ROLES.PRINCIPAL:
       return [
         ...baseItems,
         { id: 'indents', label: 'All Indents', path: '/indents', icon: FileText },
@@ -82,6 +88,12 @@ const getSidebarItems = (role: string): SidebarItem[] => {
         ...baseItems,
         { id: 'enquiries', label: 'New Enquiries', path: '/enquiries', icon: Mail },
         { id: 'quotes', label: 'Quote History', path: '/quotes', icon: Clock },
+        { id: 'profile', label: 'Profile', path: '/profile', icon: User }
+      ];
+    case USER_ROLES.ACCOUNT:
+      return [
+        ...baseItems,
+        { id: 'indents', label: 'All Indents', path: '/indents', icon: FileText },
         { id: 'profile', label: 'Profile', path: '/profile', icon: User }
       ];
     default:

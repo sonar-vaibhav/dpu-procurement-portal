@@ -201,14 +201,7 @@ const OfficerDashboard: React.FC = () => {
                     
                     <div className="flex items-center space-x-4">
                       {getStatusBadge(indent.status)}
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="hover:bg-dpu-red hover:text-white transition-colors duration-200"
-                        onClick={() => navigate(`/officer/quotes/${indent.id}`)}
-                      >
-                        View Details
-                      </Button>
+                      
                     </div>
                   </div>
                 </div>

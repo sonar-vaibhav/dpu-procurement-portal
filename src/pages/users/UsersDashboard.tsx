@@ -27,7 +27,6 @@ const UsersDashboard: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedIndent, setSelectedIndent] = useState<IndentDetails | null>(null);
 
-  // Mock data - these would come from an API
   const stats = {
     totalIndents: 12,
     approvedIndents: 8,
@@ -35,86 +34,57 @@ const UsersDashboard: React.FC = () => {
     rejectedIndents: 1
   };
 
-  const recentIndents = [
-    { 
-      id: 'IND001', 
-      title: 'Laboratory Equipment', 
-      status: 'pending_hod', 
-      date: '2024-01-15', 
+  const recentIndents: IndentDetails[] = [
+    {
+      id: 'IND001',
+      title: 'Laboratory Equipment',
+      status: 'pending_hod',
+      date: '2024-01-15',
       amount: '₹25,000',
       department: 'Biology',
       budgetHead: 'Research Equipment',
       priority: 'high',
       justification: 'Required for advanced research in cell biology',
       requestedBy: 'Dr. John Smith',
-      items: [
-        {
-          itemName: 'Microscope',
-          description: 'High-resolution microscope for cell research',
-          quantity: '2',
-          make: 'Olympus',
-          uom: 'Nos',
-          stockInHand: '0',
-          approxValue: '25000',
-          purpose: 'Research'
-        }
-      ]
+      items: []
     },
-    { 
-      id: 'IND002', 
-      title: 'Office Supplies', 
-      status: 'approved', 
-      date: '2024-01-10', 
+    {
+      id: 'IND002',
+      title: 'Office Supplies',
+      status: 'approved',
+      date: '2024-01-10',
       amount: '₹5,000',
       department: 'Administration',
       budgetHead: 'Office Supplies',
       priority: 'low',
       justification: 'Regular office supplies replenishment',
       requestedBy: 'Admin Staff',
-      items: [
-        {
-          itemName: 'Stationery',
-          description: 'Office stationery items',
-          quantity: '1',
-          make: 'Local',
-          uom: 'Lot',
-          stockInHand: '0',
-          approxValue: '5000',
-          purpose: 'Office Use'
-        }
-      ]
+      items: []
     },
-    { 
-      id: 'IND003', 
-      title: 'Computer Hardware', 
-      status: 'pending_store', 
-      date: '2024-01-08', 
+    {
+      id: 'IND003',
+      title: 'Computer Hardware',
+      status: 'pending_principal',
+      date: '2024-01-08',
       amount: '₹45,000',
       department: 'Computer Science',
       budgetHead: 'IT Infrastructure',
       priority: 'medium',
       justification: 'Upgrading computer lab equipment for new courses',
       requestedBy: 'Prof. Sarah Wilson',
-      items: [
-        {
-          itemName: 'Desktop Computers',
-          description: 'High-performance workstations',
-          quantity: '5',
-          make: 'Dell',
-          uom: 'Nos',
-          stockInHand: '2',
-          approxValue: '45000',
-          purpose: 'Teaching'
-        }
-      ]
+      items: []
     }
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending_hod': return 'bg-yellow-100 text-yellow-800';
+      case 'pending_principal': return 'bg-orange-100 text-orange-800';
       case 'pending_store': return 'bg-blue-100 text-blue-800';
       case 'approved': return 'bg-green-100 text-green-800';
+      case 'rejected_hod':
+      case 'rejected_principal':
+      case 'rejected_store':
       case 'rejected': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -123,8 +93,12 @@ const UsersDashboard: React.FC = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'pending_hod': return 'Pending HOD';
+      case 'pending_principal': return 'Pending Principal';
       case 'pending_store': return 'Pending Store';
       case 'approved': return 'Approved';
+      case 'rejected_hod': return 'Rejected by HOD';
+      case 'rejected_principal': return 'Rejected by Principal';
+      case 'rejected_store': return 'Rejected by Store';
       case 'rejected': return 'Rejected';
       default: return status;
     }
@@ -132,7 +106,6 @@ const UsersDashboard: React.FC = () => {
 
   const handleCreateIndent = (data: any) => {
     console.log('Creating indent:', data);
-    // Handle indent creation logic here
   };
 
   return (
@@ -141,7 +114,7 @@ const UsersDashboard: React.FC = () => {
         title="Dashboard"
         subtitle="Welcome to your procurement dashboard"
         action={
-          <Button 
+          <Button
             className="bg-dpu-red hover:bg-dpu-red-dark text-white"
             onClick={() => setIsCreateModalOpen(true)}
           >
@@ -149,7 +122,7 @@ const UsersDashboard: React.FC = () => {
           </Button>
         }
       />
-      
+
       <div className="p-6 space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -162,7 +135,7 @@ const UsersDashboard: React.FC = () => {
               <p className="text-xs text-gray-500 mt-1">All time</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Approved Indents</CardTitle>
@@ -172,7 +145,7 @@ const UsersDashboard: React.FC = () => {
               <p className="text-xs text-gray-500 mt-1">Successfully processed</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Pending Indents</CardTitle>
@@ -202,10 +175,7 @@ const UsersDashboard: React.FC = () => {
                 <CardTitle>Recent Indents</CardTitle>
                 <CardDescription>Your latest procurement requests</CardDescription>
               </div>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/users/indents')}
-              >
+              <Button variant="outline" onClick={() => navigate('/users/indents')}>
                 View All
               </Button>
             </div>
@@ -213,7 +183,10 @@ const UsersDashboard: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               {recentIndents.map((indent) => (
-                <div key={indent.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                <div
+                  key={indent.id}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                >
                   <div className="flex-1">
                     <div className="flex items-center space-x-3">
                       <h4 className="font-medium text-gray-900">{indent.title}</h4>
@@ -227,8 +200,8 @@ const UsersDashboard: React.FC = () => {
                       <span>Amount: {indent.amount}</span>
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => setSelectedIndent(indent)}
                   >
