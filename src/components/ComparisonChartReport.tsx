@@ -66,54 +66,6 @@ const comparisonData = {
         { model: 'Prama\nPT-NR3A64-M8/R', rate: 104650, amount: 418600 },
       ],
     },
-    {
-      sr: 4,
-      description: '8TB HDD for Recording 1 Month',
-      unit: 'Nos',
-      qty: 32,
-      vendors: [
-        { model: 'Seagate\nST8000VEOO1', rate: 17230, amount: 551360 },
-        { model: 'WD', rate: 16500, amount: 528000 },
-        { model: 'Segate', rate: 19800, amount: 633600 },
-        { model: 'Segate\nST8000VEOO1', rate: 20995, amount: 671840 },
-      ],
-    },
-    {
-      sr: 5,
-      description: 'PVC Box For Camera Mount',
-      unit: 'Nos',
-      qty: 200,
-      vendors: [
-        { model: 'Standard', rate: 40, amount: 8000 },
-        { model: 'Standard', rate: 50, amount: 10000 },
-        { model: 'Standard', rate: 60, amount: 12000 },
-        { model: 'Standard', rate: 45, amount: 9000 },
-      ],
-    },
-    {
-      sr: 6,
-      description: 'RJ 45 Connector\nPack Size: 1 Box x 100 Nos',
-      unit: 'Box',
-      qty: 4,
-      vendors: [
-        { model: 'D-Link', rate: 310, amount: 1240 },
-        { model: 'D-Link', rate: 290, amount: 1160 },
-        { model: 'D-Link', rate: 1800, amount: 7200 },
-        { model: 'D-Link', rate: 450, amount: 1800 },
-      ],
-    },
-    {
-      sr: 7,
-      description: 'Installation Charges',
-      unit: 'Job',
-      qty: 1,
-      vendors: [
-        { model: 'Custom', rate: 63900, amount: 63900 },
-        { model: 'Custom', rate: 48600, amount: 48600 },
-        { model: 'Custom', rate: 141500, amount: 141500 },
-        { model: 'Custom', rate: 110500, amount: 110500 },
-      ],
-    },
   ],
   totals: [
     { label: 'Total', values: ['15,33,165.00', '15,10,610.00', '21,25,220.00', '19,58,395.00'] },
@@ -144,7 +96,7 @@ const ComparisonChartReport: React.FC = () => {
   const handleDownloadPDF = () => {
     if (!printRef.current) return;
     const opt = {
-      margin: [10, 0, 0, 0],
+      margin: [10, 10, 10, 10],
       filename: 'ComparisonChartReport.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
@@ -162,7 +114,7 @@ const ComparisonChartReport: React.FC = () => {
       >
         Download Comparison Chart as PDF
       </button>
-      <div ref={printRef} className="w-[297mm] bg-white text-black text-[13px] font-sans print:w-full">
+      <div ref={printRef} className="w-[277mm] bg-white text-black text-[13px] font-sans print:w-full p-0 m-0">
         {/* Header Table */}
         <table className="w-full border border-black text-xs mb-2">
           <thead>
@@ -273,7 +225,7 @@ const ComparisonChartReport: React.FC = () => {
           </table>
         </div>
         {/* Warranty, Delivery, Payment, Signatures */}
-        <div className="flex justify-between items-end mt-8 text-xs">
+        <div className="flex justify-between items-end mt-6 mb-[6px] text-xs w-full" style={{ pageBreakInside: 'avoid' }}>
           <div>
             <div>Omkar Rokade</div>
             <div>Prepared By</div>
@@ -288,7 +240,7 @@ const ComparisonChartReport: React.FC = () => {
           </div>
           <div className="text-right">
             <div>For DR. D. Y. PATIL UNITECH SOCIETY, PUNE</div>
-            <br /><br /><br />
+            <div style={{ height: '12px' }}></div>
             <div className="font-semibold">Secretary/Vice-Chairman/Chairman</div>
           </div>
         </div>

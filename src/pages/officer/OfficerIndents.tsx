@@ -7,11 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import ComparisonChartReport from '@/components/ComparisonChartReport';
+import PurchaseOrderPage from '@/components/PurchaseOrder';
+import IndentReport from '@/components/IndentReport';
+import { Eye } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface AssignedIndent {
   id: string;
@@ -31,7 +35,9 @@ const OfficerIndents: React.FC = () => {
   const [selectedIndent, setSelectedIndent] = useState<AssignedIndent | null>(null);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
   const [showComparisonChart, setShowComparisonChart] = useState(false);
-
+  const [finalizedVendor, setFinalizedVendor] = useState<{ [indentId: string]: string | null }>({});
+  const [showFinalizeModal, setShowFinalizeModal] = useState<string | null>(null);
+  const [showPOModal, setShowPOModal] = useState<string | null>(null);
   const [enquiryForm, setEnquiryForm] = useState({
     enquiryNumber: '',
     serial: '',
@@ -43,6 +49,16 @@ const OfficerIndents: React.FC = () => {
     packing: '',
     vendors: [] as string[],
   });
+  const [showIndentPreview, setShowIndentPreview] = useState<string | null>(null);
+
+  // Dummy vendor quotes for the demo indent
+  const vendorQuotes = {
+    'IND_DEMO': [
+      { name: 'ABC Traders', price: '₹23,500', delivery: '10 days' },
+      { name: 'XYZ Supplies', price: '₹22,800', delivery: '12 days' },
+      { name: 'Global Tech', price: '₹24,000', delivery: '9 days' },
+    ]
+  };
 
   const indents: AssignedIndent[] = [
     {
@@ -74,6 +90,16 @@ const OfficerIndents: React.FC = () => {
       status: 'quotation_received',
       assignedDate: '2024-01-12',
       deadline: '2024-01-25'
+    },
+    {
+      id: 'IND_DEMO',
+      title: 'Demo Indent - Projector System',
+      quantity: '3 Units',
+      department: 'AV Services',
+      category: 'Electronics',
+      status: 'quotation_received',
+      assignedDate: '2024-01-10',
+      deadline: '2024-01-30'
     }
   ];
 
@@ -222,11 +248,30 @@ const OfficerIndents: React.FC = () => {
                     <TableCell>{indent.deadline}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button size="icon" variant="ghost" onClick={() => setShowIndentPreview(indent.id)}>
+                                <Eye className="w-5 h-5" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>See Indent</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                         {indent.status === 'pending_inquiry' && (
                           <Button size="sm" onClick={() => handleSendEnquiry(indent)}>Send Enquiry</Button>
                         )}
+                        {indent.status === 'quotation_received' && !finalizedVendor[indent.id] && (
+                          <Button size="sm" variant="outline" onClick={() => setShowFinalizeModal(indent.id)}>Finalize Vendor</Button>
+                        )}
+                        {indent.status === 'quotation_received' && finalizedVendor[indent.id] && (
+                          <>
+                            <span className="text-green-700 font-semibold text-xs">Finalized: {finalizedVendor[indent.id]}</span>
+                            <Button size="sm" variant="outline" onClick={() => setShowPOModal(indent.id)}>Generate PO</Button>
+                          </>
+                        )}
                         {indent.status === 'quotation_received' && (
-                          <Button size="sm" variant="outline" onClick={() => setShowComparisonChart(true)}>Compare Quotes</Button>
+                          <Button size="sm" variant="ghost" onClick={() => setShowComparisonChart(true)}>Compare Quotes</Button>
                         )}
                       </div>
                     </TableCell>
@@ -240,17 +285,17 @@ const OfficerIndents: React.FC = () => {
 
       {/* Comparison Chart Modal */}
       <Dialog open={showComparisonChart} onOpenChange={setShowComparisonChart}>
-        <DialogContent className="w-screen max-w-none h-screen max-h-none p-0">
+        <DialogContent className="max-w-[90vw]">
           <DialogHeader>
-            <DialogTitle>Compare Quotes</DialogTitle>
-            <DialogDescription className="sr-only">Comparison chart and work order details</DialogDescription>
+            <DialogTitle>Vendor Comparison Chart</DialogTitle>
+            <DialogDescription>Preview of the vendor comparison chart for this PO.</DialogDescription>
           </DialogHeader>
-          <div className="overflow-x-auto h-full">
+          <div className="max-h-[80vh] overflow-y-auto text-center text-gray-500 py-8">
             <ComparisonChartReport />
           </div>
-          <div className="flex justify-end mt-4 p-4">
-            <Button className='' variant="outline" onClick={() => setShowComparisonChart(false)}>Close</Button>
-          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowComparisonChart(false)}>Close</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -301,6 +346,73 @@ const OfficerIndents: React.FC = () => {
             <Button variant="outline" disabled>Generate PDF (Auto)</Button>
             <Button onClick={handleEnquirySubmit}>Send Enquiry</Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Finalize Vendor Modal */}
+      <Dialog open={!!showFinalizeModal} onOpenChange={v => !v && setShowFinalizeModal(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Finalize Vendor</DialogTitle>
+            <DialogDescription>Select a vendor to finalize for this indent.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            {(showFinalizeModal && vendorQuotes[showFinalizeModal]) ? (
+              vendorQuotes[showFinalizeModal].map(vendor => (
+                <div key={vendor.name} className="flex items-center justify-between border rounded p-2">
+                  <div>
+                    <div className="font-semibold">{vendor.name}</div>
+                    <div className="text-xs text-gray-500">Price: {vendor.price} | Delivery: {vendor.delivery}</div>
+                  </div>
+                  <Button size="sm" onClick={() => {
+                    setFinalizedVendor(prev => ({ ...prev, [showFinalizeModal]: vendor.name }));
+                    setShowFinalizeModal(null);
+                    toast({ title: 'Vendor Finalized', description: `Finalized ${vendor.name} for indent ${showFinalizeModal}` });
+                  }}>Select</Button>
+                </div>
+              ))
+            ) : (
+              <div className="text-gray-500">No vendor quotes available.</div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowFinalizeModal(null)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* PO Modal */}
+      <Dialog open={!!showPOModal} onOpenChange={v => !v && setShowPOModal(null)}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Purchase Order</DialogTitle>
+            <DialogDescription>Preview and send the Purchase Order to the finalized vendor.</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">
+            <PurchaseOrderPage />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPOModal(null)}>Close</Button>
+            <Button onClick={() => {
+              setShowPOModal(null);
+              toast({ title: 'PO Sent', description: `Purchase Order sent to ${finalizedVendor[showPOModal || '']}` });
+            }}>Send PO</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Indent Preview Modal */}
+      <Dialog open={!!showIndentPreview} onOpenChange={v => !v && setShowIndentPreview(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Indent Preview</DialogTitle>
+            <DialogDescription>Preview of the Indent Report Form</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">
+            <IndentReport />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowIndentPreview(null)}>Close</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </DashboardLayout>

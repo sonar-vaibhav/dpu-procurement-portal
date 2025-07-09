@@ -8,11 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useNavigate } from 'react-router-dom';
+import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import PurchaseOrderPage from '@/components/PurchaseOrder';
 
 const VendorQuotes: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [openPOFor, setOpenPOFor] = useState<string | null>(null);
 
   const quotes = [
     {
@@ -192,6 +195,15 @@ const VendorQuotes: React.FC = () => {
                         >
                           View
                         </Button>
+                        {quote.status === 'accepted' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setOpenPOFor(quote.id)}
+                          >
+                            View PO
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -207,6 +219,17 @@ const VendorQuotes: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+      <Dialog open={!!openPOFor} onOpenChange={v => !v && setOpenPOFor(null)}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Purchase Order</DialogTitle>
+            <DialogDescription>Preview of the final Purchase Order for this quote.</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">
+            <PurchaseOrderPage />
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };

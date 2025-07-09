@@ -150,49 +150,6 @@ const VendorDashboard: React.FC = () => {
           })}
         </div>
 
-        {/* Quick Actions */}
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <TrendingUp className="w-5 h-5 text-dpu-red" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button
-                onClick={() => navigate('/vendor/enquiries')}
-                className="h-auto p-6 bg-dpu-red hover:bg-dpu-red-dark text-white hover:scale-105 transition-all duration-200 shadow-lg"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="p-2 bg-white/20 rounded-lg">
-                    <Mail className="w-6 h-6" />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold text-lg">New Enquiries</h4>
-                    <p className="text-sm opacity-90">View and respond to new requests</p>
-                  </div>
-                </div>
-              </Button>
-              
-              <Button
-                onClick={() => navigate('/vendor/quotes')}
-                variant="outline"
-                className="h-auto p-6 border-2 hover:bg-gray-50 hover:scale-105 transition-all duration-200 shadow-lg"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <FileText className="w-6 h-6 text-gray-600" />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold text-lg text-gray-900">Quote History</h4>
-                    <p className="text-sm text-gray-600">Track submitted quotations</p>
-                  </div>
-                </div>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Recent Enquiries */}
         <Card className="shadow-lg">

@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Eye, FileText, ListChecks } from 'lucide-react';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
+import ComparisonChartReport from '@/components/ComparisonChartReport';
 
 // Dummy data for Indents and POs grouped by college
 const indentData = [
@@ -367,13 +368,13 @@ const ManagementDashboard: React.FC = () => {
 
         {/* Vendor Comparison Chart Modal */}
         <Dialog open={openVendorChart} onOpenChange={setOpenVendorChart}>
-          <DialogContent className="max-w-5xl">
+          <DialogContent className="max-w-[90vw]">
             <DialogHeader>
               <DialogTitle>Vendor Comparison Chart</DialogTitle>
               <DialogDescription>Preview of the vendor comparison chart for this PO.</DialogDescription>
             </DialogHeader>
             <div className="max-h-[80vh] overflow-y-auto text-center text-gray-500 py-8">
-              [Vendor Comparison Chart Preview Here]
+              <ComparisonChartReport />
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpenVendorChart(false)}>Close</Button>
