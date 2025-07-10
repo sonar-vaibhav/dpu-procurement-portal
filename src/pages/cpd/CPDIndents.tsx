@@ -376,7 +376,7 @@ const CPDIndents: React.FC = () => {
                           {indent.status === 'in_progress' && (
                             <>
                               <Button
-                                variant="secondary"
+                                variant="outline"
                                 size="sm"
                                 onClick={() => handleViewPO(indent)}
                               >

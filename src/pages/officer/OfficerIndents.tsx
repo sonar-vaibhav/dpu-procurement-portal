@@ -82,16 +82,6 @@ const OfficerIndents: React.FC = () => {
       deadline: '2024-01-22'
     },
     {
-      id: 'IND003',
-      title: 'Office Furniture',
-      quantity: '10 Sets',
-      department: 'Administration',
-      category: 'Furniture',
-      status: 'quotation_received',
-      assignedDate: '2024-01-12',
-      deadline: '2024-01-25'
-    },
-    {
       id: 'IND_DEMO',
       title: 'Demo Indent - Projector System',
       quantity: '3 Units',

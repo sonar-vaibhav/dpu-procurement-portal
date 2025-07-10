@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Eye, FileText, ListChecks } from 'lucide-react';
+import { Eye, FileText, ListChecks, ClipboardList, Hourglass, Building2, Coins } from 'lucide-react';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
 import ComparisonChartReport from '@/components/ComparisonChartReport';
@@ -168,44 +168,49 @@ const ManagementDashboard: React.FC = () => {
                 <ListChecks className="w-6 h-6 text-blue-600 mr-2" />
                 <h2 className="text-2xl font-bold text-gray-800">Indents</h2>
               </div>
-              {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <ListChecks className="w-8 h-8 text-green-600 mb-2" />
-                    <div className="text-2xl font-extrabold text-green-700 mb-1">{indentSummary.approved}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Approved Indents</CardTitle>
+              {/* Summary Cards - Minimal UI */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <Card className="bg-green-50 border border-green-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                    <div>
+                      <CardTitle className="text-base font-medium text-gray-800">Total Approved Indents</CardTitle>
+                      <div className="text-2xl font-bold mt-2 mb-1">{indentSummary.approved}</div>
+                      <p className="text-xs text-gray-500">+12% from last month</p>
+                    </div>
+                    <ClipboardList className="w-8 h-8 text-green-500 mt-1" />
                   </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <ListChecks className="w-8 h-8 text-yellow-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-yellow-700 mb-1">{indentSummary.pending}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Pending Indents</CardTitle>
+                <Card className="bg-yellow-50 border border-yellow-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                    <div>
+                      <CardTitle className="text-base font-medium text-gray-800">Total Pending Indents</CardTitle>
+                      <div className="text-2xl font-bold mt-2 mb-1">{indentSummary.pending}</div>
+                      <p className="text-xs text-gray-500">Requires immediate attention</p>
+                    </div>
+                    <Hourglass className="w-8 h-8 text-yellow-500 mt-1" />
                   </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <FileText className="w-8 h-8 text-green-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-green-700 mb-1">₹{indentSummary.approvedAmt.toLocaleString()}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Approved Amount</CardTitle>
+                <Card className="bg-blue-50 border border-blue-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                    <div>
+                      <CardTitle className="text-base font-medium text-gray-800">Total Approved Amount</CardTitle>
+                      <div className="text-2xl font-bold mt-2 mb-1">₹{indentSummary.approvedAmt.toLocaleString()}</div>
+                      <p className="text-xs text-gray-500">+43% from last month</p>
+                    </div>
+                    <Building2 className="w-8 h-8 text-blue-500 mt-1" />
                   </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <FileText className="w-8 h-8 text-yellow-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-yellow-700 mb-1">₹{indentSummary.pendingAmt.toLocaleString()}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Pending Amount</CardTitle>
-            </CardHeader>
-          </Card>
-                <Card className="flex flex-col items-center justify-center bg-blue-50 border-blue-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <FileText className="w-8 h-8 text-blue-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-blue-700 mb-1">₹{(indentSummary.approvedAmt+indentSummary.pendingAmt).toLocaleString()}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Amount</CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
+                <Card className="bg-orange-50 border border-orange-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                    <div>
+                      <CardTitle className="text-base font-medium text-gray-800">Total Pending Amount</CardTitle>
+                      <div className="text-2xl font-bold mt-2 mb-1">₹{indentSummary.pendingAmt.toLocaleString()}</div>
+                      <p className="text-xs text-gray-500">+55% from last month</p>
+                    </div>
+                    <Coins className="w-8 h-8 text-orange-500 mt-1" />
+                  </CardHeader>
+                </Card>
+              </div>
               {/* Grouped List */}
             <div className="space-y-6">
                 {indentData.map(group => (
@@ -252,44 +257,49 @@ const ManagementDashboard: React.FC = () => {
                 <FileText className="w-6 h-6 text-blue-600 mr-2" />
                 <h2 className="text-2xl font-bold text-gray-800">Purchase Orders (POs)</h2>
                         </div>
-              {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <FileText className="w-8 h-8 text-green-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-green-700 mb-1">{poSummary.approved}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Approved POs</CardTitle>
+              {/* Summary Cards for POs - Minimal UI */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <Card className="bg-green-50 border border-green-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                    <div>
+                      <CardTitle className="text-base font-medium text-gray-800">Total Approved POs</CardTitle>
+                      <div className="text-2xl font-bold mt-2 mb-1">{poSummary.approved}</div>
+                      <p className="text-xs text-gray-500">+12% from last month</p>
+                    </div>
+                    <ClipboardList className="w-8 h-8 text-green-500 mt-1" />
                   </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <FileText className="w-8 h-8 text-yellow-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-yellow-700 mb-1">{poSummary.pending}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Pending POs</CardTitle>
+                <Card className="bg-yellow-50 border border-yellow-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                    <div>
+                      <CardTitle className="text-base font-medium text-gray-800">Total Pending POs</CardTitle>
+                      <div className="text-2xl font-bold mt-2 mb-1">{poSummary.pending}</div>
+                      <p className="text-xs text-gray-500">Requires immediate attention</p>
+                    </div>
+                    <Hourglass className="w-8 h-8 text-yellow-500 mt-1" />
                   </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-green-50 border-green-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <FileText className="w-8 h-8 text-green-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-green-700 mb-1">₹{poSummary.approvedAmt.toLocaleString()}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Approved Amount</CardTitle>
+                <Card className="bg-blue-50 border border-blue-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                    <div>
+                      <CardTitle className="text-base font-medium text-gray-800">Total Approved Amount</CardTitle>
+                      <div className="text-2xl font-bold mt-2 mb-1">₹{poSummary.approvedAmt.toLocaleString()}</div>
+                      <p className="text-xs text-gray-500">+43% from last month</p>
+                    </div>
+                    <Building2 className="w-8 h-8 text-blue-500 mt-1" />
                   </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-yellow-50 border-yellow-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <FileText className="w-8 h-8 text-yellow-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-yellow-700 mb-1">₹{poSummary.pendingAmt.toLocaleString()}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Pending Amount</CardTitle>
+                <Card className="bg-orange-50 border border-orange-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                    <div>
+                      <CardTitle className="text-base font-medium text-gray-800">Total Pending Amount</CardTitle>
+                      <div className="text-2xl font-bold mt-2 mb-1">₹{poSummary.pendingAmt.toLocaleString()}</div>
+                      <p className="text-xs text-gray-500">+55% from last month</p>
+                    </div>
+                    <Coins className="w-8 h-8 text-orange-500 mt-1" />
                   </CardHeader>
                 </Card>
-                <Card className="flex flex-col items-center justify-center bg-blue-50 border-blue-200 py-6">
-                  <CardHeader className="flex flex-col items-center border-none p-0 mb-2 bg-transparent">
-                    <FileText className="w-8 h-8 text-blue-600 mb-2" />
-                    <div className="text-3xl font-extrabold text-blue-700 mb-1">₹{(poSummary.approvedAmt+poSummary.pendingAmt).toLocaleString()}</div>
-                    <CardTitle className="text-base font-medium text-gray-700 mt-1">Total Amount</CardTitle>
-                  </CardHeader>
-                </Card>
-                        </div>
+              </div>
               {/* Grouped List */}
               <div className="space-y-6">
                 {poData.map(group => (

@@ -1,6 +1,9 @@
 import React, { useRef } from 'react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
+import { useAuth } from '@/contexts/AuthContext';
+import { USER_ROLES } from '@/constants/roles';
+import { useToast } from '@/hooks/use-toast';
 
 // Sample data
 const workOrderData = {
@@ -69,6 +72,10 @@ function numberToWords(num: number) {
 // Rename component
 const PurchaseOrderPage: React.FC = () => {
   const printRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const { toast } = useToast ? useToast() : { toast: (args: any) => alert(args.description) };
+  // Simulate PO acceptance state (in real app, fetch from API)
+  const [accepted, setAccepted] = React.useState(false);
 
   const handleDownloadPDF = () => {
     if (!printRef.current) return;
@@ -83,6 +90,11 @@ const PurchaseOrderPage: React.FC = () => {
     html2pdf().set(opt).from(printRef.current).save();
   };
 
+  const handleAcceptPO = () => {
+    setAccepted(true);
+    toast({ title: 'PO Accepted', description: 'You have accepted the Purchase Order.' });
+  };
+
   // Calculate totals
   const items = workOrderData.items || [];
   const subTotal = items.reduce((sum, item) => sum + item.value, 0);
@@ -91,12 +103,28 @@ const PurchaseOrderPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <button
-        className="mb-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 print:hidden"
-        onClick={handleDownloadPDF}
-      >
-        Download Work Order as PDF
-      </button>
+      {/* Only show download for non-vendor, accept for vendor if not accepted */}
+      {user && user.role && user.role.trim().toLowerCase() === USER_ROLES.VENDOR ? (
+        !accepted ? (
+          <button
+            className="mb-6 px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 print:hidden"
+            onClick={handleAcceptPO}
+          >
+            Accept Purchase Order
+          </button>
+        ) : (
+          <div className="mb-6 px-6 py-2 bg-green-100 text-green-800 rounded shadow print:hidden">
+            You have accepted this Purchase Order.
+          </div>
+        )
+      ) : (
+        <button
+          className="mb-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 print:hidden"
+          onClick={handleDownloadPDF}
+        >
+          Download Work Order as PDF
+        </button>
+      )}
       <div ref={printRef} className="w-[210mm] bg-white text-black text-[13px] font-sans print:w-full">
         {/* Page 1 */}
         <div className="wo-page w-full min-h-[297mm] px-10 py-8 flex flex-col justify-between">

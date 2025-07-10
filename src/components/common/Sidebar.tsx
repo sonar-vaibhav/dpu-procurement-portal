@@ -68,6 +68,8 @@ const getSidebarItems = (role: string): SidebarItem[] => {
         ...baseItems,
         { id: 'indents', label: 'All Indents', path: '/indents', icon: FileText },
         { id: 'vendors', label: 'Vendor Directory', path: '/vendors', icon: Building },
+        { id: 'finalized_vendors', label: 'Finalized Vendors', path: '/finalized-vendors', icon: BarChart3 },
+        { id: 'stock_checkup', label: 'Stock Checkup', path: '/stock-checkup', icon: Package },
         { id: 'track', label: 'Indent Tracker', path: '/track', icon: BarChart3 },
         { id: 'profile', label: 'Profile', path: '/profile', icon: User }
       ];
