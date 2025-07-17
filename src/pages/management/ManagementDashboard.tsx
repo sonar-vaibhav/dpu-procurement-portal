@@ -212,7 +212,7 @@ const ManagementDashboard: React.FC = () => {
                 </Card>
               </div>
               {/* Grouped List */}
-            <div className="space-y-6">
+              <div className="space-y-6">
                 {indentData.map(group => (
                   <div key={group.college} className="border rounded-lg p-4 bg-white/90 shadow-sm">
                     <h3 className="font-semibold text-gray-800 mb-2">{group.college}</h3>
@@ -229,7 +229,15 @@ const ManagementDashboard: React.FC = () => {
                       <tbody>
                         {group.items.map((item, idx) => (
                           <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                            <td><input type="checkbox" checked={selectedIndents.includes(item.id)} onChange={() => handleIndentSelect(item.id)} /></td>
+                            <td>
+                              {item.status === 'Pending' ? (
+                                <input
+                                  type="checkbox"
+                                  checked={selectedIndents.includes(item.id)}
+                                  onChange={() => handleIndentSelect(item.id)}
+                                />
+                              ) : null}
+                            </td>
                             <td>{item.title} <span className="text-xs text-gray-400">({item.id})</span></td>
                             <td>₹{item.amount.toLocaleString()}</td>
                             <td><Badge variant={item.status === 'Approved' ? 'secondary' : item.status === 'Pending' ? 'outline' : 'secondary'} className={item.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{item.status}</Badge></td>
@@ -238,15 +246,15 @@ const ManagementDashboard: React.FC = () => {
                         ))}
                       </tbody>
                     </table>
-                      </div>
+                  </div>
                 ))}
-                        </div>
+              </div>
               {/* Bulk Approve & Live Total */}
               {selectedIndents.length > 0 && (
                 <div className="flex items-center justify-end mt-4 space-x-4">
                   <div className="text-sm font-medium">Selected Amount: <span className="text-blue-700 font-bold">₹{getSelectedAmount(indentData, selectedIndents).toLocaleString()}</span></div>
                   <Button className="dpu-button-primary" onClick={handleBulkIndentApprove}>Approve Selected</Button>
-                        </div>
+                </div>
               )}
             </section>
           </TabsContent>
@@ -256,7 +264,7 @@ const ManagementDashboard: React.FC = () => {
               <div className="flex items-center mb-4">
                 <FileText className="w-6 h-6 text-blue-600 mr-2" />
                 <h2 className="text-2xl font-bold text-gray-800">Purchase Orders (POs)</h2>
-                        </div>
+              </div>
               {/* Summary Cards for POs - Minimal UI */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <Card className="bg-green-50 border border-green-200 shadow-none p-0">
@@ -354,11 +362,11 @@ const ManagementDashboard: React.FC = () => {
           <DialogContent className="max-w-xl">
             {openPO && (
               <Card className="shadow-lg">
-            <CardHeader>
+                <CardHeader>
                   <CardTitle className="text-lg">Purchase Order Details</CardTitle>
                   <CardDescription>ID: {openPO.id}</CardDescription>
-            </CardHeader>
-            <CardContent>
+                </CardHeader>
+                <CardContent>
                   <div className="mb-2"><span className="font-medium">Title:</span> {openPO.title}</div>
                   <div className="mb-2"><span className="font-medium">College:</span> {openPO.college}</div>
                   <div className="mb-2"><span className="font-medium">Requested Amount:</span> <span className="text-blue-700 font-semibold">₹{openPO.amount.toLocaleString()}</span></div>
@@ -366,12 +374,12 @@ const ManagementDashboard: React.FC = () => {
                   <div className="flex gap-2 mt-4">
                     <Button variant="outline" onClick={() => setOpenVendorChart(true)}><FileText className="w-4 h-4 mr-1" />Vendor Comparison Chart</Button>
                     <Button variant="outline" onClick={() => setOpenPODoc(true)}><FileText className="w-4 h-4 mr-1" />Final PO Document</Button>
-              </div>
-            </CardContent>
+                  </div>
+                </CardContent>
                 <CardFooter className="justify-end">
                   <Button variant="outline" onClick={() => setOpenPO(null)}>Close</Button>
                 </CardFooter>
-          </Card>
+              </Card>
             )}
           </DialogContent>
         </Dialog>
