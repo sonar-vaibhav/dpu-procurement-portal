@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+import { FileText, Hourglass, Building2, Coins } from 'lucide-react';
 
 const CPDDashboard: React.FC = () => {
   const [selectedIndent, setSelectedIndent] = useState(null);
@@ -149,7 +150,7 @@ const CPDDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Indents</CardTitle>
-              <div className="h-4 w-4 text-muted-foreground">📋</div>
+              <FileText className="w-7 h-7 text-blue-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">88</div>
@@ -160,7 +161,7 @@ const CPDDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending Assignment</CardTitle>
-              <div className="h-4 w-4 text-muted-foreground">⏳</div>
+              <Hourglass className="w-7 h-7 text-yellow-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">12</div>
@@ -171,7 +172,7 @@ const CPDDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Vendors</CardTitle>
-              <div className="h-4 w-4 text-muted-foreground">🏢</div>
+              <Building2 className="w-7 h-7 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">24</div>
@@ -182,7 +183,7 @@ const CPDDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Monthly Budget</CardTitle>
-              <div className="h-4 w-4 text-muted-foreground">💰</div>
+              <Coins className="w-7 h-7 text-orange-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">₹45.2L</div>

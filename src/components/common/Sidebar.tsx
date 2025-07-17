@@ -124,10 +124,10 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="bg-white border-r border-gray-200 h-screen w-64 flex flex-col shadow-lg">
+    <div className="fixed top-0 left-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-lg z-40">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-dpu-red-light to-white">
-        <DPULogo size="md" variant="full" />
+      <div className="p-2 border-b border-gray-200 bg-gradient-to-r from-dpu-red-light to-white flex items-center justify-center">
+        <img src="/og_dpu_logo.png" alt="DPU Logo" className="h-16 w-auto object-contain" />
       </div>
 
       {/* User Info */}

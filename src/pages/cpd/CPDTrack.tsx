@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import IndentTrackerModal from '@/components/modals/IndentTrackerModal';
+import { CheckCircle, Truck, Loader, AlertTriangle, Package } from 'lucide-react';
 
 const CPDTrack: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState('all');
@@ -167,36 +168,51 @@ const CPDTrack: React.FC = () => {
           </CardHeader>
           <CardContent>
             {/* Summary Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-              <div className="bg-green-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">
-                  {finalizedIndents.filter(i => i.deliveryStatus === 'delivered').length}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
+              <div className="bg-green-50 p-4 rounded-lg flex items-center gap-2 max-w-xs w-full">
+                <CheckCircle className="w-7 h-7 text-green-600" />
+                <div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {finalizedIndents.filter(i => i.deliveryStatus === 'delivered').length}
+                  </div>
+                  <div className="text-sm text-green-700">Delivered</div>
                 </div>
-                <div className="text-sm text-green-700">Delivered</div>
               </div>
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
-                  {finalizedIndents.filter(i => i.deliveryStatus === 'in_transit').length}
+              <div className="bg-blue-50 p-4 rounded-lg flex items-center gap-2 max-w-xs w-full">
+                <Truck className="w-7 h-7 text-blue-600" />
+                <div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {finalizedIndents.filter(i => i.deliveryStatus === 'in_transit').length}
+                  </div>
+                  <div className="text-sm text-blue-700">In Transit</div>
                 </div>
-                <div className="text-sm text-blue-700">In Transit</div>
               </div>
-              <div className="bg-yellow-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-yellow-600">
-                  {finalizedIndents.filter(i => i.deliveryStatus === 'processing').length}
+              <div className="bg-yellow-50 p-4 rounded-lg flex items-center gap-2 max-w-xs w-full">
+                <Loader className="w-7 h-7 text-yellow-600" />
+                <div>
+                  <div className="text-2xl font-bold text-yellow-600">
+                    {finalizedIndents.filter(i => i.deliveryStatus === 'processing').length}
+                  </div>
+                  <div className="text-sm text-yellow-700">Processing</div>
                 </div>
-                <div className="text-sm text-yellow-700">Processing</div>
               </div>
-              <div className="bg-red-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-red-600">
-                  {finalizedIndents.filter(i => i.deliveryStatus === 'delayed').length}
+              <div className="bg-red-50 p-4 rounded-lg flex items-center gap-2 max-w-xs w-full">
+                <AlertTriangle className="w-7 h-7 text-red-600" />
+                <div>
+                  <div className="text-2xl font-bold text-red-600">
+                    {finalizedIndents.filter(i => i.deliveryStatus === 'delayed').length}
+                  </div>
+                  <div className="text-sm text-red-700">Delayed</div>
                 </div>
-                <div className="text-sm text-red-700">Delayed</div>
               </div>
-              <div className="bg-orange-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-orange-600">
-                  {finalizedIndents.filter(i => i.deliveryStatus === 'partially_delivered').length}
+              <div className="bg-orange-50 p-4 rounded-lg flex items-center gap-2 max-w-xs w-full">
+                <Package className="w-7 h-7 text-orange-600" />
+                <div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {finalizedIndents.filter(i => i.deliveryStatus === 'partially_delivered').length}
+                  </div>
+                  <div className="text-sm text-orange-700">Partial</div>
                 </div>
-                <div className="text-sm text-orange-700">Partial</div>
               </div>
             </div>
 
