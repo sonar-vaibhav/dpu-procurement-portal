@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
+import { FileText, CheckCircle, Clock, XCircle } from 'lucide-react';
 
 const VendorQuotes: React.FC = () => {
   const navigate = useNavigate();
@@ -87,27 +88,39 @@ const VendorQuotes: React.FC = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-sm text-gray-600">Total Quotes</p>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <FileText className="w-6 h-6 text-blue-600" />
+              <div>
+                <div className="text-2xl font-bold">{stats.total}</div>
+                <p className="text-sm text-gray-600">Total Quotes</p>
+              </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-green-600">{stats.accepted}</div>
-              <p className="text-sm text-gray-600">Accepted</p>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+              <div>
+                <div className="text-2xl font-bold text-green-600">{stats.accepted}</div>
+                <p className="text-sm text-gray-600">Accepted</p>
+              </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-              <p className="text-sm text-gray-600">Pending</p>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <Clock className="w-6 h-6 text-yellow-600" />
+              <div>
+                <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+                <p className="text-sm text-gray-600">Pending</p>
+              </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
-              <p className="text-sm text-gray-600">Rejected</p>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <XCircle className="w-6 h-6 text-red-600" />
+              <div>
+                <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+                <p className="text-sm text-gray-600">Rejected</p>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -191,7 +204,7 @@ const VendorQuotes: React.FC = () => {
                         <Button 
                           size="sm" 
                           variant="ghost"
-                          onClick={() => navigate(`/vendor/quotes/${quote.id}`)}
+                          onClick={() => navigate(`/vendor/quotes/${quote.id}`, { state: { quote } })}
                         >
                           View
                         </Button>

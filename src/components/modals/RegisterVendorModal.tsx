@@ -201,7 +201,7 @@ const RegisterVendorModal: React.FC<RegisterVendorModalProps> = ({
 
           <div>
             <Label htmlFor="bankDetails">Bank Details</Label>
-            <Textarea
+            <Input
               id="bankDetails"
               value={formData.bankDetails}
               onChange={(e) => handleInputChange('bankDetails', e.target.value)}

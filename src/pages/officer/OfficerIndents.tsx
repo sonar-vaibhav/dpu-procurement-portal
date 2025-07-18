@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +51,10 @@ const OfficerIndents: React.FC = () => {
     vendors: [] as string[],
   });
   const [showIndentPreview, setShowIndentPreview] = useState<string | null>(null);
+  const [showPDFPreviewModal, setShowPDFPreviewModal] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [sentEnquiries, setSentEnquiries] = useState<{ [indentId: string]: { form: typeof enquiryForm, pdfUrl: string } }>({});
+  const [viewEnquiryIndentId, setViewEnquiryIndentId] = useState<string | null>(null);
 
   // Dummy vendor quotes for the demo indent
   const vendorQuotes = {
@@ -204,6 +209,122 @@ const OfficerIndents: React.FC = () => {
     doc.save(`DPU_Enquiry_${selectedIndent.id}_${date.replace(/\//g, '-')}.pdf`);
   };
 
+  // Dummy API-like indent data
+  const dummyIndent = {
+    enquiryId: 'ENQ2024-001',
+    itemName: 'High-Resolution Microscope',
+    quantity: '2 Units',
+    description: 'A high-resolution microscope for cell research with 1000x magnification, LED illumination, and digital camera support.',
+    delivery: 'Within 15 days from PO',
+    warranty: '2 years comprehensive',
+    payment: '50% advance, 50% on delivery',
+    packing: 'Safe, shock-proof packaging',
+  };
+
+  const handlePreviewPDF = () => {
+    const doc = new jsPDF();
+    const date = new Date().toLocaleDateString('en-GB');
+    const centerX = doc.internal.pageSize.getWidth() / 2;
+    const logoImg = new Image();
+    logoImg.src = '/dpu_logo.png';
+    logoImg.onload = () => {
+      doc.addImage(logoImg, 'PNG', 10, 8, 28, 18);
+      doc.setFontSize(15);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(200, 0, 0);
+      doc.text('DR. D. Y. PATIL UNITECH SOCIETY, PUNE', centerX, 16, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(0, 0, 0);
+      doc.text('Central Purchase Department', centerX, 23, { align: 'center' });
+      doc.setDrawColor(200, 0, 0);
+      doc.setLineWidth(0.8);
+      doc.line(10, 32, doc.internal.pageSize.getWidth() - 10, 32);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(200, 0, 0);
+      doc.text('VENDOR ENQUIRY FOR QUOTATION', centerX, 40, { align: 'center' });
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Date: ${date}`, 150, 48);
+      // Indent Details Table using autoTable
+      let y = 58;
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('INDENT DETAILS', 10, y);
+      y += 4;
+      // @ts-ignore: autoTable attaches lastAutoTable to doc
+      autoTable(doc, {
+        startY: y + 2,
+        head: [['Field', 'Value']],
+        body: [
+          ['Enquiry ID', dummyIndent.enquiryId],
+          ['Item Name', dummyIndent.itemName],
+          ['Quantity Required', dummyIndent.quantity],
+          ['Description / Specifications', dummyIndent.description],
+          ['Delivery Requirement', dummyIndent.delivery],
+          ['Warranty Expectation', dummyIndent.warranty],
+          ['Payment Terms', dummyIndent.payment],
+          ['Packing Instructions', dummyIndent.packing],
+        ],
+        theme: 'grid',
+        headStyles: { fillColor: [200, 0, 0], textColor: 255, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 11, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 55, fontStyle: 'bold' },
+          1: { cellWidth: 120 },
+        },
+        styles: { overflow: 'linebreak', valign: 'top' },
+      });
+      // @ts-ignore: autoTable attaches lastAutoTable to doc
+      y = doc.lastAutoTable.finalY + 6;
+      y += 10;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(200, 0, 0);
+      doc.text('IMPORTANT:', 10, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      const note1 = 'Please submit your quotation within 7 working days from the date of enquiry.';
+      const note2 = 'The university reserves the right to accept or reject any quotation without assigning reasons.';
+      doc.text(note1, 10, y + 6);
+      doc.text(note2, 10, y + 12);
+      y += 20;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('For any queries regarding this enquiry, vendors can contact:', 10, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('Dr. D. Y. Patil Institute of Technology, Pimpri, Pune – 411018', 10, y + 6);
+      doc.text('Phone: +91-20-27420195', 10, y + 12);
+      doc.text('Email: purchase@dyp.edu.in', 10, y + 18);
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      setPdfUrl(url);
+      setShowPDFPreviewModal(true);
+    };
+    if (logoImg.complete) logoImg.onload(new Event('load'));
+  };
+
+  // Confirm send after preview
+  const handleConfirmSendEnquiry = () => {
+    if (!selectedIndent || !pdfUrl) return;
+    toast({
+      title: 'Enquiry Sent',
+      description: `Enquiry sent to: ${enquiryForm.vendors.join(', ') || 'No vendors selected'}`
+    });
+    setSentEnquiries(prev => ({
+      ...prev,
+      [selectedIndent.id]: { form: { ...enquiryForm }, pdfUrl }
+    }));
+    setShowPDFPreviewModal(false);
+    setShowEnquiryModal(false);
+    setSelectedIndent(null);
+    setPdfUrl(null);
+  };
+
   return (
     <DashboardLayout>
       <PageHeader title="Assigned Indents" subtitle="Manage your assigned procurement tasks" />
@@ -248,7 +369,7 @@ const OfficerIndents: React.FC = () => {
                             <TooltipContent>See Indent</TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-                        {indent.status === 'pending_inquiry' && (
+                        {indent.status === 'pending_inquiry' && !sentEnquiries[indent.id] && (
                           <Button size="sm" onClick={() => handleSendEnquiry(indent)}>Send Enquiry</Button>
                         )}
                         {indent.status === 'quotation_received' && !finalizedVendor[indent.id] && (
@@ -262,6 +383,9 @@ const OfficerIndents: React.FC = () => {
                         )}
                         {indent.status === 'quotation_received' && (
                           <Button size="sm" variant="ghost" onClick={() => setShowComparisonChart(true)}>Compare Quotes</Button>
+                        )}
+                        {sentEnquiries[indent.id] && (
+                          <Button size="sm" variant="secondary" onClick={() => setViewEnquiryIndentId(indent.id)}>View Enquiry</Button>
                         )}
                       </div>
                     </TableCell>
@@ -333,9 +457,26 @@ const OfficerIndents: React.FC = () => {
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setShowEnquiryModal(false)}>Cancel</Button>
-            <Button variant="outline" disabled>Generate PDF (Auto)</Button>
-            <Button onClick={handleEnquirySubmit}>Send Enquiry</Button>
+            <Button onClick={handlePreviewPDF}>Preview PDF</Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* PDF Preview Modal */}
+      <Dialog open={showPDFPreviewModal} onOpenChange={v => { setShowPDFPreviewModal(v); if (!v && pdfUrl) { URL.revokeObjectURL(pdfUrl); setPdfUrl(null); } }}>
+        <DialogContent className="max-w-4xl flex flex-col items-center justify-center max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Preview Enquiry PDF</DialogTitle>
+          </DialogHeader>
+          <div className="w-full h-[70vh] flex items-center justify-center bg-gray-100">
+            {pdfUrl && (
+              <iframe src={pdfUrl} title="Enquiry PDF Preview" className="w-full h-full border rounded" />
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPDFPreviewModal(false)}>Cancel</Button>
+            <Button onClick={handleConfirmSendEnquiry}>Send Enquiry</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -402,6 +543,33 @@ const OfficerIndents: React.FC = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowIndentPreview(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Enquiry Modal */}
+      <Dialog open={!!viewEnquiryIndentId} onOpenChange={v => !v && setViewEnquiryIndentId(null)}>
+        <DialogContent className="max-w-4xl flex flex-col items-left justify-left max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Enquiry Details</DialogTitle>
+          </DialogHeader>
+          {viewEnquiryIndentId && sentEnquiries[viewEnquiryIndentId] && (
+            <>
+              <div className="mb-4">
+                <strong>Vendors:</strong>
+                <ol className="list-decimal list-inside mt-1">
+                  {sentEnquiries[viewEnquiryIndentId].form.vendors.map((vendor, idx) => (
+                    <li key={vendor}>{vendor}</li>
+                  ))}
+                </ol>
+              </div>
+              <div className="w-full h-[70vh] flex items-center justify-center bg-gray-100 mb-4">
+                <iframe src={sentEnquiries[viewEnquiryIndentId].pdfUrl} title="Sent Enquiry PDF" className="w-full h-full border rounded" />
+              </div>
+            </>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewEnquiryIndentId(null)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

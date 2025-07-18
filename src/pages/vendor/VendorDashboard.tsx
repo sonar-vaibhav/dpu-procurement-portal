@@ -129,7 +129,7 @@ const VendorDashboard: React.FC = () => {
           {stats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <Card key={index} className={`border-0 bg-gradient-to-br ${stat.bgGradient} shadow-lg hover:shadow-xl transition-all duration-300`}>
+              <Card key={index} className={`border-0 bg-gradient-to-br ${stat.bgGradient} shadow-lg hover:shadow-xl transition-all duration-300 min-h-[120px]`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div>

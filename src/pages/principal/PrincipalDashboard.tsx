@@ -12,6 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+import { FileText, Clock, CheckCircle } from 'lucide-react';
 
 interface IndentDetails {
   id: string;
@@ -137,7 +138,8 @@ const PrincipalDashboard: React.FC = () => {
                 Total Requests
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex items-center gap-4 pt-4">
+              <FileText className="w-8 h-8 text-blue-600" />
               <div className="text-2xl font-bold text-blue-600">
                 {approvedCount + pendingApprovals.length}
               </div>
@@ -150,11 +152,14 @@ const PrincipalDashboard: React.FC = () => {
                 Pending Approvals
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">
-                {pendingApprovals.length}
+            <CardContent className="flex items-center gap-4 pt-4">
+              <Clock className="w-8 h-8 text-yellow-600" />
+              <div>
+                <div className="text-2xl font-bold text-yellow-600">
+                  {pendingApprovals.length}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Require your action</p>
               </div>
-              <p className="text-xs text-gray-500 mt-1">Require your action</p>
             </CardContent>
           </Card>
 
@@ -164,11 +169,14 @@ const PrincipalDashboard: React.FC = () => {
                 Approved
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {approvedCount}
+            <CardContent className="flex items-center gap-4 pt-4">
+              <CheckCircle className="w-8 h-8 text-green-600" />
+              <div>
+                <div className="text-2xl font-bold text-green-600">
+                  {approvedCount}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Approx ₹2,45,000 value</p>
               </div>
-              <p className="text-xs text-gray-500 mt-1">Approx ₹2,45,000 value</p>
             </CardContent>
           </Card>
         </div>

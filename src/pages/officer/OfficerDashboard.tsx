@@ -41,7 +41,7 @@ const OfficerDashboard: React.FC = () => {
     },
     {
       title: 'Finalized Vendors',
-      value: '12',
+      value: '3',
       description: 'This month',
       icon: CheckCircle,
       bgGradient: 'from-green-50 to-green-100',

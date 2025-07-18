@@ -12,6 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+import { FileText, Hourglass, CheckCircle } from 'lucide-react';
 
 interface IndentDetails {
   id: string;
@@ -129,47 +130,52 @@ const AccountDashboard: React.FC = () => {
       />
 
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Total Requests
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
-                {approvedCount + pendingApprovals.length}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex justify-left">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="py-2 max-w-xs w-full">
+              <CardHeader className="pb-1 flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Total Requests
+                  </CardTitle>
+                  <div className="text-2xl font-bold text-blue-600 mt-1">
+                    {approvedCount + pendingApprovals.length}
+                  </div>
+                </div>
+                <FileText size={32} className="text-blue-500 ml-2" />
+              </CardHeader>
+            </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Pending Approvals
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">
-                {pendingApprovals.length}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Require your verification</p>
-            </CardContent>
-          </Card>
+            <Card className="py-2 max-w-xs w-full">
+              <CardHeader className="pb-1 flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Pending Approvals
+                  </CardTitle>
+                  <div className="text-2xl font-bold text-yellow-600 mt-1">
+                    {pendingApprovals.length}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">Require your verification</p>
+                </div>
+                <Hourglass size={32} className="text-yellow-500 ml-2" />
+              </CardHeader>
+            </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Approved
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {approvedCount}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Approx ₹1,85,000 value</p>
-            </CardContent>
-          </Card>
+            <Card className="py-2 max-w-xs w-full">
+              <CardHeader className="pb-1 flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Approved
+                  </CardTitle>
+                  <div className="text-2xl font-bold text-green-600 mt-1">
+                    {approvedCount}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">Approx ₹1,85,000 value</p>
+                </div>
+                <CheckCircle size={32} className="text-green-500 ml-2" />
+              </CardHeader>
+            </Card>
+          </div>
         </div>
 
         <Card>
