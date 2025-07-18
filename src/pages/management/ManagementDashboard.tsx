@@ -326,7 +326,15 @@ const ManagementDashboard: React.FC = () => {
                       <tbody>
                         {group.items.map((item, idx) => (
                           <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                            <td><input type="checkbox" checked={selectedPOs.includes(item.id)} onChange={() => handlePOSelect(item.id)} /></td>
+                            <td>
+                              {item.status === 'Approved' ? (
+                                <input
+                                  type="checkbox"
+                                  checked={selectedPOs.includes(item.id)}
+                                  onChange={() => handlePOSelect(item.id)}
+                                />
+                              ) : null}
+                            </td>
                             <td>{item.title} <span className="text-xs text-gray-400">({item.id})</span></td>
                             <td>₹{item.amount.toLocaleString()}</td>
                             <td><Badge variant={item.status === 'Approved' ? 'secondary' : item.status === 'Pending' ? 'outline' : 'secondary'} className={item.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{item.status}</Badge></td>
