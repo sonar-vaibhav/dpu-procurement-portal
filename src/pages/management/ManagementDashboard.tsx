@@ -327,7 +327,7 @@ const ManagementDashboard: React.FC = () => {
                         {group.items.map((item, idx) => (
                           <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                             <td>
-                              {item.status === 'Approved' ? (
+                              {item.status === 'Pending' ? (
                                 <input
                                   type="checkbox"
                                   checked={selectedPOs.includes(item.id)}
