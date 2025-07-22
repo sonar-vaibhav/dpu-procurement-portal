@@ -1,29 +1,34 @@
-If you want to work locally using your own IDE, you can clone this repo and push changes.
+# 🧾 DPU Procurement System – Internal Automation Portal
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+[![React](https://img.shields.io/badge/Frontend-React-blue?logo=react)](https://reactjs.org/)
+[![TailwindCSS](https://img.shields.io/badge/UI-TailwindCSS-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
+[![Backend](https://img.shields.io/badge/Backend-.NET-blueviolet?logo=dotnet)]
+[![Status](https://img.shields.io/badge/Status-Under%20Development-yellow)]()
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📌 About the Project
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+DPU Procurement System is a centralized web-based portal designed to streamline the inventory procurement process across various colleges under Dr. D. Y. Patil Dnyan Pratishthan University, Pimpri. The system enables faculty and administrators to request items, process multi-step approvals, and generate purchase orders efficiently.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## ✨ Features
 
-## What technologies are used for this project?
+- 🔐 Role-based workflows for requesters, verifiers, and approvers
+- 📥 Dynamic indent form with support for multiple items per request
+- 🧾 Auto-generated Purchase Order PDFs with DPU branding using `jsPDF`
+- 📄 Organized item specifications: quantity, expected price, etc.
+- 📱 Fully responsive and intuitive frontend UI
+- 📊 Planned: Admin dashboard with analytics and tracking
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🧑‍💻 Tech Stack
+
+| Layer     | Technology        |
+|-----------|-------------------|
+| Frontend  | React.js, Tailwind CSS, Shadcn |
+| Backend   | .NET Core (API) |
+
+---
