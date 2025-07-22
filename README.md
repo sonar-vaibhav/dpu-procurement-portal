@@ -2,7 +2,6 @@
 
 [![React](https://img.shields.io/badge/Frontend-React-blue?logo=react)](https://reactjs.org/)
 [![TailwindCSS](https://img.shields.io/badge/UI-TailwindCSS-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
-[![jsPDF](https://img.shields.io/badge/PDF%20Engine-jsPDF-yellow)](https://github.com/parallax/jsPDF)
 [![Backend](https://img.shields.io/badge/Backend-.NET-blueviolet?logo=dotnet)]
 [![Status](https://img.shields.io/badge/Status-Under%20Development-yellow)]()
 
