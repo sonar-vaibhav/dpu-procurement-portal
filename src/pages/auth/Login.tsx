@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ROLE_ROUTES } from '@/constants/roles';
-import DPULogo from '@/components/ui/DPULogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -61,7 +60,7 @@ const Login: React.FC = () => {
         <Card className="shadow-lg">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <DPULogo size="xl" />
+              <img src="/og_dpu_logo.png" alt="DPU Logo" className="w-28 h-16" />
             </div>
             <div>
               <CardTitle className="text-2xl font-bold text-gray-900">

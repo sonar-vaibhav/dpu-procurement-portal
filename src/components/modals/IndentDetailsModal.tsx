@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface IndentItem {
   itemName: string;
@@ -44,7 +45,6 @@ interface IndentDetailsModalProps {
   indent: IndentDetails | null;
   onApprove?: (indentId: string) => void;
   onReject?: (indentId: string, remarks: string) => void;
-  userRole?: 'hod' | 'principal' | 'store' | 'registrar' | 'management' | 'account';
 }
 
 const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
@@ -53,10 +53,21 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
   indent,
   onApprove,
   onReject,
-  userRole,
 }) => {
   const [showRejectionInput, setShowRejectionInput] = useState(false);
   const [rejectionRemarks, setRejectionRemarks] = useState('');
+  const { user } = useAuth();
+  const userRole = user?.role;
+
+  // Local state for editable items
+  const [editableItems, setEditableItems] = useState<IndentItem[]>([]);
+
+  // When indent changes or modal opens, copy items to local state
+  useEffect(() => {
+    if (indent) {
+      setEditableItems(indent.items.map(item => ({ ...item })));
+    }
+  }, [indent]);
 
   const canApprove = () => {
     if (!indent || !userRole) return false;
@@ -224,7 +235,7 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
           <div>
             <h3 className="font-medium mb-4">Requested Items</h3>
             <div className="space-y-4">
-              {indent.items.map((item, index) => (
+              {editableItems.map((item, index) => (
                 <div key={index} className="border rounded-lg p-4 bg-gray-50">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Object.entries(item).map(([field, value]) => (
@@ -233,8 +244,14 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
                         <Input
                           type={field === 'quantity' || field === 'approxValue' || field === 'stockInHand' ? 'number' : 'text'}
                           value={value}
-                          onChange={(e) => (indent.items[index][field as keyof IndentItem] = e.target.value)}
-                          disabled={userRole !== 'hod'}
+                          onChange={(e) => {
+                            if (field === 'quantity' && userRole === 'hod') {
+                              const updated = [...editableItems];
+                              updated[index][field as keyof IndentItem] = e.target.value;
+                              setEditableItems(updated);
+                            }
+                          }}
+                          disabled={field !== 'quantity' || userRole !== 'hod'}
                         />
                       </div>
                     ))}

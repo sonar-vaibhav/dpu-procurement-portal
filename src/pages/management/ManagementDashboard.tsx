@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Eye, FileText, ListChecks, ClipboardList, Hourglass, Building2, Coins } from 'lucide-react';
+import { Eye, FileText, ListChecks, ClipboardList, Hourglass, Building2, Coins, CheckCircle, XCircle } from 'lucide-react';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
 import ComparisonChartReport from '@/components/ComparisonChartReport';
@@ -85,6 +85,8 @@ const mapToIndentDetails = (item: any) => ({
 
 const ManagementDashboard: React.FC = () => {
   const { toast } = useToast();
+  const [indents, setIndents] = useState(indentData);
+  const [purchaseOrders, setPurchaseOrders] = useState(poData);
   // State for selected indents/POs
   const [selectedIndents, setSelectedIndents] = useState<string[]>([]);
   const [selectedPOs, setSelectedPOs] = useState<string[]>([]);
@@ -96,8 +98,24 @@ const ManagementDashboard: React.FC = () => {
   const [openPODoc, setOpenPODoc] = useState(false);
 
   // Summary
-  const indentSummary = getSummary(indentData);
-  const poSummary = getSummary(poData);
+  const indentSummary = getSummary(indents);
+  const poSummary = getSummary(purchaseOrders);
+
+  const handleStatusUpdate = (id: string, type: 'indent' | 'po', status: 'Approved' | 'Rejected') => {
+    const updater = type === 'indent' ? setIndents : setPurchaseOrders;
+    updater(prev => 
+      prev.map(group => ({
+        ...group,
+        items: group.items.map(item => 
+          item.id === id ? { ...item, status } : item
+        )
+      }))
+    );
+    toast({
+      title: `${type === 'indent' ? 'Indent' : 'PO'} ${status}`,
+      description: `${type === 'indent' ? 'Indent' : 'PO'} ${id} has been ${status.toLowerCase()}.`
+    });
+  };
 
   // Handlers
   const handleIndentSelect = (id: string) => {
@@ -213,7 +231,7 @@ const ManagementDashboard: React.FC = () => {
               </div>
               {/* Grouped List */}
               <div className="space-y-6">
-                {indentData.map(group => (
+                {indents.map(group => (
                   <div key={group.college} className="border rounded-lg p-4 bg-white/90 shadow-sm">
                     <h3 className="font-semibold text-gray-800 mb-2">{group.college}</h3>
                     <table className="w-full text-sm rounded-lg overflow-hidden">
@@ -241,7 +259,21 @@ const ManagementDashboard: React.FC = () => {
                             <td>{item.title} <span className="text-xs text-gray-400">({item.id})</span></td>
                             <td>₹{item.amount.toLocaleString()}</td>
                             <td><Badge variant={item.status === 'Approved' ? 'secondary' : item.status === 'Pending' ? 'outline' : 'secondary'} className={item.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{item.status}</Badge></td>
-                            <td><Button size="icon" variant="ghost" onClick={() => setOpenIndent(mapToIndentDetails(item))} title="Preview"><Eye className="w-5 h-5" /></Button></td>
+                            <td className="flex items-center">
+                              <Button size="icon" variant="ghost" onClick={() => setOpenIndent(mapToIndentDetails(item))} title="Preview">
+                                <Eye className="w-10 h-10" />
+                              </Button>
+                              {item.status === 'Pending' && (
+                                <>
+                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'indent', 'Approved')} title="Approve">
+                                    <CheckCircle className="w-7 h-7 text-green-600" />
+                                  </Button>
+                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'indent', 'Rejected')} title="Reject">
+                                    <XCircle className="w-7 h-7 text-red-600" />
+                                  </Button>
+                                </>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -252,7 +284,7 @@ const ManagementDashboard: React.FC = () => {
               {/* Bulk Approve & Live Total */}
               {selectedIndents.length > 0 && (
                 <div className="flex items-center justify-end mt-4 space-x-4">
-                  <div className="text-sm font-medium">Selected Amount: <span className="text-blue-700 font-bold">₹{getSelectedAmount(indentData, selectedIndents).toLocaleString()}</span></div>
+                  <div className="text-sm font-medium">Selected Amount: <span className="text-blue-700 font-bold">₹{getSelectedAmount(indents, selectedIndents).toLocaleString()}</span></div>
                   <Button className="dpu-button-primary" onClick={handleBulkIndentApprove}>Approve Selected</Button>
                 </div>
               )}
@@ -310,7 +342,7 @@ const ManagementDashboard: React.FC = () => {
               </div>
               {/* Grouped List */}
               <div className="space-y-6">
-                {poData.map(group => (
+                {purchaseOrders.map(group => (
                   <div key={group.college} className="border rounded-lg p-4 bg-white/90 shadow-sm">
                     <h3 className="font-semibold text-gray-800 mb-2">{group.college}</h3>
                     <table className="w-full text-sm rounded-lg overflow-hidden">
@@ -338,7 +370,21 @@ const ManagementDashboard: React.FC = () => {
                             <td>{item.title} <span className="text-xs text-gray-400">({item.id})</span></td>
                             <td>₹{item.amount.toLocaleString()}</td>
                             <td><Badge variant={item.status === 'Approved' ? 'secondary' : item.status === 'Pending' ? 'outline' : 'secondary'} className={item.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{item.status}</Badge></td>
-                            <td><Button size="icon" variant="ghost" onClick={() => setOpenPO(item)} title="Preview"><Eye className="w-5 h-5" /></Button></td>
+                            <td className="flex items-center">
+                              <Button size="icon" variant="ghost" onClick={() => setOpenPO(item)} title="Preview">
+                                <Eye className="w-7 h-7" />
+                              </Button>
+                              {item.status === 'Pending' && (
+                                <>
+                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'po', 'Approved')} title="Approve">
+                                    <CheckCircle className="w-7 h-7 text-green-600" />
+                                  </Button>
+                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'po', 'Rejected')} title="Reject">
+                                    <XCircle className="w-7 h-7 text-red-600" />
+                                  </Button>
+                                </>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -349,7 +395,7 @@ const ManagementDashboard: React.FC = () => {
               {/* Bulk Approve & Live Total */}
               {selectedPOs.length > 0 && (
                 <div className="flex items-center justify-end mt-4 space-x-4">
-                  <div className="text-sm font-medium">Selected Amount: <span className="text-blue-700 font-bold">₹{getSelectedAmount(poData, selectedPOs).toLocaleString()}</span></div>
+                  <div className="text-sm font-medium">Selected Amount: <span className="text-blue-700 font-bold">₹{getSelectedAmount(purchaseOrders, selectedPOs).toLocaleString()}</span></div>
                   <Button className="dpu-button-primary" onClick={handleBulkPOApprove}>Approve Selected</Button>
                 </div>
               )}
@@ -362,7 +408,6 @@ const ManagementDashboard: React.FC = () => {
           isOpen={!!openIndent}
           onClose={() => setOpenIndent(null)}
           indent={openIndent}
-          userRole="management"
         />
 
         {/* PO Detail Modal */}

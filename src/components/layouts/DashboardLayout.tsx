@@ -1,6 +1,7 @@
 
 import React from 'react';
 import Sidebar from '@/components/common/Sidebar';
+import { Toaster } from 'sonner';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       <main className="flex-1 overflow-auto ml-64">
         {children}
       </main>
+      <Toaster richColors />
     </div>
   );
 };

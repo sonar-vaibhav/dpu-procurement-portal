@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface IndentDetails {
   id: string;
@@ -20,88 +21,116 @@ interface IndentDetails {
   justification: string;
   requestedBy: string;
   items: any[];
+  rejectionRemarks?: string;
 }
+
+const initialIndents = [
+  {
+    id: 'IND001',
+    title: 'Laboratory Equipment - Microscopes',
+    requestedBy: 'Dr. John Smith',
+    department: 'Biology',
+    amount: '₹25,000',
+    date: '2024-01-15',
+    status: 'approved',
+    priority: 'high',
+    budgetHead: 'Research Equipment',
+    justification: 'Required for advanced research in cell biology',
+    items: [
+      {
+        itemName: 'Microscope',
+        description: 'High-resolution microscope for cell research',
+        quantity: '2',
+        make: 'Olympus',
+        uom: 'Nos',
+        stockInHand: '0',
+        approxValue: '25000',
+        purpose: 'Research'
+      }
+    ]
+  },
+  {
+    id: 'IND002',
+    title: 'Computer Lab Hardware',
+    requestedBy: 'Prof. Sarah Wilson',
+    department: 'Computer Science',
+    amount: '₹45,000',
+    date: '2024-01-14',
+    status: 'pending_hod',
+    priority: 'medium',
+    budgetHead: 'IT Infrastructure',
+    justification: 'Upgrading computer lab equipment for new courses',
+    items: [
+      {
+        itemName: 'Desktop Computers',
+        description: 'High-performance workstations',
+        quantity: '5',
+        make: 'Dell',
+        uom: 'Nos',
+        stockInHand: '2',
+        approxValue: '45000',
+        purpose: 'Teaching'
+      }
+    ]
+  },
+  {
+    id: 'IND003',
+    title: 'Office Supplies',
+    requestedBy: 'Admin Staff',
+    department: 'Administration',
+    amount: '₹5,000',
+    date: '2024-01-13',
+    status: 'rejected',
+    priority: 'low',
+    budgetHead: 'Office Supplies',
+    justification: 'Regular office supplies replenishment',
+    items: [
+      {
+        itemName: 'Stationery',
+        description: 'Office stationery items',
+        quantity: '1',
+        make: 'Local',
+        uom: 'Lot',
+        stockInHand: '0',
+        approxValue: '5000',
+        purpose: 'Office Use'
+      }
+    ]
+  }
+];
 
 const HODIndents: React.FC = () => {
   const [selectedIndent, setSelectedIndent] = useState<IndentDetails | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [indentsList, setIndentsList] = useState(initialIndents);
+  const { toast } = useToast();
 
-  const indents = [
-    {
-      id: 'IND001',
-      title: 'Laboratory Equipment - Microscopes',
-      requestedBy: 'Dr. John Smith',
-      department: 'Biology',
-      amount: '₹25,000',
-      date: '2024-01-15',
-      status: 'approved',
-      priority: 'high',
-      budgetHead: 'Research Equipment',
-      justification: 'Required for advanced research in cell biology',
-      items: [
-        {
-          itemName: 'Microscope',
-          description: 'High-resolution microscope for cell research',
-          quantity: '2',
-          make: 'Olympus',
-          uom: 'Nos',
-          stockInHand: '0',
-          approxValue: '25000',
-          purpose: 'Research'
-        }
-      ]
-    },
-    {
-      id: 'IND002',
-      title: 'Computer Lab Hardware',
-      requestedBy: 'Prof. Sarah Wilson',
-      department: 'Computer Science',
-      amount: '₹45,000',
-      date: '2024-01-14',
-      status: 'pending_hod',
-      priority: 'medium',
-      budgetHead: 'IT Infrastructure',
-      justification: 'Upgrading computer lab equipment for new courses',
-      items: [
-        {
-          itemName: 'Desktop Computers',
-          description: 'High-performance workstations',
-          quantity: '5',
-          make: 'Dell',
-          uom: 'Nos',
-          stockInHand: '2',
-          approxValue: '45000',
-          purpose: 'Teaching'
-        }
-      ]
-    },
-    {
-      id: 'IND003',
-      title: 'Office Supplies',
-      requestedBy: 'Admin Staff',
-      department: 'Administration',
-      amount: '₹5,000',
-      date: '2024-01-13',
-      status: 'rejected',
-      priority: 'low',
-      budgetHead: 'Office Supplies',
-      justification: 'Regular office supplies replenishment',
-      items: [
-        {
-          itemName: 'Stationery',
-          description: 'Office stationery items',
-          quantity: '1',
-          make: 'Local',
-          uom: 'Lot',
-          stockInHand: '0',
-          approxValue: '5000',
-          purpose: 'Office Use'
-        }
-      ]
-    }
-  ];
+  // Approve handler
+  const handleApprove = (indentId: string) => {
+    setIndentsList(prev => prev.map(indent =>
+      indent.id === indentId ? { ...indent, status: 'approved' } : indent
+    ));
+    setSelectedIndent(null);
+    toast({
+      title: 'Indent Approved',
+      description: `Indent ${indentId} has been approved.`,
+    });
+  };
+
+  // Reject handler
+  const handleReject = (indentId: string, remarks: string) => {
+    setIndentsList(prev => prev.map(indent =>
+      indent.id === indentId ? { ...indent, status: 'rejected', rejectionRemarks: remarks } : indent
+    ));
+    setSelectedIndent(null);
+    toast({
+      title: 'Indent Rejected',
+      description: `Indent ${indentId} has been rejected.`,
+      variant: 'destructive',
+    });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -123,7 +152,7 @@ const HODIndents: React.FC = () => {
     }
   };
 
-  const filteredIndents = indents.filter(indent => {
+  const filteredIndents = indentsList.filter(indent => {
     const matchesSearch = indent.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          indent.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          indent.requestedBy.toLowerCase().includes(searchTerm.toLowerCase());
@@ -226,6 +255,8 @@ const HODIndents: React.FC = () => {
         isOpen={!!selectedIndent}
         onClose={() => setSelectedIndent(null)}
         indent={selectedIndent}
+        onApprove={handleApprove}
+        onReject={handleReject}
       />
     </DashboardLayout>
   );

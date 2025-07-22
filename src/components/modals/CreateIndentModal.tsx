@@ -32,6 +32,8 @@ interface IndentItem {
   approxValue: string;
   description: string;
   vendorQuotationFile?: File | null;
+  imageFile?: File | null;
+  catalogFile?: File | null;
 }
 
 interface CreateIndentModalProps {
@@ -61,7 +63,9 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
       similarItem: '',
       approxValue: '',
       description: '',
-      vendorQuotationFile: null
+      vendorQuotationFile: null,
+      imageFile: null,
+      catalogFile: null
     }
   ]);
 
@@ -70,6 +74,7 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
     department: '',
     materialType: '',
     contactNo: '',
+    intercomNo: '',
     categoryCode: '',
     timeline: '',
     urgentReason: '',
@@ -92,7 +97,9 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
         similarItem: '',
         approxValue: '',
         description: '',
-        vendorQuotationFile: null
+        vendorQuotationFile: null,
+        imageFile: null,
+        catalogFile: null
       }
     ]);
   };
@@ -120,12 +127,11 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
     setItems(updatedItems);
   };
 
-  const handleFileChange = (
-    index: number,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0] || null;
-    updateItem(index, 'vendorQuotationFile', file);
+  const handleFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>, field: 'imageFile' | 'catalogFile' | 'vendorQuotationFile') => {
+    const file = e.target.files ? e.target.files[0] : null;
+    const updatedItems = [...items];
+    (updatedItems[index] as any)[field] = file;
+    setItems(updatedItems);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -215,6 +221,15 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                 value={formData.contactNo}
                 onChange={e =>
                   setFormData({ ...formData, contactNo: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Intercom No.</Label>
+              <Input
+                value={formData.intercomNo}
+                onChange={e =>
+                  setFormData({ ...formData, intercomNo: e.target.value })
                 }
               />
             </div>
@@ -386,11 +401,10 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                           onClick={() =>
                             updateItem(index, 'similarItem', opt)
                           }
-                          className={`px-4 py-1 rounded-full border ${
-                            item.similarItem === opt
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-white text-gray-800'
-                          }`}
+                          className={`px-4 py-1 rounded-full border ${item.similarItem === opt
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white text-gray-800'
+                            }`}
                         >
                           {opt.charAt(0).toUpperCase() + opt.slice(1)}
                         </button>
@@ -403,7 +417,7 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
-                      onChange={e => handleFileChange(index, e)}
+                      onChange={e => handleFileChange(index, e, 'vendorQuotationFile')}
                     />
                     {item.vendorQuotationFile && (
                       <p className="text-sm text-gray-600 mt-1 truncate">
@@ -411,6 +425,44 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       </p>
                     )}
                   </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs text-gray-500 font-medium">
+                      Note: If the product is not listed, please upload the image and catalog.
+                    </Label>
+                  </div>
+                  
+                  <div className="space-y-2"></div>
+
+                  <div className="space-y-2">
+                    <Label>Upload Image</Label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => handleFileChange(index, e, 'imageFile')}
+                    />
+                    {item.imageFile && (
+                      <p className="text-sm text-gray-600 mt-1 truncate">
+                        {item.imageFile.name}
+                      </p>
+                    )}
+                  </div>
+
+
+                  <div className="space-y-2">
+                    <Label>Upload Catalog</Label>
+                    <Input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={e => handleFileChange(index, e, 'catalogFile')}
+                    />
+                    {item.catalogFile && (
+                      <p className="text-sm text-gray-600 mt-1 truncate">
+                        {item.catalogFile.name}
+                      </p>
+                    )}
+                  </div>
+
                 </div>
               </div>
             ))}

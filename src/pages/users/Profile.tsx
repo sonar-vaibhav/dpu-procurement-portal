@@ -17,6 +17,7 @@ const Profile: React.FC = () => {
     name: user?.name || '',
     email: user?.email || '',
     contactNumber: '',
+    intercomNumber: '',
     designation: '',
     collegeName: '',
     department: ''
@@ -41,6 +42,12 @@ const Profile: React.FC = () => {
       newErrors.contactNumber = 'Contact number is required';
     } else if (!/^\d{10}$/.test(formData.contactNumber.replace(/\D/g, ''))) {
       newErrors.contactNumber = 'Contact number must be 10 digits';
+    }
+    
+    if (!formData.intercomNumber.trim()) {
+      newErrors.intercomNumber = 'Intercom number is required';
+    } else if (!/^\d+$/.test(formData.intercomNumber)) {
+      newErrors.intercomNumber = 'Intercom number must contain only digits';
     }
     
     if (!formData.designation) {
@@ -132,6 +139,17 @@ const Profile: React.FC = () => {
                     className={errors.contactNumber ? 'border-red-500' : ''}
                   />
                   {errors.contactNumber && <p className="text-sm text-red-500">{errors.contactNumber}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="intercomNumber">Intercom Number *</Label>
+                  <Input
+                    id="intercomNumber"
+                    value={formData.intercomNumber}
+                    onChange={(e) => handleInputChange('intercomNumber', e.target.value)}
+                    placeholder="Enter your intercom number"
+                    className={errors.intercomNumber ? 'border-red-500' : ''}
+                  />
+                  {errors.intercomNumber && <p className="text-sm text-red-500">{errors.intercomNumber}</p>}
                 </div>
                 
                 <div className="space-y-2">

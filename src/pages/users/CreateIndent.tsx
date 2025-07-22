@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { USER_ROLES } from '@/constants/roles';
 
 interface IndentItem {
   itemName: string;
@@ -20,11 +22,16 @@ interface IndentItem {
   stockInHand: string;
   approxValue: string;
   purpose: string;
+  isCustom?: boolean;
+  vendorQuotation?: string;
+  imageFile?: File | null;
+  catalogFile?: File | null;
 }
 
 const CreateIndent: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [items, setItems] = useState<IndentItem[]>([
     {
       itemName: '',
@@ -34,7 +41,11 @@ const CreateIndent: React.FC = () => {
       uom: '',
       stockInHand: '',
       approxValue: '',
-      purpose: ''
+      purpose: '',
+      isCustom: false,
+      vendorQuotation: '',
+      imageFile: null,
+      catalogFile: null
     }
   ]);
 
@@ -54,7 +65,11 @@ const CreateIndent: React.FC = () => {
       uom: '',
       stockInHand: '',
       approxValue: '',
-      purpose: ''
+      purpose: '',
+      isCustom: false,
+      vendorQuotation: '',
+      imageFile: null,
+      catalogFile: null
     }]);
   };
 
@@ -64,9 +79,15 @@ const CreateIndent: React.FC = () => {
     }
   };
 
-  const updateItem = (index: number, field: keyof IndentItem, value: string) => {
+  const updateItem = (index: number, field: keyof IndentItem, value: any) => {
     const updatedItems = [...items];
-    updatedItems[index][field] = value;
+    (updatedItems[index] as any)[field] = value;
+    setItems(updatedItems);
+  };
+
+  const handleFileChange = (index: number, field: 'imageFile' | 'catalogFile', file: File | null) => {
+    const updatedItems = [...items];
+    updatedItems[index][field] = file;
     setItems(updatedItems);
   };
 
@@ -192,7 +213,15 @@ const CreateIndent: React.FC = () => {
                       </Button>
                     )}
                   </div>
-                  
+                  <div className="flex items-center space-x-4 mb-2">
+                    <input
+                      type="checkbox"
+                      id={`isCustom-${index}`}
+                      checked={!!item.isCustom}
+                      onChange={e => updateItem(index, 'isCustom', e.target.checked)}
+                    />
+                    <Label htmlFor={`isCustom-${index}`}>Custom Item (not in existing list)</Label>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor={`itemName-${index}`}>Item Name *</Label>
@@ -204,7 +233,6 @@ const CreateIndent: React.FC = () => {
                         required
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor={`make-${index}`}>Make/Brand</Label>
                       <Input
@@ -214,7 +242,6 @@ const CreateIndent: React.FC = () => {
                         placeholder="Enter make or brand"
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor={`quantity-${index}`}>Quantity *</Label>
                       <Input
@@ -226,7 +253,6 @@ const CreateIndent: React.FC = () => {
                         required
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor={`uom-${index}`}>Unit of Measurement</Label>
                       <Input
@@ -236,7 +262,6 @@ const CreateIndent: React.FC = () => {
                         placeholder="e.g., Nos, Kg, Ltr"
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor={`stockInHand-${index}`}>Stock in Hand</Label>
                       <Input
@@ -246,7 +271,6 @@ const CreateIndent: React.FC = () => {
                         placeholder="Current stock available"
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor={`approxValue-${index}`}>Approximate Value *</Label>
                       <Input
@@ -259,7 +283,6 @@ const CreateIndent: React.FC = () => {
                       />
                     </div>
                   </div>
-                  
                   <div className="space-y-2">
                     <Label htmlFor={`description-${index}`}>Description</Label>
                     <Textarea
@@ -270,7 +293,6 @@ const CreateIndent: React.FC = () => {
                       rows={2}
                     />
                   </div>
-                  
                   <div className="space-y-2">
                     <Label htmlFor={`purpose-${index}`}>Purpose</Label>
                     <Input
@@ -279,6 +301,39 @@ const CreateIndent: React.FC = () => {
                       onChange={(e) => updateItem(index, 'purpose', e.target.value)}
                       placeholder="Purpose of this item"
                     />
+                  </div>
+                  {/* Vendor Quotation Field */}
+                  <div className="space-y-2">
+                    <Label htmlFor={`vendorQuotation-${index}`}>Vendor Quotation</Label>
+                    <Input
+                      id={`vendorQuotation-${index}`}
+                      value={item.vendorQuotation || ''}
+                      onChange={(e) => updateItem(index, 'vendorQuotation', e.target.value)}
+                      placeholder="Enter vendor quotation details or reference"
+                    />
+                  </div>
+                  {/* Image and Catalog Uploads (Optional, always visible) */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor={`imageFile-${index}`}>Upload Image (optional)</Label>
+                      <Input
+                        id={`imageFile-${index}`}
+                        type="file"
+                        accept="image/*"
+                        onChange={e => handleFileChange(index, 'imageFile', e.target.files ? e.target.files[0] : null)}
+                      />
+                      {item.imageFile && <span className="text-xs text-gray-500">{item.imageFile.name}</span>}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`catalogFile-${index}`}>Upload Catalog (optional)</Label>
+                      <Input
+                        id={`catalogFile-${index}`}
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        onChange={e => handleFileChange(index, 'catalogFile', e.target.files ? e.target.files[0] : null)}
+                      />
+                      {item.catalogFile && <span className="text-xs text-gray-500">{item.catalogFile.name}</span>}
+                    </div>
                   </div>
                 </div>
               ))}
