@@ -23,6 +23,7 @@ import CPDTrack from '@/pages/cpd/CPDTrack';
 import CPDProfile from '@/pages/cpd/CPDProfile';
 import CPDFinalizedVendors from '@/pages/cpd/CPDFinalizedVendors';
 import CPDStockCheckup from '@/pages/cpd/CPDStockCheckup';
+import CPDOfficers from '@/pages/cpd/CPDOfficers';
 import OfficerDashboard from '@/pages/officer/OfficerDashboard';
 import OfficerIndents from '@/pages/officer/OfficerIndents';
 import OfficerVendors from '@/pages/officer/OfficerVendors';
@@ -133,6 +134,7 @@ const App: React.FC = () => {
                 <Route index element={<CPDDashboard />} />
                 <Route path="indents" element={<CPDIndents />} />
                 <Route path="vendors" element={<CPDVendors />} />
+                <Route path="officers" element={<CPDOfficers />} />
                 <Route path="finalized-vendors" element={<CPDFinalizedVendors />} />
                 <Route path="stock-checkup" element={<CPDStockCheckup />} />
                 <Route path="track" element={<CPDTrack />} />

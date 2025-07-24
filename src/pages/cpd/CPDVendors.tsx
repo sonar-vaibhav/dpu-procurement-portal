@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import RegisterVendorModal from '@/components/modals/RegisterVendorModal';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import PurchaseOrderPage from '@/components/PurchaseOrder';
 
 const CPDVendors: React.FC = () => {
   const { toast } = useToast();
@@ -94,6 +96,29 @@ const CPDVendors: React.FC = () => {
       status: 'active'
     }
   ]);
+
+  const [openVendorHistory, setOpenVendorHistory] = useState<null | any>(null);
+  const [selectedYear, setSelectedYear] = useState('2023-2024');
+  const [openPOIndent, setOpenPOIndent] = useState<null | any>(null);
+
+  // Mock vendor history data
+  const vendorHistories = {
+    V001: {
+      years: ['2023-2024', '2022-2023'],
+      indents: [
+        { id: 'IND001', title: 'Lab Equipment', price: 25000, year: '2023-2024' },
+        { id: 'IND002', title: 'Library Books', price: 12000, year: '2023-2024' },
+        { id: 'IND010', title: 'Old Order', price: 8000, year: '2022-2023' }
+      ]
+    },
+    V002: {
+      years: ['2023-2024'],
+      indents: [
+        { id: 'IND003', title: 'Projectors', price: 18000, year: '2023-2024' }
+      ]
+    }
+    // ... add more as needed
+  };
 
   const handleVendorRegistered = (newVendor: any) => {
     setVendors(prev => [...prev, newVendor]);
@@ -236,23 +261,17 @@ const CPDVendors: React.FC = () => {
                     </div> */}
 
                     {/* Actions */}
-                    {/* <div className="flex gap-2 pt-3 border-t">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => handleViewPerformance(vendor.id)}
+                    <div className="flex gap-2 pt-3 border-t">
+                      
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full mt-2"
+                        onClick={() => setOpenVendorHistory(vendor)}
                       >
-                        View Profile
+                        Past History
                       </Button>
-                      <Button 
-                        size="sm" 
-                        className="flex-1 dpu-button-primary"
-                        onClick={() => handleSendRFQ(vendor.id)}
-                      >
-                        Send RFQ
-                      </Button>
-                    </div> */}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -273,6 +292,95 @@ const CPDVendors: React.FC = () => {
         onClose={() => setIsRegisterModalOpen(false)}
         onVendorRegistered={handleVendorRegistered}
       />
+
+      {/* Vendor History Modal */}
+      {openVendorHistory && (
+        <Dialog open={!!openVendorHistory} onOpenChange={v => !v && setOpenVendorHistory(null)}>
+          <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-xl shadow-xl">
+            {/* Header */}
+            <div className="flex items-center gap-4 px-6 py-4 bg-white border-l-4 border-dpu-red">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-dpu-red font-bold text-xl border-2 border-gray-200">
+                {openVendorHistory.name.split(' ').map(n => n[0]).join('').slice(0,2)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-lg font-semibold text-gray-900">{openVendorHistory.name}</div>
+                <div className="text-xs text-gray-500">ID: {openVendorHistory.id} • {openVendorHistory.category}</div>
+              </div>
+            </div>
+            <div className="px-6 pt-4 pb-2 bg-white">
+              {/* Summary Row */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                    <svg className="w-5 h-5 text-dpu-red" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /></svg>
+                    <span className="font-medium text-gray-700">Total Indents:</span>
+                    <span className="font-bold text-dpu-red">{(vendorHistories[openVendorHistory.id]?.indents.filter(i => i.year === selectedYear).length) || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 0V4m0 16v-4" /></svg>
+                    <span className="font-medium text-gray-700">Total Price:</span>
+                    <span className="font-bold text-green-600">₹{(vendorHistories[openVendorHistory.id]?.indents.filter(i => i.year === selectedYear).reduce((sum, i) => sum + i.price, 0) || 0).toLocaleString()}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Financial Year:</span>
+                  <select
+                    className="border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-dpu-red bg-white text-gray-900"
+                    value={selectedYear}
+                    onChange={e => setSelectedYear(e.target.value)}
+                  >
+                    {(vendorHistories[openVendorHistory.id]?.years || ['2023-2024']).map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {/* Indents List */}
+              <div className="border rounded-lg bg-white p-0 max-h-64 overflow-y-auto shadow-sm">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-600 bg-gray-100">
+                      <th className="px-4 py-2">Indent ID</th>
+                      <th className="px-4 py-2">Title</th>
+                      <th className="px-4 py-2">Price</th>
+                      <th className="px-4 py-2">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(vendorHistories[openVendorHistory.id]?.indents.filter(i => i.year === selectedYear) || []).map(indent => (
+                      <tr key={indent.id} className="even:bg-gray-50 odd:bg-white">
+                        <td className="px-4 py-2 font-mono text-dpu-gray">{indent.id}</td>
+                        <td className="px-4 py-2">{indent.title}</td>
+                        <td className="px-4 py-2 font-semibold text-gray-800">₹{indent.price.toLocaleString()}</td>
+                        <td className="px-4 py-2">
+                          <Button size="sm" variant="outline" className="border-gray-300 hover:text-dpu-red hover:bg-red-50" onClick={() => setOpenPOIndent(indent)}>
+                            View
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {(vendorHistories[openVendorHistory.id]?.indents.filter(i => i.year === selectedYear).length === 0) && (
+                      <tr><td colSpan={4} className="text-center text-gray-400 py-4">No indents found for this year.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Purchase Order Modal */}
+      {openPOIndent && (
+        <Dialog open={!!openPOIndent} onOpenChange={v => !v && setOpenPOIndent(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="mb-2 font-semibold text-lg text-dpu-red">Purchase Order for Indent: {openPOIndent.id}</div>
+            <div className="bg-white rounded shadow">
+              <PurchaseOrderPage />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </DashboardLayout>
   );
 };

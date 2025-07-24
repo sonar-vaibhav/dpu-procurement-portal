@@ -140,7 +140,7 @@ const CPDIndents: React.FC = () => {
       category: 'IT Equipment',
       requester: 'Prof. Anil Mehra - Electronics',
       department: 'Electronics',
-      status: 'pending_assignment',
+      status: 'pending_indent_assignment',
       priority: 'medium',
       amount: '₹90,000',
       dateReceived: '2024-01-16',
@@ -215,7 +215,7 @@ const CPDIndents: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusColors = {
-      'pending_assignment': 'bg-yellow-100 text-yellow-800',
+      'pending_indent_assignment': 'bg-yellow-100 text-yellow-800',
       'assigned': 'bg-blue-100 text-blue-800',
       'in_progress': 'bg-purple-100 text-purple-800',
       'completed': 'bg-green-100 text-green-800'
@@ -284,7 +284,7 @@ const CPDIndents: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending_assignment">Pending Assignment</SelectItem>
+                  <SelectItem value="pending_indent_assignment">Pending Indent Assignment</SelectItem>
                   <SelectItem value="assigned">Assigned</SelectItem>
                   <SelectItem value="in_progress">In Progress</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
@@ -327,7 +327,13 @@ const CPDIndents: React.FC = () => {
                           <div className="text-xs text-gray-500">{indent.department}</div>
                         </div>
                       </TableCell>
-                      <TableCell>{getStatusBadge(indent.status)}</TableCell>
+                      <TableCell className='text-xs'>
+                        {indent.status === 'pending_indent_assignment' ? (
+                          <span className="inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-[10px] font-semibold uppercase tracking-wide">Pending Indent Assignment</span>
+                        ) : (
+                          <span className="text-[11px]">{getStatusBadge(indent.status)}</span>
+                        )}
+                      </TableCell>
                       <TableCell className="font-medium">{indent.amount}</TableCell>
                       <TableCell>
                         {indent.assignedTo ? (
@@ -339,7 +345,7 @@ const CPDIndents: React.FC = () => {
                       <TableCell>
                         <div className="flex gap-2">
                           {/* Workflow: Assign to officer, View, Forward to management */}
-                          {indent.status === 'pending_assignment' && (
+                          {indent.status === 'pending_indent_assignment' && (
                             <Select onValueChange={(value) => handleAssignOfficer(indent.id, value)}>
                               <SelectTrigger className="w-32">
                                 <SelectValue placeholder="Assign" />
@@ -422,7 +428,6 @@ const CPDIndents: React.FC = () => {
         isOpen={isIndentModalOpen}
         onClose={() => setIsIndentModalOpen(false)}
         indent={selectedIndent}
-        userRole="management"
       />
 
       {/* Purchase Order Modal */}

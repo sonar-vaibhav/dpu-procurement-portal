@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Eye, FileText, ListChecks, ClipboardList, Hourglass, Building2, Coins, CheckCircle, XCircle } from 'lucide-react';
@@ -98,8 +98,31 @@ const ManagementDashboard: React.FC = () => {
   const [openPODoc, setOpenPODoc] = useState(false);
 
   // Summary
-  const indentSummary = getSummary(indents);
-  const poSummary = getSummary(purchaseOrders);
+  // Combine indents and POs for summary
+  const allItems = [
+    ...indents.flatMap(group => group.items),
+    ...purchaseOrders.flatMap(group => group.items)
+  ];
+  const summary = allItems.reduce(
+    (acc, item) => {
+      if (item.status === 'Approved') {
+        acc.approved.count++;
+        acc.approved.amount += item.amount;
+      } else if (item.status === 'Rejected') {
+        acc.rejected.count++;
+        acc.rejected.amount += item.amount;
+      } else {
+        acc.pending.count++;
+        acc.pending.amount += item.amount;
+      }
+      return acc;
+    },
+    {
+      approved: { count: 0, amount: 0 },
+      rejected: { count: 0, amount: 0 },
+      pending: { count: 0, amount: 0 }
+    }
+  );
 
   const handleStatusUpdate = (id: string, type: 'indent' | 'po', status: 'Approved' | 'Rejected') => {
     const updater = type === 'indent' ? setIndents : setPurchaseOrders;
@@ -167,13 +190,22 @@ const ManagementDashboard: React.FC = () => {
     }
   };
 
+  // Responsive title/subtitle for PageHeader
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <DashboardLayout>
       <PageHeader
-        title="Management Dashboard"
-        subtitle="Final procurement approvals and institutional oversight"
+        title={isMobile ? 'Dashboard' : 'Management Dashboard'}
+        subtitle={isMobile ? '' : 'Final procurement approvals and institutional oversight'}
       />
-      <div className="p-6 min-h-screen bg-gray-50 space-y-10 rounded-xl shadow-inner text-base md:text-lg">
+      <div className="px-3 py-4 pr-6 pl-6 sm:px-4 sm:py-4 md:p-6 min-h-screen bg-gray-50 space-y-6 md:space-y-10 rounded-xl shadow-inner text-base md:text-lg">
         <Tabs defaultValue="indents">
           <TabsList className="mb-6">
             <TabsTrigger value="indents"><ListChecks className="w-4 h-4 mr-2" />Indents</TabsTrigger>
@@ -183,58 +215,48 @@ const ManagementDashboard: React.FC = () => {
             {/* Indents Section */}
             <section>
               <div className="flex items-center mb-4">
-                <ListChecks className="w-6 h-6 text-blue-600 mr-2" />
-                <h2 className="text-2xl font-bold text-gray-800">Indents</h2>
+                <ListChecks className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-2" />
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-800">Indents</h2>
               </div>
-              {/* Summary Cards - Minimal UI */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              {/* Combined Summary Cards */}
+              <div className="grid grid-cols-1 gap-2 mb-3 md:grid-cols-3 md:gap-4 md:mb-6">
                 <Card className="bg-green-50 border border-green-200 shadow-none p-0">
-                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                  <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
                     <div>
-                      <CardTitle className="text-base font-medium text-gray-800">Total Approved Indents</CardTitle>
-                      <div className="text-2xl font-bold mt-2 mb-1">{indentSummary.approved}</div>
-                      <p className="text-xs text-gray-500">+12% from last month</p>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Approved</CardTitle>
+                      <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{summary.approved.count}</div>
+                      <div className="text-xs md:text-sm text-gray-500">Amount: ₹{summary.approved.amount.toLocaleString()}</div>
                     </div>
-                    <ClipboardList className="w-8 h-8 text-green-500 mt-1" />
+                    <CheckCircle className="w-5 h-5 md:w-8 md:h-8 text-green-500 mt-1" />
+                  </CardHeader>
+                </Card>
+                <Card className="bg-red-50 border border-red-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
+                    <div>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Rejected</CardTitle>
+                      <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{summary.rejected.count}</div>
+                      <div className="text-xs md:text-sm text-gray-500">Amount: ₹{summary.rejected.amount.toLocaleString()}</div>
+                    </div>
+                    <XCircle className="w-5 h-5 md:w-8 md:h-8 text-red-500 mt-1" />
                   </CardHeader>
                 </Card>
                 <Card className="bg-yellow-50 border border-yellow-200 shadow-none p-0">
-                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
+                  <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
                     <div>
-                      <CardTitle className="text-base font-medium text-gray-800">Total Pending Indents</CardTitle>
-                      <div className="text-2xl font-bold mt-2 mb-1">{indentSummary.pending}</div>
-                      <p className="text-xs text-gray-500">Requires immediate attention</p>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Pending</CardTitle>
+                      <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{summary.pending.count}</div>
+                      <div className="text-xs md:text-sm text-gray-500">Amount: ₹{summary.pending.amount.toLocaleString()}</div>
                     </div>
-                    <Hourglass className="w-8 h-8 text-yellow-500 mt-1" />
-                  </CardHeader>
-                </Card>
-                <Card className="bg-blue-50 border border-blue-200 shadow-none p-0">
-                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
-                    <div>
-                      <CardTitle className="text-base font-medium text-gray-800">Total Approved Amount</CardTitle>
-                      <div className="text-2xl font-bold mt-2 mb-1">₹{indentSummary.approvedAmt.toLocaleString()}</div>
-                      <p className="text-xs text-gray-500">+43% from last month</p>
-                    </div>
-                    <Building2 className="w-8 h-8 text-blue-500 mt-1" />
-                  </CardHeader>
-                </Card>
-                <Card className="bg-orange-50 border border-orange-200 shadow-none p-0">
-                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
-                    <div>
-                      <CardTitle className="text-base font-medium text-gray-800">Total Pending Amount</CardTitle>
-                      <div className="text-2xl font-bold mt-2 mb-1">₹{indentSummary.pendingAmt.toLocaleString()}</div>
-                      <p className="text-xs text-gray-500">+55% from last month</p>
-                    </div>
-                    <Coins className="w-8 h-8 text-orange-500 mt-1" />
+                    <Hourglass className="w-5 h-5 md:w-8 md:h-8 text-yellow-500 mt-1" />
                   </CardHeader>
                 </Card>
               </div>
               {/* Grouped List */}
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {indents.map(group => (
-                  <div key={group.college} className="border rounded-lg p-4 bg-white/90 shadow-sm">
+                  <div key={group.college} className="border rounded-lg p-2 sm:p-4 bg-white/90 shadow-sm overflow-x-auto">
                     <h3 className="font-semibold text-gray-800 mb-2">{group.college}</h3>
-                    <table className="w-full text-sm rounded-lg overflow-hidden">
+                    <table className="w-full min-w-[600px] text-sm rounded-lg overflow-hidden">
                       <thead>
                         <tr className="text-left text-gray-600 bg-gray-100">
                           <th></th>
@@ -273,6 +295,11 @@ const ManagementDashboard: React.FC = () => {
                                   </Button>
                                 </>
                               )}
+                              {item.status === 'Rejected' && (
+                                <Button size="sm" variant="outline" className="ml-2 text-green-700 border-green-300 hover:bg-green-50" onClick={() => handleStatusUpdate(item.id, 'indent', 'Approved')} title="Re-Approve">
+                                  Re-Approve
+                                </Button>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -294,58 +321,15 @@ const ManagementDashboard: React.FC = () => {
             {/* Purchase Orders Section */}
             <section>
               <div className="flex items-center mb-4">
-                <FileText className="w-6 h-6 text-blue-600 mr-2" />
-                <h2 className="text-2xl font-bold text-gray-800">Purchase Orders (POs)</h2>
-              </div>
-              {/* Summary Cards for POs - Minimal UI */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <Card className="bg-green-50 border border-green-200 shadow-none p-0">
-                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
-                    <div>
-                      <CardTitle className="text-base font-medium text-gray-800">Total Approved POs</CardTitle>
-                      <div className="text-2xl font-bold mt-2 mb-1">{poSummary.approved}</div>
-                      <p className="text-xs text-gray-500">+12% from last month</p>
-                    </div>
-                    <ClipboardList className="w-8 h-8 text-green-500 mt-1" />
-                  </CardHeader>
-                </Card>
-                <Card className="bg-yellow-50 border border-yellow-200 shadow-none p-0">
-                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
-                    <div>
-                      <CardTitle className="text-base font-medium text-gray-800">Total Pending POs</CardTitle>
-                      <div className="text-2xl font-bold mt-2 mb-1">{poSummary.pending}</div>
-                      <p className="text-xs text-gray-500">Requires immediate attention</p>
-                    </div>
-                    <Hourglass className="w-8 h-8 text-yellow-500 mt-1" />
-                  </CardHeader>
-                </Card>
-                <Card className="bg-blue-50 border border-blue-200 shadow-none p-0">
-                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
-                    <div>
-                      <CardTitle className="text-base font-medium text-gray-800">Total Approved Amount</CardTitle>
-                      <div className="text-2xl font-bold mt-2 mb-1">₹{poSummary.approvedAmt.toLocaleString()}</div>
-                      <p className="text-xs text-gray-500">+43% from last month</p>
-                    </div>
-                    <Building2 className="w-8 h-8 text-blue-500 mt-1" />
-                  </CardHeader>
-                </Card>
-                <Card className="bg-orange-50 border border-orange-200 shadow-none p-0">
-                  <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
-                    <div>
-                      <CardTitle className="text-base font-medium text-gray-800">Total Pending Amount</CardTitle>
-                      <div className="text-2xl font-bold mt-2 mb-1">₹{poSummary.pendingAmt.toLocaleString()}</div>
-                      <p className="text-xs text-gray-500">+55% from last month</p>
-                    </div>
-                    <Coins className="w-8 h-8 text-orange-500 mt-1" />
-                  </CardHeader>
-                </Card>
+                <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-2" />
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-800">Purchase Orders (POs)</h2>
               </div>
               {/* Grouped List */}
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {purchaseOrders.map(group => (
-                  <div key={group.college} className="border rounded-lg p-4 bg-white/90 shadow-sm">
+                  <div key={group.college} className="border rounded-lg p-2 sm:p-4 bg-white/90 shadow-sm overflow-x-auto">
                     <h3 className="font-semibold text-gray-800 mb-2">{group.college}</h3>
-                    <table className="w-full text-sm rounded-lg overflow-hidden">
+                    <table className="w-full min-w-[600px] text-sm rounded-lg overflow-hidden">
                       <thead>
                         <tr className="text-left text-gray-600 bg-gray-100">
                           <th></th>
@@ -384,6 +368,11 @@ const ManagementDashboard: React.FC = () => {
                                   </Button>
                                 </>
                               )}
+                              {item.status === 'Rejected' && (
+                                <Button size="sm" variant="outline" className="ml-2 text-green-700 border-green-300 hover:bg-green-50" onClick={() => handleStatusUpdate(item.id, 'po', 'Approved')} title="Re-Approve">
+                                  Re-Approve
+                                </Button>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -404,32 +393,36 @@ const ManagementDashboard: React.FC = () => {
         </Tabs>
 
         {/* Indent Detail Modal */}
-        <IndentDetailsModal
-          isOpen={!!openIndent}
-          onClose={() => setOpenIndent(null)}
-          indent={openIndent}
-        />
+        <Dialog open={!!openIndent} onOpenChange={v => !v && setOpenIndent(null)}>
+          <DialogContent className="max-w-full w-[95vw] sm:max-w-xl overflow-y-auto">
+            <IndentDetailsModal
+              isOpen={!!openIndent}
+              onClose={() => setOpenIndent(null)}
+              indent={openIndent}
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* PO Detail Modal */}
         <Dialog open={!!openPO} onOpenChange={v => !v && setOpenPO(null)}>
-          <DialogContent className="max-w-xl">
+          <DialogContent className="w-full max-w-[98vw] sm:max-w-xl overflow-y-auto p-2">
             {openPO && (
               <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-lg">Purchase Order Details</CardTitle>
-                  <CardDescription>ID: {openPO.id}</CardDescription>
+                <CardHeader className="p-2 sm:p-4">
+                  <CardTitle className="text-base sm:text-lg">Purchase Order Details</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">ID: {openPO.id}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="mb-2"><span className="font-medium">Title:</span> {openPO.title}</div>
-                  <div className="mb-2"><span className="font-medium">College:</span> {openPO.college}</div>
-                  <div className="mb-2"><span className="font-medium">Requested Amount:</span> <span className="text-blue-700 font-semibold">₹{openPO.amount.toLocaleString()}</span></div>
-                  <div className="mb-2"><span className="font-medium">Status:</span> <Badge variant={openPO.status === 'Approved' ? 'secondary' : openPO.status === 'Pending' ? 'outline' : 'secondary'} className={openPO.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{openPO.status}</Badge></div>
-                  <div className="flex gap-2 mt-4">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="mb-2 text-sm sm:text-base"><span className="font-medium">Title:</span> {openPO.title}</div>
+                  <div className="mb-2 text-sm sm:text-base"><span className="font-medium">College:</span> {openPO.college}</div>
+                  <div className="mb-2 text-sm sm:text-base"><span className="font-medium">Requested Amount:</span> <span className="text-blue-700 font-semibold">₹{openPO.amount.toLocaleString()}</span></div>
+                  <div className="mb-2 text-sm sm:text-base"><span className="font-medium">Status:</span> <Badge variant={openPO.status === 'Approved' ? 'secondary' : openPO.status === 'Pending' ? 'outline' : 'secondary'} className={openPO.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{openPO.status}</Badge></div>
+                  <div className="flex flex-col sm:flex-row gap-2 mt-4">
                     <Button variant="outline" onClick={() => setOpenVendorChart(true)}><FileText className="w-4 h-4 mr-1" />Vendor Comparison Chart</Button>
                     <Button variant="outline" onClick={() => setOpenPODoc(true)}><FileText className="w-4 h-4 mr-1" />Final PO Document</Button>
                   </div>
                 </CardContent>
-                <CardFooter className="justify-end">
+                <CardFooter className="justify-end p-2 sm:p-4">
                   <Button variant="outline" onClick={() => setOpenPO(null)}>Close</Button>
                 </CardFooter>
               </Card>
@@ -439,15 +432,23 @@ const ManagementDashboard: React.FC = () => {
 
         {/* Vendor Comparison Chart Modal */}
         <Dialog open={openVendorChart} onOpenChange={setOpenVendorChart}>
-          <DialogContent className="max-w-[90vw]">
-            <DialogHeader>
+          <DialogContent className="max-w-full w-[98vw] sm:max-w-[90vw] overflow-y-auto p-0">
+            {/* Sticky top bar for mobile close button */}
+            <div className="sticky top-0 z-10 bg-white flex justify-end sm:hidden border-b p-2">
+              <Button size="sm" variant="outline" onClick={() => setOpenVendorChart(false)}>
+                Close
+              </Button>
+            </div>
+            <DialogHeader className="hidden sm:block">
               <DialogTitle>Vendor Comparison Chart</DialogTitle>
               <DialogDescription>Preview of the vendor comparison chart for this PO.</DialogDescription>
             </DialogHeader>
-            <div className="max-h-[80vh] overflow-y-auto text-center text-gray-500 py-8">
-              <ComparisonChartReport />
+            <div className="max-h-[80vh] overflow-auto px-0 sm:px-0 text-center text-gray-500 py-4 sm:py-8">
+              <div className="w-max min-w-full">
+                <ComparisonChartReport />
+              </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="hidden sm:flex">
               <Button variant="outline" onClick={() => setOpenVendorChart(false)}>Close</Button>
             </DialogFooter>
           </DialogContent>
@@ -455,15 +456,23 @@ const ManagementDashboard: React.FC = () => {
 
         {/* Final PO Document Modal */}
         <Dialog open={openPODoc} onOpenChange={setOpenPODoc}>
-          <DialogContent className="max-w-5xl">
-            <DialogHeader>
+          <DialogContent className="max-w-full w-[98vw] sm:max-w-5xl overflow-y-auto p-0">
+            {/* Sticky top bar for mobile close button */}
+            <div className="sticky top-0 z-10 bg-white flex justify-end sm:hidden border-b p-2">
+              <Button size="sm" variant="outline" onClick={() => setOpenPODoc(false)}>
+                Close
+              </Button>
+            </div>
+            <DialogHeader className="hidden sm:block">
               <DialogTitle>Final Purchase Order Document</DialogTitle>
               <DialogDescription>Preview of the final PO document for this order.</DialogDescription>
             </DialogHeader>
-            <div className="max-h-[80vh] overflow-y-auto">
-              <PurchaseOrderPage />
+            <div className="max-h-[80vh] overflow-auto px-0 sm:px-0 py-4 sm:py-8">
+              <div className="w-max min-w-full">
+                <PurchaseOrderPage />
+              </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="hidden sm:flex">
               <Button variant="outline" onClick={() => setOpenPODoc(false)}>Close</Button>
             </DialogFooter>
           </DialogContent>

@@ -167,15 +167,15 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full max-w-[98vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto px-1 py-2">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             {indent.title}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <Badge className={getStatusColor(indent.status)}>
               {getStatusText(indent.status)}
             </Badge>
@@ -185,9 +185,9 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
           </div>
 
           {indent.approvalTrail && (
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-2 sm:p-4 rounded-lg">
               <h3 className="font-medium mb-2">Approval Trail</h3>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap justify-center gap-2">
                 {indent.approvalTrail.map((step, index) => (
                   <React.Fragment key={step}>
                     <Badge variant="outline">{step}</Badge>
@@ -200,7 +200,7 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <div>
               <h3 className="font-medium mb-2">Request Details</h3>
               <div className="space-y-2 text-sm">
@@ -234,10 +234,10 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
 
           <div>
             <h3 className="font-medium mb-4">Requested Items</h3>
-            <div className="space-y-4">
+            <div className="space-y-2 sm:space-y-4">
               {editableItems.map((item, index) => (
-                <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div key={index} className="border rounded-lg p-2 sm:p-4 bg-gray-50 w-full">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 sm:gap-4">
                     {Object.entries(item).map(([field, value]) => (
                       <div key={field}>
                         <Label className="capitalize">{field}</Label>

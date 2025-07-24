@@ -34,14 +34,14 @@ const ManagementProfile: React.FC = () => {
         subtitle="Manage your account information"
       />
       
-      <div className="p-6">
+      <div className="p-2 sm:p-4 md:p-6">
         <Card>
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
             <CardDescription>Update your profile details</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
               <div>
                 <Label htmlFor="name">Full Name</Label>
                 <Input
