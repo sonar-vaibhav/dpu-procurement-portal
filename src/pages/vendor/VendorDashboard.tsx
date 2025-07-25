@@ -47,14 +47,6 @@ const VendorDashboard: React.FC = () => {
       iconColor: 'text-emerald-600',
       textColor: 'text-emerald-900'
     },
-    { 
-      title: 'Rejected Quotes', 
-      value: '3', 
-      icon: XCircle,
-      bgGradient: 'from-red-50 to-red-100',
-      iconColor: 'text-red-600',
-      textColor: 'text-red-900'
-    }
   ];
 
   const recentEnquiries = [
@@ -84,7 +76,7 @@ const VendorDashboard: React.FC = () => {
       category: 'Furniture',
       quantity: '15 sets',
       deadline: '2024-01-28',
-      status: 'pending',
+      status: 'responded',
       priority: 'Low',
       estimatedValue: '₹4,50,000'
     }

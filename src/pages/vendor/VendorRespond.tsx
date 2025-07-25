@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
@@ -14,7 +13,7 @@ const VendorRespond: React.FC = () => {
   const { enquiryId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [formData, setFormData] = useState({
     itemSpecs: '',
     initialPrice: '',
@@ -23,7 +22,11 @@ const VendorRespond: React.FC = () => {
     remarks: ''
   });
 
-  // Mock enquiry data
+
+  const [gstRate] = useState(18); // default GST 18%
+  const [calculatedTotal, setCalculatedTotal] = useState('0');
+
+  // Mock enquiry data (unchanged)
   const enquiry = {
     id: enquiryId,
     title: 'Laboratory Equipment - Microscopes',
@@ -35,18 +38,25 @@ const VendorRespond: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // In a real app, this would submit to backend
+
+    // shows total price incl. GST
     toast({
       title: "Quotation Submitted",
-      description: `Your quotation for ${enquiry.title} has been submitted successfully.`,
+      description: `Your quotation for ${enquiry.title} has been submitted successfully. Total (incl. GST): ₹${calculatedTotal}`,
     });
-    
+
     navigate('/vendor/quotes');
   };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
+
+    // Auto-calculate total when price changes
+    if (field === 'initialPrice') {
+      const price = parseFloat(value) || 0;
+      const total = price + (price * gstRate) / 100;
+      setCalculatedTotal(total.toFixed(2));
+    }
   };
 
   return (
@@ -55,7 +65,7 @@ const VendorRespond: React.FC = () => {
         title="Submit Quotation"
         subtitle={`Respond to enquiry: ${enquiry.title}`}
       />
-      
+
       <div className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Enquiry Details */}
@@ -121,9 +131,17 @@ const VendorRespond: React.FC = () => {
                       value={formData.initialPrice}
                       onChange={(e) => handleInputChange('initialPrice', e.target.value)}
                       required
+                      min="1" // Prevent negative/zero values
                     />
+                    {/* Added GST & Total price preview */}
+                    <p className="text-xs text-gray-500 mt-1">
+                      GST ({gstRate}%): ₹{((parseFloat(formData.initialPrice) || 0) * gstRate / 100).toFixed(2)}
+                    </p>
+                    <p className="text-sm font-medium text-blue-600">
+                      Total with GST: ₹{calculatedTotal}
+                    </p>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="deliveryTime">Delivery Time *</Label>
                     <Input
@@ -132,6 +150,8 @@ const VendorRespond: React.FC = () => {
                       value={formData.deliveryTime}
                       onChange={(e) => handleInputChange('deliveryTime', e.target.value)}
                       required
+                      pattern="^\d+\s?(days|day|weeks|week)$"
+                      title="Use format like '15 days' or '2 weeks'"
                     />
                   </div>
                 </div>
@@ -161,9 +181,9 @@ const VendorRespond: React.FC = () => {
                   <Button type="submit" className="dpu-button-primary">
                     Submit Quotation
                   </Button>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     onClick={() => navigate('/vendor/enquiries')}
                   >
                     Cancel

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
@@ -92,6 +92,7 @@ const comparisonData = {
 
 const ComparisonChartReport: React.FC = () => {
   const printRef = useRef<HTMLDivElement>(null);
+  const [selectedVendor, setSelectedVendor] = useState<number | null>(null);
 
   const handleDownloadPDF = () => {
     if (!printRef.current) return;
@@ -104,6 +105,10 @@ const ComparisonChartReport: React.FC = () => {
       pagebreak: { mode: ['css', 'legacy'] },
     };
     html2pdf().set(opt).from(printRef.current).save();
+  };
+
+  const handleVendorClick = (index: number) => {
+    setSelectedVendor(index === selectedVendor ? null : index);
   };
 
   return (
@@ -119,21 +124,28 @@ const ComparisonChartReport: React.FC = () => {
         <table className="w-full border border-black text-xs mb-2">
           <thead>
             <tr>
-              <th colSpan={20} className="border border-black text-center font-bold text-base" style={{ borderRight: 0 }}>DR. D. Y. PATIL UNITECH SOCIETY, PUNE</th>
+              <th colSpan={20} className="border border-black text-center font-bold text-base">
+                DR. D. Y. PATIL UNITECH SOCIETY, PUNE
+              </th>
             </tr>
             <tr>
-              <th colSpan={20} className="border border-black text-center font-semibold px-2 py-1">Statement for Comparison of Estimate</th>
+              <th colSpan={20} className="border border-black text-center font-semibold px-2 py-1">
+                Statement for Comparison of Estimate
+              </th>
             </tr>
             <tr>
-              <th colSpan={4} className="border border-black font-normal text-left px-2 py-1">Name: Dr. D. Y. Patil Unitech Society, Pune</th>
-              <th colSpan={2} className="border border-black font-normal text-left px-2 py-1">Department: College Bldg- Sr. No. 138, Tathawade</th>
+              <th colSpan={4} className="border border-black font-normal text-left px-2 py-1">
+                Name: Dr. D. Y. Patil Unitech Society, Pune
+              </th>
+              <th colSpan={2} className="border border-black font-normal text-left px-2 py-1">
+                Department: College Bldg- Sr. No. 138, Tathawade
+              </th>
               <th className="border border-black font-normal text-left px-2 py-1">Indent No: 1046</th>
               <th className="border border-black font-normal text-left px-2 py-1">Date: 03/12/2024</th>
             </tr>
-
-
           </thead>
         </table>
+
         {/* Table */}
         <div className="overflow-x-auto mt-2">
           <table className="w-full border border-gray-400 text-xs">
@@ -144,7 +156,14 @@ const ComparisonChartReport: React.FC = () => {
                 <th rowSpan={2} className="border border-gray-400 px-1 py-1">Unit</th>
                 <th rowSpan={2} className="border border-gray-400 px-1 py-1">Qty</th>
                 {comparisonData.estimates.map((est, idx) => (
-                  <th className="border border-gray-400 px-1 py-1 text-center" colSpan={3} key={idx}>
+                  <th
+                    className={`border border-gray-400 px-1 py-1 text-center cursor-pointer ${
+                      selectedVendor === idx ? 'bg-yellow-200' : ''
+                    }`}
+                    colSpan={3}
+                    key={idx}
+                    onClick={() => handleVendorClick(idx)}
+                  >
                     Estimate {idx + 1}<br />
                     <span className="font-semibold">{est.vendor}</span><br />
                     <span className="font-normal">Estimate No. {est.estimateNo}</span><br />
@@ -172,59 +191,100 @@ const ComparisonChartReport: React.FC = () => {
               {comparisonData.items.map((item, idx) => (
                 <tr key={item.sr} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                   <td className="border border-gray-400 px-1 py-1 text-center">{item.sr}</td>
-                  <td className="border border-gray-400 px-1 py-1 text-center">{item.description.split('\n').map((line, i) => <div key={i}>{line}</div>)}</td>
+                  <td className="border border-gray-400 px-1 py-1 text-center">
+                    {item.description.split('\n').map((line, i) => <div key={i}>{line}</div>)}
+                  </td>
                   <td className="border border-gray-400 px-1 py-1 text-center">{item.unit}</td>
                   <td className="border border-gray-400 px-1 py-1 text-center">{item.qty}</td>
                   {item.vendors.map((v, vIdx) => (
                     <React.Fragment key={vIdx}>
-                      <td className="border border-gray-400 px-1 py-1 text-center">{v.model.split('\n').map((line, i) => <div key={i}>{line}</div>)}</td>
-                      <td className="border border-gray-400 px-1 py-1 text-right">{v.rate.toLocaleString()}</td>
-                      <td className="border border-gray-400 px-1 py-1 text-right">{v.amount.toLocaleString()}</td>
+                      <td className={`border border-gray-400 px-1 py-1 text-center ${
+                        selectedVendor === vIdx ? 'bg-yellow-100 font-semibold' : ''
+                      }`}>
+                        {v.model.split('\n').map((line, i) => <div key={i}>{line}</div>)}
+                      </td>
+                      <td className={`border border-gray-400 px-1 py-1 text-right ${
+                        selectedVendor === vIdx ? 'bg-yellow-100 font-semibold' : ''
+                      }`}>
+                        {v.rate.toLocaleString()}
+                      </td>
+                      <td className={`border border-gray-400 px-1 py-1 text-right ${
+                        selectedVendor === vIdx ? 'bg-yellow-100 font-semibold' : ''
+                      }`}>
+                        {v.amount.toLocaleString()}
+                      </td>
                     </React.Fragment>
                   ))}
                 </tr>
               ))}
+
               {/* Totals and Summary Rows */}
-              {comparisonData.totals.map((row, idx) => (
+              {comparisonData.totals.map((row) => (
                 <tr key={row.label} className="font-bold">
                   <td className="border border-gray-400 px-1 py-1 text-right bg-gray-100" colSpan={4}>{row.label}</td>
                   {row.values.map((val, vIdx) => (
-                    <td className="border border-gray-400 px-1 py-1 text-center bg-gray-100" colSpan={3} key={vIdx}>{val}</td>
+                    <td
+                      className={`border border-gray-400 px-1 py-1 text-center bg-gray-100 ${
+                        selectedVendor === vIdx ? 'bg-yellow-200 font-bold' : ''
+                      }`}
+                      colSpan={3}
+                      key={vIdx}
+                    >
+                      {val}
+                    </td>
                   ))}
                 </tr>
               ))}
-              {/* Warranty/Delivery/Payment Row */}
+
+              {/* Warranty/Delivery/Payment Rows */}
               <tr>
                 <td colSpan={4} className="border border-gray-400 px-1 py-1 font-semibold text-right bg-gray-50">Warranty</td>
-                {comparisonData.estimates.map((est, idx) => (
-                  <td className="border border-gray-400 px-1 py-1 text-center bg-gray-50" colSpan={3} key={idx}>
-                    <div><span className="font-semibold"></span> {comparisonData.warranty[idx]}</div>
-                    <div><span className="font-semibold"></span> {comparisonData.hdd[idx]}</div>
+                {comparisonData.estimates.map((_, idx) => (
+                  <td
+                    className={`border border-gray-400 px-1 py-1 text-center bg-gray-50 ${
+                      selectedVendor === idx ? 'bg-yellow-100 font-semibold' : ''
+                    }`}
+                    colSpan={3}
+                    key={idx}
+                  >
+                    <div>{comparisonData.warranty[idx]}</div>
+                    <div>{comparisonData.hdd[idx]}</div>
                   </td>
                 ))}
               </tr>
               <tr>
                 <td colSpan={4} className="border border-gray-400 px-1 py-1 font-semibold text-right bg-gray-50">Delivery</td>
-                {comparisonData.estimates.map((est, idx) => (
-                  <td className="border border-gray-400 px-1 py-1 text-center bg-gray-50" colSpan={3} key={idx}>
-                    <div><span className="font-semibold"></span> {comparisonData.delivery[idx]}</div>
+                {comparisonData.estimates.map((_, idx) => (
+                  <td
+                    className={`border border-gray-400 px-1 py-1 text-center bg-gray-50 ${
+                      selectedVendor === idx ? 'bg-yellow-100 font-semibold' : ''
+                    }`}
+                    colSpan={3}
+                    key={idx}
+                  >
+                    {comparisonData.delivery[idx]}
                   </td>
                 ))}
               </tr>
               <tr>
                 <td colSpan={4} className="border border-gray-400 px-1 py-1 font-semibold text-right bg-gray-50">Payment</td>
-                {comparisonData.estimates.map((est, idx) => (
-                  <td className="border border-gray-400 px-1 py-1 text-center bg-gray-50" colSpan={3} key={idx}>
-                    <div><span className="font-semibold"></span> {comparisonData.payment[idx]}</div>
+                {comparisonData.estimates.map((_, idx) => (
+                  <td
+                    className={`border border-gray-400 px-1 py-1 text-center bg-gray-50 ${
+                      selectedVendor === idx ? 'bg-yellow-100 font-semibold' : ''
+                    }`}
+                    colSpan={3}
+                    key={idx}
+                  >
+                    {comparisonData.payment[idx]}
                   </td>
                 ))}
               </tr>
-
-
             </tbody>
           </table>
         </div>
-        {/* Warranty, Delivery, Payment, Signatures */}
+
+        {/* Signatures */}
         <div className="flex justify-between items-end mt-6 mb-[6px] text-xs w-full" style={{ pageBreakInside: 'avoid' }}>
           <div>
             <div>Omkar Rokade</div>
@@ -249,4 +309,4 @@ const ComparisonChartReport: React.FC = () => {
   );
 };
 
-export default ComparisonChartReport; 
+export default ComparisonChartReport;

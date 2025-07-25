@@ -48,7 +48,7 @@ const VendorQuotes: React.FC = () => {
       quotedPrice: '₹15,600',
       revisedPrice: '₹14,200',
       submittedDate: '2024-01-12',
-      status: 'rejected',
+      status: 'pending',
       deliveryTime: '5 days',
       notes: 'Competitor offered better terms'
     }
@@ -111,15 +111,6 @@ const VendorQuotes: React.FC = () => {
               <div>
                 <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
                 <p className="text-sm text-gray-600">Pending</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6 flex items-center gap-4">
-              <XCircle className="w-6 h-6 text-red-600" />
-              <div>
-                <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
-                <p className="text-sm text-gray-600">Rejected</p>
               </div>
             </CardContent>
           </Card>

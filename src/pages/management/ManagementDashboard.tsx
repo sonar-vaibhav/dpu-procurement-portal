@@ -124,6 +124,30 @@ const ManagementDashboard: React.FC = () => {
     }
   );
 
+  // PO summary for the PO tab
+  const poSummary = purchaseOrders
+    .flatMap(group => group.items)
+    .reduce(
+      (acc, item) => {
+        if (item.status === 'Approved') {
+          acc.approved.count++;
+          acc.approved.amount += item.amount;
+        } else if (item.status === 'Rejected') {
+          acc.rejected.count++;
+          acc.rejected.amount += item.amount;
+        } else {
+          acc.pending.count++;
+          acc.pending.amount += item.amount;
+        }
+        return acc;
+      },
+      {
+        approved: { count: 0, amount: 0 },
+        rejected: { count: 0, amount: 0 },
+        pending: { count: 0, amount: 0 }
+      }
+    );
+
   const handleStatusUpdate = (id: string, type: 'indent' | 'po', status: 'Approved' | 'Rejected') => {
     const updater = type === 'indent' ? setIndents : setPurchaseOrders;
     updater(prev => 
@@ -324,6 +348,39 @@ const ManagementDashboard: React.FC = () => {
                 <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-2" />
                 <h2 className="text-lg sm:text-2xl font-bold text-gray-800">Purchase Orders (POs)</h2>
               </div>
+              {/* PO Summary Cards */}
+              <div className="grid grid-cols-1 gap-2 mb-3 md:grid-cols-3 md:gap-4 md:mb-6">
+                <Card className="bg-green-50 border border-green-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
+                    <div>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Approved</CardTitle>
+                      <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{poSummary.approved.count}</div>
+                      <div className="text-xs md:text-sm text-gray-500">Amount: ₹{poSummary.approved.amount.toLocaleString()}</div>
+                    </div>
+                    <CheckCircle className="w-5 h-5 md:w-8 md:h-8 text-green-500 mt-1" />
+                  </CardHeader>
+                </Card>
+                <Card className="bg-red-50 border border-red-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
+                    <div>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Rejected</CardTitle>
+                      <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{poSummary.rejected.count}</div>
+                      <div className="text-xs md:text-sm text-gray-500">Amount: ₹{poSummary.rejected.amount.toLocaleString()}</div>
+                    </div>
+                    <XCircle className="w-5 h-5 md:w-8 md:h-8 text-red-500 mt-1" />
+                  </CardHeader>
+                </Card>
+                <Card className="bg-yellow-50 border border-yellow-200 shadow-none p-0">
+                  <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
+                    <div>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Pending</CardTitle>
+                      <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{poSummary.pending.count}</div>
+                      <div className="text-xs md:text-sm text-gray-500">Amount: ₹{poSummary.pending.amount.toLocaleString()}</div>
+                    </div>
+                    <Hourglass className="w-5 h-5 md:w-8 md:h-8 text-yellow-500 mt-1" />
+                  </CardHeader>
+                </Card>
+              </div>
               {/* Grouped List */}
               <div className="space-y-4 md:space-y-6">
                 {purchaseOrders.map(group => (
@@ -419,7 +476,7 @@ const ManagementDashboard: React.FC = () => {
                   <div className="mb-2 text-sm sm:text-base"><span className="font-medium">Status:</span> <Badge variant={openPO.status === 'Approved' ? 'secondary' : openPO.status === 'Pending' ? 'outline' : 'secondary'} className={openPO.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{openPO.status}</Badge></div>
                   <div className="flex flex-col sm:flex-row gap-2 mt-4">
                     <Button variant="outline" onClick={() => setOpenVendorChart(true)}><FileText className="w-4 h-4 mr-1" />Vendor Comparison Chart</Button>
-                    <Button variant="outline" onClick={() => setOpenPODoc(true)}><FileText className="w-4 h-4 mr-1" />Final PO Document</Button>
+                    <Button variant="outline" onClick={() => setOpenPODoc(true)}><FileText className="w-4 h-4 mr-1" />Final PO</Button>
                   </div>
                 </CardContent>
                 <CardFooter className="justify-end p-2 sm:p-4">
