@@ -47,7 +47,7 @@ import AccountIndents from '@/pages/account/AccountIndents';
 import PrincipalDashboard from '@/pages/principal/PrincipalDashboard';
 import PrincipalProfile from '@/pages/principal/PrincipalProfile';
 import PrincipalIndents from '@/pages/principal/PrincipalIndents';
-
+import { Analytics } from '@vercel/analytics/react';
 
 
 const App: React.FC = () => {
@@ -227,6 +227,7 @@ const App: React.FC = () => {
         {/* 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Analytics />
     </Router>
   );
 };

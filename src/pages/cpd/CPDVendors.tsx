@@ -263,8 +263,8 @@ const CPDVendors: React.FC = () => {
                     {/* Actions */}
                     <div className="flex gap-2 pt-3 border-t">
                       
-                      <Button
-                        size="sm"
+                      <Button 
+                        size="sm" 
                         variant="outline"
                         className="w-full mt-2"
                         onClick={() => setOpenVendorHistory(vendor)}
