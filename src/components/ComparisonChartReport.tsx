@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
+const selectedVendorIndex = 1; // Dummy: vendor at index 1 is selected for PO
 const comparisonData = {
   society: 'DR. D. Y. PATIL UNITECH SOCIETY, PUNE',
   department: 'College Bldg - St. No. 138, Tathawade',
@@ -158,7 +159,7 @@ const ComparisonChartReport: React.FC = () => {
                 {comparisonData.estimates.map((est, idx) => (
                   <th
                     className={`border border-gray-400 px-1 py-1 text-center cursor-pointer ${
-                      selectedVendor === idx ? 'bg-yellow-200' : ''
+                      (selectedVendor === idx || selectedVendorIndex === idx) ? 'bg-yellow-300 border-2 border-yellow-500 font-bold ring-2 ring-yellow-400' : ''
                     }`}
                     colSpan={3}
                     key={idx}
@@ -168,6 +169,9 @@ const ComparisonChartReport: React.FC = () => {
                     <span className="font-semibold">{est.vendor}</span><br />
                     <span className="font-normal">Estimate No. {est.estimateNo}</span><br />
                     <span className="font-normal">Estimate Date: {est.estimateDate}</span>
+                    {selectedVendorIndex === idx && (
+                      <div className="mt-1 text-xs text-yellow-900 font-bold">Selected Vendor</div>
+                    )}
                   </th>
                 ))}
               </tr>
@@ -199,17 +203,17 @@ const ComparisonChartReport: React.FC = () => {
                   {item.vendors.map((v, vIdx) => (
                     <React.Fragment key={vIdx}>
                       <td className={`border border-gray-400 px-1 py-1 text-center ${
-                        selectedVendor === vIdx ? 'bg-yellow-100 font-semibold' : ''
+                        (selectedVendor === vIdx || selectedVendorIndex === vIdx) ? 'bg-yellow-200 font-semibold border-2 border-yellow-500' : ''
                       }`}>
                         {v.model.split('\n').map((line, i) => <div key={i}>{line}</div>)}
                       </td>
                       <td className={`border border-gray-400 px-1 py-1 text-right ${
-                        selectedVendor === vIdx ? 'bg-yellow-100 font-semibold' : ''
+                        (selectedVendor === vIdx || selectedVendorIndex === vIdx) ? 'bg-yellow-200 font-semibold border-2 border-yellow-500' : ''
                       }`}>
                         {v.rate.toLocaleString()}
                       </td>
                       <td className={`border border-gray-400 px-1 py-1 text-right ${
-                        selectedVendor === vIdx ? 'bg-yellow-100 font-semibold' : ''
+                        (selectedVendor === vIdx || selectedVendorIndex === vIdx) ? 'bg-yellow-200 font-semibold border-2 border-yellow-500' : ''
                       }`}>
                         {v.amount.toLocaleString()}
                       </td>
@@ -225,7 +229,7 @@ const ComparisonChartReport: React.FC = () => {
                   {row.values.map((val, vIdx) => (
                     <td
                       className={`border border-gray-400 px-1 py-1 text-center bg-gray-100 ${
-                        selectedVendor === vIdx ? 'bg-yellow-200 font-bold' : ''
+                        (selectedVendor === vIdx || selectedVendorIndex === vIdx) ? 'bg-yellow-300 font-bold border-2 border-yellow-500' : ''
                       }`}
                       colSpan={3}
                       key={vIdx}
@@ -242,7 +246,7 @@ const ComparisonChartReport: React.FC = () => {
                 {comparisonData.estimates.map((_, idx) => (
                   <td
                     className={`border border-gray-400 px-1 py-1 text-center bg-gray-50 ${
-                      selectedVendor === idx ? 'bg-yellow-100 font-semibold' : ''
+                      (selectedVendor === idx || selectedVendorIndex === idx) ? 'bg-yellow-200 font-semibold border-2 border-yellow-500' : ''
                     }`}
                     colSpan={3}
                     key={idx}
@@ -257,7 +261,7 @@ const ComparisonChartReport: React.FC = () => {
                 {comparisonData.estimates.map((_, idx) => (
                   <td
                     className={`border border-gray-400 px-1 py-1 text-center bg-gray-50 ${
-                      selectedVendor === idx ? 'bg-yellow-100 font-semibold' : ''
+                      (selectedVendor === idx || selectedVendorIndex === idx) ? 'bg-yellow-200 font-semibold border-2 border-yellow-500' : ''
                     }`}
                     colSpan={3}
                     key={idx}
@@ -271,7 +275,7 @@ const ComparisonChartReport: React.FC = () => {
                 {comparisonData.estimates.map((_, idx) => (
                   <td
                     className={`border border-gray-400 px-1 py-1 text-center bg-gray-50 ${
-                      selectedVendor === idx ? 'bg-yellow-100 font-semibold' : ''
+                      (selectedVendor === idx || selectedVendorIndex === idx) ? 'bg-yellow-200 font-semibold border-2 border-yellow-500' : ''
                     }`}
                     colSpan={3}
                     key={idx}

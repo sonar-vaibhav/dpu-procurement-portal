@@ -71,6 +71,13 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
 
   const canApprove = () => {
     if (!indent || !userRole) return false;
+    if (
+      (userRole === 'management' && indent.status === 'pending_management') ||
+      (userRole === 'cpd' && indent.status === 'pending_cpd')
+    ) {
+      return true;
+    }
+    // Keep existing logic for other roles
     switch (userRole) {
       case 'hod':
         return indent.status === 'pending_hod';
@@ -80,10 +87,8 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
         return indent.status === 'pending_store';
       case 'registrar':
         return indent.status === 'pending_registrar';
-      case 'management':
-        return indent.status === 'pending_management';
       case 'account':
-      return indent.status === 'pending_account'; 
+        return indent.status === 'pending_account';
       default:
         return false;
     }
@@ -165,9 +170,23 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
 
   if (!indent) return null;
 
+  const isManagement = userRole === 'management';
+  const isCPD = userRole === 'cpd';
+  const normalizedStatus = (indent.status || '').toLowerCase().replace(/\s+/g, '_');
+  const isPendingManagement = isManagement && (normalizedStatus === 'pending_management' || normalizedStatus === 'pending');
+  const isRejectedManagement = isManagement && normalizedStatus === 'rejected';
+  const isPendingCPD = isCPD && (normalizedStatus === 'pending_cpd' || normalizedStatus === 'pending');
+  const isRejectedCPD = isCPD && normalizedStatus === 'rejected';
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-[98vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto px-1 py-2">
+      <DialogContent
+        className={
+          (isManagement || isCPD)
+            ? 'w-screen h-screen max-w-none max-h-none rounded-none shadow-none px-2 py-2 md:px-12 md:py-8 overflow-y-auto pb-20 md:pb-8'
+            : 'w-full max-w-[98vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto px-1 py-2'
+        }
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             {indent.title}
@@ -261,7 +280,48 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
             </div>
           </div>
 
-          {!showRejectionInput && canApprove() && (
+          {/* Management/CPD: Pending - Approve/Reject, Rejected - Re-Approve */}
+          {(isManagement || isCPD) && (
+            <>
+              {(isPendingManagement || isPendingCPD) && !showRejectionInput && (
+                <div className="flex justify-end space-x-2 mt-6">
+                  <Button variant="outline" onClick={handleReject}>
+                    Reject
+                  </Button>
+                  <Button onClick={handleApprove}>Approve</Button>
+                </div>
+              )}
+              {(isPendingManagement || isPendingCPD) && showRejectionInput && (
+                <div className="space-y-4 mt-6">
+                  <div>
+                    <Label htmlFor="rejectionRemarks">Rejection Remarks</Label>
+                    <Textarea
+                      id="rejectionRemarks"
+                      placeholder="Enter remarks for rejection or return for clarification..."
+                      value={rejectionRemarks}
+                      onChange={(e) => setRejectionRemarks(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={handleCancelReject}>
+                      Cancel
+                    </Button>
+                    <Button variant="destructive" onClick={handleReject}>
+                      Confirm Rejection
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {(isRejectedManagement || isRejectedCPD) && (
+                <div className="flex justify-end mt-6">
+                  <Button onClick={handleApprove}>Re-Approve</Button>
+                </div>
+              )}
+            </>
+          )}
+          {/* Other roles: fallback to previous logic */}
+          {!(isManagement || isCPD) && !showRejectionInput && canApprove() && (
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={handleReject}>
                 Reject
@@ -269,8 +329,7 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
               <Button onClick={handleApprove}>Approve</Button>
             </div>
           )}
-
-          {showRejectionInput && (
+          {!(isManagement || isCPD) && showRejectionInput && (
             <div className="space-y-4">
               <div>
                 <Label htmlFor="rejectionRemarks">Rejection Remarks</Label>

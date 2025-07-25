@@ -180,16 +180,7 @@ const CPDDashboard: React.FC = () => {
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Budget</CardTitle>
-              <Coins className="w-7 h-7 text-orange-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₹45.2L</div>
-              <p className="text-xs text-muted-foreground">68% utilized</p>
-            </CardContent>
-          </Card>
+          
         </div>
 
         {/* Charts */}

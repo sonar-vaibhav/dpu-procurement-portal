@@ -160,7 +160,32 @@ const CPDIndents: React.FC = () => {
           purpose: 'Seminars'
         }
       ]
-    }
+    },
+    {
+      id: 'CPD001',
+      title: 'CPD Test Indent',
+      status: 'pending_cpd',
+      date: '2024-07-10',
+      amount: 15000,
+      department: 'CPD',
+      budgetHead: 'General',
+      priority: 'High',
+      justification: 'Test justification for CPD.',
+      requestedBy: 'CPD User',
+      items: [
+        {
+          itemName: 'Test Item',
+          description: 'Test Description',
+          quantity: '2',
+          make: 'TestMake',
+          uom: 'pcs',
+          stockInHand: '5',
+          approxValue: '15000',
+          purpose: 'Testing',
+        },
+      ],
+      approvalTrail: ['User', 'HOD', 'CPD'],
+    },
   ];
 
   const purchaseOfficers = [
@@ -323,7 +348,7 @@ const CPDIndents: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium text-sm">{indent.requester.split(' - ')[0]}</div>
+                          <div className="font-medium text-sm">{indent.requester ? indent.requester.split(' - ')[0] : '-'}</div>
                           <div className="text-xs text-gray-500">{indent.department}</div>
                         </div>
                       </TableCell>
