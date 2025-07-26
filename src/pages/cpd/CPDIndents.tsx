@@ -12,6 +12,7 @@ import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import IndentReportModal from '@/components/modals/IndentReportModal';
+import ComparisonChartReport from '@/components/ComparisonChartReport';
 
 const CPDIndents: React.FC = () => {
   const { toast } = useToast();
@@ -24,6 +25,8 @@ const CPDIndents: React.FC = () => {
   const [selectedPOIndent, setSelectedPOIndent] = useState(null);
   const [isIndentReportOpen, setIsIndentReportOpen] = useState(false);
   const [selectedIndentForReport, setSelectedIndentForReport] = useState(null);
+  const [showComparisonChart, setShowComparisonChart] = useState(false);
+  const [selectedIndentForComparison, setSelectedIndentForComparison] = useState(null);
 
   const indents = [
     {
@@ -227,6 +230,11 @@ const CPDIndents: React.FC = () => {
     });
   };
 
+  const handleViewComparisonChart = (indent: any) => {
+    setSelectedIndentForComparison(indent);
+    setShowComparisonChart(true);
+  };
+
   const filteredIndents = indents.filter(indent => {
     const matchesCategory = filterCategory === 'all' || indent.category === filterCategory;
     const matchesStatus = filterStatus === 'all' || indent.status === filterStatus;
@@ -318,17 +326,17 @@ const CPDIndents: React.FC = () => {
             </div>
 
             {/* Indents Table */}
-            <div className="border rounded-lg">
+            <div className="border rounded-lg overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Indent Details</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Requester</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Assigned To</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="min-w-[200px]">Indent Details</TableHead>
+                    <TableHead className="min-w-[120px]">Category</TableHead>
+                    <TableHead className="min-w-[150px]">Requester</TableHead>
+                    <TableHead className="min-w-[140px]">Status</TableHead>
+                    <TableHead className="min-w-[100px]">Amount</TableHead>
+                    <TableHead className="min-w-[120px]">Assigned To</TableHead>
+                    <TableHead className="min-w-[200px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -337,7 +345,7 @@ const CPDIndents: React.FC = () => {
                       <TableCell>
                         <div>
                           <div className="font-medium">{indent.title}</div>
-                          <div className="text-sm text-gray-500 flex items-center gap-2">
+                          <div className="text-sm text-gray-500 flex items-center gap-2 flex-wrap">
                             {indent.id} • {indent.dateReceived}
                             {getPriorityBadge(indent.priority)}
                           </div>
@@ -368,7 +376,7 @@ const CPDIndents: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           {/* Workflow: Assign to officer, View, Forward to management */}
                           {indent.status === 'pending_indent_assignment' && (
                             <Select onValueChange={(value) => handleAssignOfficer(indent.id, value)}>
@@ -413,6 +421,15 @@ const CPDIndents: React.FC = () => {
                               >
                                 View PO
                               </Button>
+                              {/* button to open comaprision chart */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleViewComparisonChart(indent)}
+                              >
+                                View Comparison Chart
+                              </Button>
+                              
                               <Button
                                 variant="default"
                                 size="sm"
@@ -448,6 +465,47 @@ const CPDIndents: React.FC = () => {
         </Card>
       </div>
 
+      {/* Comparison Chart Modal */}
+      <Dialog open={showComparisonChart} onOpenChange={setShowComparisonChart}>
+        <DialogContent
+          className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+        >
+          <div className="h-full flex flex-col">
+            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Vendor Comparison Chart
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Detailed vendor comparison for indent {selectedIndentForComparison?.id}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
+                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
+                onClick={() => setShowComparisonChart(false)}
+              >
+                ✕
+              </Button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="bg-white rounded-lg shadow p-5">
+                <ComparisonChartReport />
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end">
+              <Button variant="outline" onClick={() => setShowComparisonChart(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       {/* Indent Details Modal */}
       <IndentDetailsModal
         isOpen={isIndentModalOpen}

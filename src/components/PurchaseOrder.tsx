@@ -330,12 +330,12 @@ const PurchaseOrderPage: React.FC = () => {
                   <div className="font-bold">For DR. D. Y. PATIL UNITECH SOCIETY, PUNE</div>
                   <div>Dr. D. Y. Patil Institute of Technology</div>
                   <div className="text-sm mt-2">Secretary/ Vice-Chairman/ Chairman</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 };
