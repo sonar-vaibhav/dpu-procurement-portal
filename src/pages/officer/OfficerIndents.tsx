@@ -678,10 +678,7 @@ const OfficerIndents: React.FC = () => {
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto p-6">
               {showPOModal && finalizedVendor[showPOModal] && (
-                <PurchaseOrderPage
-                  indentId={showPOModal}
-                  vendorName={finalizedVendor[showPOModal]!}
-                />
+                <PurchaseOrderPage />
               )}
             </div>
 
@@ -716,7 +713,7 @@ const OfficerIndents: React.FC = () => {
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto p-6">
-              {showIndentPreview && <IndentReport indentId={showIndentPreview} />}
+              {showIndentPreview && <IndentReport />}
             </div>
 
             {/* Sticky Footer */}
