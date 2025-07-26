@@ -299,105 +299,475 @@ const OfficerIndents: React.FC = () => {
 
       {/* === Modals === */}
       <Dialog open={showComparisonChart} onOpenChange={setShowComparisonChart}>
-        <DialogContent className="max-w-[90vw]">
-          <DialogHeader><DialogTitle>Vendor Comparison Chart</DialogTitle></DialogHeader>
-          <ComparisonChartReport />
-          <DialogFooter><Button onClick={() => setShowComparisonChart(false)}>Close</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <DialogContent
+          className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+        >
+          <div className="h-full flex flex-col">
 
-      <Dialog open={showEnquiryModal} onOpenChange={setShowEnquiryModal}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader><DialogTitle>Generate Enquiry - {selectedIndent?.id}</DialogTitle></DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div><Label>Enquiry ID</Label><Input value={enquiryForm.enquiryNumber} onChange={e => setEnquiryForm({ ...enquiryForm, enquiryNumber: e.target.value })} /></div>
-            <div><Label>Serial</Label><Input value={enquiryForm.serial} onChange={e => setEnquiryForm({ ...enquiryForm, serial: e.target.value })} /></div>
-            <div className="col-span-2"><Label>Description</Label><Textarea value={enquiryForm.description} onChange={e => setEnquiryForm({ ...enquiryForm, description: e.target.value })} /></div>
-            <div><Label>Delivery</Label><Input value={enquiryForm.delivery} onChange={e => setEnquiryForm({ ...enquiryForm, delivery: e.target.value })} /></div>
-            <div><Label>Payment</Label><Input value={enquiryForm.payment} onChange={e => setEnquiryForm({ ...enquiryForm, payment: e.target.value })} /></div>
-            <div><Label>Warranty</Label><Input value={enquiryForm.warranty} onChange={e => setEnquiryForm({ ...enquiryForm, warranty: e.target.value })} /></div>
-            <div><Label>Packing</Label><Input value={enquiryForm.packing} onChange={e => setEnquiryForm({ ...enquiryForm, packing: e.target.value })} /></div>
-            <div className="col-span-2">
-              <Label>Select Vendors</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {vendorsList.map(vendor => (
-                  <label key={vendor} className="flex items-center space-x-3 p-2 border rounded-md">
-                    <input
-                      type="checkbox"
-                      checked={enquiryForm.vendors.includes(vendor)}
-                      onChange={e => {
-                        const updated = e.target.checked
-                          ? [...enquiryForm.vendors, vendor]
-                          : enquiryForm.vendors.filter(v => v !== vendor);
-                        setEnquiryForm({ ...enquiryForm, vendors: updated });
-                      }}
-                    />
-                    <span>{vendor}</span>
-                  </label>
-                ))}
+            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Vendor Comparison Chart
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Detailed vendor comparison for this Purchase Order
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
+                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
+                onClick={() => setShowComparisonChart(false)}
+              >
+                ✕
+              </Button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="bg-white rounded-lg shadow p-5">
+                <ComparisonChartReport />
               </div>
             </div>
+
+
+            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end">
+              <Button variant="outline" onClick={() => setShowComparisonChart(false)}>
+                Close
+              </Button>
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEnquiryModal(false)}>Cancel</Button>
-            <Button onClick={handlePreviewPDF}>Preview PDF</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showPDFPreviewModal} onOpenChange={v => !v && setShowPDFPreviewModal(false)}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader><DialogTitle>Preview Enquiry PDF</DialogTitle></DialogHeader>
-          <div className="w-full h-[70vh] bg-gray-100">{pdfUrl && <iframe src={pdfUrl} className="w-full h-full border" />}</div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPDFPreviewModal(false)}>Cancel</Button>
-            <Button onClick={handleConfirmSendEnquiry}>Send Enquiry</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      <Dialog open={!!showFinalizeModal} onOpenChange={v => !v && setShowFinalizeModal(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Finalize Vendor</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            {(showFinalizeModal && vendorQuotes[showFinalizeModal])?.map(vendor => (
-              <div key={vendor.name} className="flex items-center justify-between border rounded p-2">
-                <div><div className="font-semibold">{vendor.name}</div><div className="text-xs">Price: {vendor.price} | Delivery: {vendor.delivery}</div></div>
-                <Button size="sm" onClick={() => {
-                  setFinalizedVendor(prev => ({ ...prev, [showFinalizeModal]: vendor.name }));
-                  setShowFinalizeModal(null);
-                  toast({ title: 'Vendor Finalized', description: `Finalized ${vendor.name}` });
-                }}>Select</Button>
+      <Dialog open={showEnquiryModal} onOpenChange={setShowEnquiryModal}>
+        <DialogContent
+          className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+        >
+          <div className="h-full flex flex-col">
+
+            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Generate Enquiry
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Enquiry for Indent ID:{" "}
+                  <span className="font-medium">{selectedIndent?.id}</span>
+                </p>
               </div>
-            ))}
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
+                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
+                onClick={() => setShowEnquiryModal(false)}
+              >
+                ✕
+              </Button>
+            </div>
+
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* 🔹 Enquiry Details */}
+              <div className="bg-white rounded-lg shadow p-5 space-y-4">
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+                  Enquiry Details
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Enquiry ID</Label>
+                    <Input
+                      value={enquiryForm.enquiryNumber}
+                      onChange={(e) =>
+                        setEnquiryForm({
+                          ...enquiryForm,
+                          enquiryNumber: e.target.value,
+                        })
+                      }
+                      className="h-10 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <Label>Serial</Label>
+                    <Input
+                      value={enquiryForm.serial}
+                      onChange={(e) =>
+                        setEnquiryForm({ ...enquiryForm, serial: e.target.value })
+                      }
+                      className="h-10 rounded-md"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <Label>Description</Label>
+                    <Textarea
+                      value={enquiryForm.description}
+                      onChange={(e) =>
+                        setEnquiryForm({
+                          ...enquiryForm,
+                          description: e.target.value,
+                        })
+                      }
+                      rows={3}
+                      className="rounded-md"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 🔹 Terms & Conditions */}
+              <div className="bg-white rounded-lg shadow p-5 space-y-4">
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+                  Terms & Conditions
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Delivery</Label>
+                    <Input
+                      value={enquiryForm.delivery}
+                      onChange={(e) =>
+                        setEnquiryForm({ ...enquiryForm, delivery: e.target.value })
+                      }
+                      className="h-10 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <Label>Payment</Label>
+                    <Input
+                      value={enquiryForm.payment}
+                      onChange={(e) =>
+                        setEnquiryForm({ ...enquiryForm, payment: e.target.value })
+                      }
+                      className="h-10 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <Label>Warranty</Label>
+                    <Input
+                      value={enquiryForm.warranty}
+                      onChange={(e) =>
+                        setEnquiryForm({ ...enquiryForm, warranty: e.target.value })
+                      }
+                      className="h-10 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <Label>Packing</Label>
+                    <Input
+                      value={enquiryForm.packing}
+                      onChange={(e) =>
+                        setEnquiryForm({ ...enquiryForm, packing: e.target.value })
+                      }
+                      className="h-10 rounded-md"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 🔹 Vendor Selection */}
+              <div className="bg-white rounded-lg shadow p-5">
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+                  Select Vendors
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                  {vendorsList.map((vendor) => (
+                    <label
+                      key={vendor}
+                      className={`flex items-center space-x-3 p-2 rounded-md border transition-all cursor-pointer ${enquiryForm.vendors.includes(vendor)
+                        ? "bg-blue-50 border-blue-400 text-blue-700"
+                        : "bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700"
+                        }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={enquiryForm.vendors.includes(vendor)}
+                        onChange={(e) => {
+                          const updated = e.target.checked
+                            ? [...enquiryForm.vendors, vendor]
+                            : enquiryForm.vendors.filter((v) => v !== vendor);
+                          setEnquiryForm({ ...enquiryForm, vendors: updated });
+                        }}
+                        className="accent-blue-600"
+                      />
+                      <span className="text-sm">{vendor}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setShowEnquiryModal(false)}>
+                Cancel
+              </Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handlePreviewPDF}
+              >
+                Preview PDF
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!showPOModal} onOpenChange={v => !v && setShowPOModal(null)}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader><DialogTitle>Generate Purchase Order</DialogTitle></DialogHeader>
-          {showPOModal && finalizedVendor[showPOModal] && (
-            <PurchaseOrderPage indentId={showPOModal} vendorName={finalizedVendor[showPOModal]!} />
-          )}
+
+      <Dialog
+        open={showPDFPreviewModal}
+        onOpenChange={(v) => !v && setShowPDFPreviewModal(false)}
+      >
+        <DialogContent
+          className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+        >
+          <div className="h-full flex flex-col">
+
+            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Preview Enquiry PDF
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Review the generated enquiry PDF before sending
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
+                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
+                onClick={() => setShowPDFPreviewModal(false)}
+              >
+                ✕
+              </Button>
+            </div>
+
+
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="bg-white rounded-lg shadow p-4 h-[75vh]">
+                {pdfUrl ? (
+                  <iframe
+                    src={pdfUrl}
+                    className="w-full h-full border rounded"
+                    title="PDF Preview"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    No PDF available to preview
+                  </div>
+                )}
+              </div>
+            </div>
+
+
+            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowPDFPreviewModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-blue-600 text-white hover:bg-blue-700"
+                onClick={handleConfirmSendEnquiry}
+              >
+                Send Enquiry
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!showIndentPreview} onOpenChange={v => !v && setShowIndentPreview(null)}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader><DialogTitle>Indent Preview</DialogTitle></DialogHeader>
-          {showIndentPreview && <IndentReport indentId={showIndentPreview} />}
+
+      <Dialog
+        open={!!showFinalizeModal}
+        onOpenChange={(v) => !v && setShowFinalizeModal(null)}
+      >
+        <DialogContent
+          className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+        >
+          <div className="h-full flex flex-col">
+
+            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">Finalize Vendor</h2>
+                <p className="text-sm text-gray-500">
+                  Select the best vendor from the list below
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
+                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
+                onClick={() => setShowFinalizeModal(null)}
+              >
+                ✕
+              </Button>
+            </div>
+
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {(showFinalizeModal && vendorQuotes[showFinalizeModal])?.map((vendor: any) => (
+                <div
+                  key={vendor.name}
+                  className="flex items-center justify-between bg-white shadow rounded-lg p-4 border hover:shadow-md transition"
+                >
+                  <div>
+                    <div className="font-semibold text-gray-800">{vendor.name}</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      💰 <span className="font-medium">Price:</span> {vendor.price} | 🚚{' '}
+                      <span className="font-medium">Delivery:</span> {vendor.delivery}
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-green-600 text-white hover:bg-green-700"
+                    onClick={() => {
+                      setFinalizedVendor((prev) => ({
+                        ...prev,
+                        [showFinalizeModal]: vendor.name,
+                      }));
+                      setShowFinalizeModal(null);
+                      toast({
+                        title: 'Vendor Finalized',
+                        description: `Finalized ${vendor.name}`,
+                      });
+                    }}
+                  >
+                    Select
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end">
+              <Button variant="outline" onClick={() => setShowFinalizeModal(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!viewEnquiryIndentId} onOpenChange={v => !v && setViewEnquiryIndentId(null)}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader><DialogTitle>View Enquiry - {viewEnquiryIndentId}</DialogTitle></DialogHeader>
-          {viewEnquiryIndentId && sentEnquiries[viewEnquiryIndentId] && (
-            <iframe src={sentEnquiries[viewEnquiryIndentId].pdfUrl} className="w-full h-[70vh] border" />
-          )}
+
+      {/* ✅ Generate Purchase Order Modal */}
+      <Dialog open={!!showPOModal} onOpenChange={(v) => !v && setShowPOModal(null)}>
+        <DialogContent
+          className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+        >
+          <div className="h-full flex flex-col">
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-800">Generate Purchase Order</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
+                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
+                onClick={() => setShowPOModal(null)}
+              >
+                ✕
+              </Button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {showPOModal && finalizedVendor[showPOModal] && (
+                <PurchaseOrderPage
+                  indentId={showPOModal}
+                  vendorName={finalizedVendor[showPOModal]!}
+                />
+              )}
+            </div>
+
+            {/* Sticky Footer */}
+            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end">
+              <Button variant="outline" onClick={() => setShowPOModal(null)}>Close</Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
+
+      {/* ✅ Indent Preview Modal */}
+      <Dialog open={!!showIndentPreview} onOpenChange={(v) => !v && setShowIndentPreview(null)}>
+        <DialogContent
+          className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+        >
+          <div className="h-full flex flex-col">
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-800">Indent Preview</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
+                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
+                onClick={() => setShowIndentPreview(null)}
+              >
+                ✕
+              </Button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {showIndentPreview && <IndentReport indentId={showIndentPreview} />}
+            </div>
+
+            {/* Sticky Footer */}
+            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end">
+              <Button variant="outline" onClick={() => setShowIndentPreview(null)}>Close</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ✅ View Enquiry Modal */}
+      <Dialog open={!!viewEnquiryIndentId} onOpenChange={(v) => !v && setViewEnquiryIndentId(null)}>
+        <DialogContent
+          className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+        >
+          <div className="h-full flex flex-col">
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-800">
+                View Enquiry - {viewEnquiryIndentId}
+              </h2>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
+                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
+                onClick={() => setViewEnquiryIndentId(null)}
+              >
+                ✕
+              </Button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {viewEnquiryIndentId && sentEnquiries[viewEnquiryIndentId] && (
+                <iframe
+                  src={sentEnquiries[viewEnquiryIndentId].pdfUrl}
+                  className="w-full h-[80vh] border rounded"
+                />
+              )}
+            </div>
+
+            {/* Sticky Footer */}
+            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end">
+              <Button variant="outline" onClick={() => setViewEnquiryIndentId(null)}>Close</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </DashboardLayout>
   );
 };

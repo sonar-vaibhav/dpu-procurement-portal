@@ -58,107 +58,51 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
   const [rejectionRemarks, setRejectionRemarks] = useState('');
   const { user } = useAuth();
   const userRole = user?.role;
-
-  // Local state for editable items
   const [editableItems, setEditableItems] = useState<IndentItem[]>([]);
 
-  // When indent changes or modal opens, copy items to local state
   useEffect(() => {
     if (indent) {
-      setEditableItems(indent.items.map(item => ({ ...item })));
+      setEditableItems(indent.items.map((item) => ({ ...item })));
     }
   }, [indent]);
 
   const canApprove = () => {
     if (!indent || !userRole) return false;
-    if (
-      (userRole === 'management' && indent.status === 'pending_management') ||
-      (userRole === 'cpd' && indent.status === 'pending_cpd')
-    ) {
-      return true;
-    }
-    // Keep existing logic for other roles
-    switch (userRole) {
-      case 'hod':
-        return indent.status === 'pending_hod';
-      case 'principal':
-        return indent.status === 'pending_principal';
-      case 'store':
-        return indent.status === 'pending_store';
-      case 'registrar':
-        return indent.status === 'pending_registrar';
-      case 'account':
-        return indent.status === 'pending_account';
-      default:
-        return false;
-    }
+    const roleStatusMap: Record<string, string> = {
+      hod: 'pending_hod',
+      principal: 'pending_principal',
+      store: 'pending_store',
+      registrar: 'pending_registrar',
+      account: 'pending_account',
+      management: 'pending_management',
+      cpd: 'pending_cpd',
+    };
+    return indent.status === roleStatusMap[userRole];
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending_hod':
-      case 'pending_principal':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'pending_store':
-        return 'bg-blue-100 text-blue-800';
-      case 'pending_registrar':
-        return 'bg-purple-100 text-purple-800';
-      case 'pending_management':
-        return 'bg-orange-100 text-orange-800';
-      case 'pending_account':
-      return 'bg-pink-100 text-pink-800';
-      case 'approved':
-        return 'bg-green-100 text-green-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'pending_hod':
-        return 'Pending HOD Approval';
-      case 'pending_principal':
-        return 'Pending Principal Approval';
-      case 'pending_store':
-        return 'Pending Store Approval';
-      case 'pending_registrar':
-        return 'Pending Registrar Approval';
-      case 'pending_account':
-      return 'Pending Account Approval';
-      case 'pending_management':
-        return 'Pending Management Approval';
-      case 'approved':
-        return 'Approved';
-      case 'rejected':
-        return 'Rejected';
-      default:
-        return status;
-    }
+    const colors: Record<string, string> = {
+      pending_hod: 'bg-yellow-100 text-yellow-800',
+      pending_principal: 'bg-yellow-100 text-yellow-800',
+      pending_store: 'bg-blue-100 text-blue-800',
+      pending_registrar: 'bg-purple-100 text-purple-800',
+      pending_management: 'bg-orange-100 text-orange-800',
+      pending_account: 'bg-pink-100 text-pink-800',
+      approved: 'bg-green-100 text-green-800',
+      rejected: 'bg-red-100 text-red-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
   const handleReject = () => {
-    if (!showRejectionInput) {
-      setShowRejectionInput(true);
-      return;
-    }
-    if (!rejectionRemarks.trim()) {
-      toast.error('Please provide rejection remarks');
-      return;
-    }
+    if (!showRejectionInput) return setShowRejectionInput(true);
+    if (!rejectionRemarks.trim()) return toast.error('Please provide remarks');
     if (onReject && indent) {
       onReject(indent.id, rejectionRemarks);
       setShowRejectionInput(false);
       setRejectionRemarks('');
       onClose();
     }
-  };
-
-  const handleCancelReject = () => {
-    setShowRejectionInput(false);
-    setRejectionRemarks('');
   };
 
   const handleApprove = () => {
@@ -170,43 +114,41 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
 
   if (!indent) return null;
 
-  const isManagement = userRole === 'management';
-  const isCPD = userRole === 'cpd';
-  const normalizedStatus = (indent.status || '').toLowerCase().replace(/\s+/g, '_');
-  const isPendingManagement = isManagement && (normalizedStatus === 'pending_management' || normalizedStatus === 'pending');
-  const isRejectedManagement = isManagement && normalizedStatus === 'rejected';
-  const isPendingCPD = isCPD && (normalizedStatus === 'pending_cpd' || normalizedStatus === 'pending');
-  const isRejectedCPD = isCPD && normalizedStatus === 'rejected';
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className={
-          (isManagement || isCPD)
-            ? 'w-screen h-screen max-w-none max-h-none rounded-none shadow-none px-2 py-2 md:px-12 md:py-8 overflow-y-auto pb-20 md:pb-8'
-            : 'w-full max-w-[98vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto px-1 py-2'
-        }
+        className="
+          w-screen h-screen 
+          max-w-none max-h-none 
+          rounded-none shadow-none 
+          p-4 sm:p-6 md:p-8 
+          overflow-y-auto 
+          flex flex-col
+        "
       >
-        <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
+        <DialogHeader className="border-b pb-3">
+          <DialogTitle className="text-xl sm:text-2xl font-semibold">
             {indent.title}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 sm:space-y-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1 overflow-y-auto space-y-4 mt-4 pb-20">
+
+          {/* Status & Amount */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <Badge className={getStatusColor(indent.status)}>
-              {getStatusText(indent.status)}
+              {indent.status.replace(/_/g, ' ').toUpperCase()}
             </Badge>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-base sm:text-lg font-semibold text-gray-900 mt-2 sm:mt-0">
               Amount: {indent.amount}
             </div>
           </div>
 
+          {/* Approval Trail */}
           {indent.approvalTrail && (
-            <div className="bg-gray-50 p-2 sm:p-4 rounded-lg">
-              <h3 className="font-medium mb-2">Approval Trail</h3>
-              <div className="flex flex-wrap justify-center gap-2">
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+              <h3 className="font-medium mb-2 text-gray-800">Approval Trail</h3>
+              <div className="flex flex-wrap gap-2">
                 {indent.approvalTrail.map((step, index) => (
                   <React.Fragment key={step}>
                     <Badge variant="outline">{step}</Badge>
@@ -219,58 +161,57 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-            <div>
+          {/* Request Details */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
               <h3 className="font-medium mb-2">Request Details</h3>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-medium">Date Requested:</span>{' '}
-                  {indent.date}
-                </p>
-                <p>
-                  <span className="font-medium">Department:</span>{' '}
-                  {indent.department}
-                </p>
-                <p>
-                  <span className="font-medium">Budget Head:</span>{' '}
-                  {indent.budgetHead}
-                </p>
-                <p>
-                  <span className="font-medium">Priority:</span>{' '}
-                  {indent.priority}
-                </p>
-                <p>
-                  <span className="font-medium">Requested By:</span>{' '}
-                  {indent.requestedBy}
-                </p>
+              <div className="space-y-1 text-sm text-gray-700">
+                <p><span className="font-medium">Date:</span> {indent.date}</p>
+                <p><span className="font-medium">Department:</span> {indent.department}</p>
+                <p><span className="font-medium">Budget Head:</span> {indent.budgetHead}</p>
+                <p><span className="font-medium">Priority:</span> {indent.priority}</p>
+                <p><span className="font-medium">Requested By:</span> {indent.requestedBy}</p>
               </div>
             </div>
-            <div>
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
               <h3 className="font-medium mb-2">Justification</h3>
               <p className="text-sm text-gray-600">{indent.justification}</p>
             </div>
           </div>
 
+          {/* Requested Items */}
           <div>
-            <h3 className="font-medium mb-4">Requested Items</h3>
-            <div className="space-y-2 sm:space-y-4">
+            <h3 className="font-medium mb-3 text-gray-800">Requested Items</h3>
+            <div className="space-y-4">
               {editableItems.map((item, index) => (
-                <div key={index} className="border rounded-lg p-2 sm:p-4 bg-gray-50 w-full">
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 sm:gap-4">
+                <div
+                  key={index}
+                  className="border rounded-lg p-3 sm:p-4 bg-white shadow-sm"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {Object.entries(item).map(([field, value]) => (
                       <div key={field}>
-                        <Label className="capitalize">{field}</Label>
+                        <Label className="capitalize text-sm">{field}</Label>
                         <Input
-                          type={field === 'quantity' || field === 'approxValue' || field === 'stockInHand' ? 'number' : 'text'}
+                          type={
+                            ['quantity', 'approxValue', 'stockInHand'].includes(
+                              field
+                            )
+                              ? 'number'
+                              : 'text'
+                          }
                           value={value}
                           onChange={(e) => {
                             if (field === 'quantity' && userRole === 'hod') {
                               const updated = [...editableItems];
-                              updated[index][field as keyof IndentItem] = e.target.value;
+                              updated[index][
+                                field as keyof IndentItem
+                              ] = e.target.value;
                               setEditableItems(updated);
                             }
                           }}
                           disabled={field !== 'quantity' || userRole !== 'hod'}
+                          className="mt-1"
                         />
                       </div>
                     ))}
@@ -279,79 +220,42 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Management/CPD: Pending - Approve/Reject, Rejected - Re-Approve */}
-          {(isManagement || isCPD) && (
+        {/* Sticky Action Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 flex justify-end space-x-2">
+          {!showRejectionInput && canApprove() && (
             <>
-              {(isPendingManagement || isPendingCPD) && !showRejectionInput && (
-                <div className="flex justify-end space-x-2 mt-6">
-                  <Button variant="outline" onClick={handleReject}>
-                    Reject
-                  </Button>
-                  <Button onClick={handleApprove}>Approve</Button>
-                </div>
-              )}
-              {(isPendingManagement || isPendingCPD) && showRejectionInput && (
-                <div className="space-y-4 mt-6">
-                  <div>
-                    <Label htmlFor="rejectionRemarks">Rejection Remarks</Label>
-                    <Textarea
-                      id="rejectionRemarks"
-                      placeholder="Enter remarks for rejection or return for clarification..."
-                      value={rejectionRemarks}
-                      onChange={(e) => setRejectionRemarks(e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={handleCancelReject}>
-                      Cancel
-                    </Button>
-                    <Button variant="destructive" onClick={handleReject}>
-                      Confirm Rejection
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {(isRejectedManagement || isRejectedCPD) && (
-                <div className="flex justify-end mt-6">
-                  <Button onClick={handleApprove}>Re-Approve</Button>
-                </div>
-              )}
-            </>
-          )}
-          {/* Other roles: fallback to previous logic */}
-          {!(isManagement || isCPD) && !showRejectionInput && canApprove() && (
-            <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={handleReject}>
                 Reject
               </Button>
               <Button onClick={handleApprove}>Approve</Button>
-            </div>
-          )}
-          {!(isManagement || isCPD) && showRejectionInput && (
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="rejectionRemarks">Rejection Remarks</Label>
-                <Textarea
-                  id="rejectionRemarks"
-                  placeholder="Enter remarks for rejection or return for clarification..."
-                  value={rejectionRemarks}
-                  onChange={(e) => setRejectionRemarks(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={handleCancelReject}>
-                  Cancel
-                </Button>
-                <Button variant="destructive" onClick={handleReject}>
-                  Confirm Rejection
-                </Button>
-              </div>
-            </div>
+            </>
           )}
         </div>
+
+        {showRejectionInput && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 space-y-3">
+            <div>
+              <Label htmlFor="remarks">Rejection Remarks</Label>
+              <Textarea
+                id="remarks"
+                placeholder="Enter remarks..."
+                value={rejectionRemarks}
+                onChange={(e) => setRejectionRemarks(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowRejectionInput(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleReject}>
+                Confirm Rejection
+              </Button>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

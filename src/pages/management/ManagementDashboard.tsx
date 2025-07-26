@@ -150,10 +150,10 @@ const ManagementDashboard: React.FC = () => {
 
   const handleStatusUpdate = (id: string, type: 'indent' | 'po', status: 'Approved' | 'Rejected') => {
     const updater = type === 'indent' ? setIndents : setPurchaseOrders;
-    updater(prev => 
+    updater(prev =>
       prev.map(group => ({
         ...group,
-        items: group.items.map(item => 
+        items: group.items.map(item =>
           item.id === id ? { ...item, status } : item
         )
       }))
@@ -461,79 +461,210 @@ const ManagementDashboard: React.FC = () => {
         </Dialog>
 
         {/* PO Detail Modal */}
-        <Dialog open={!!openPO} onOpenChange={v => !v && setOpenPO(null)}>
-          <DialogContent className="w-full max-w-[98vw] sm:max-w-xl overflow-y-auto p-2">
+        <Dialog open={!!openPO} onOpenChange={(v) => !v && setOpenPO(null)}>
+          <DialogContent
+            className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 overflow-y-auto bg-gray-100"
+          >
             {openPO && (
-              <Card className="shadow-lg">
-                <CardHeader className="p-2 sm:p-4">
-                  <CardTitle className="text-base sm:text-lg">Purchase Order Details</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">ID: {openPO.id}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-2 sm:p-4">
-                  <div className="mb-2 text-sm sm:text-base"><span className="font-medium">Title:</span> {openPO.title}</div>
-                  <div className="mb-2 text-sm sm:text-base"><span className="font-medium">College:</span> {openPO.college}</div>
-                  <div className="mb-2 text-sm sm:text-base"><span className="font-medium">Requested Amount:</span> <span className="text-blue-700 font-semibold">₹{openPO.amount.toLocaleString()}</span></div>
-                  <div className="mb-2 text-sm sm:text-base"><span className="font-medium">Status:</span> <Badge variant={openPO.status === 'Approved' ? 'secondary' : openPO.status === 'Pending' ? 'outline' : 'secondary'} className={openPO.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'}>{openPO.status}</Badge></div>
-                  <div className="flex flex-col sm:flex-row gap-2 mt-4">
-                    <Button variant="outline" onClick={() => setOpenVendorChart(true)}><FileText className="w-4 h-4 mr-1" />Vendor Comparison Chart</Button>
-                    <Button variant="outline" onClick={() => setOpenPODoc(true)}><FileText className="w-4 h-4 mr-1" />Final PO</Button>
+              <div className="h-full flex flex-col">
+                {/* HEADER - Sticky */}
+                <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                      Purchase Order Details
+                    </h2>
+                    <p className="text-sm text-gray-500">ID: {openPO.id}</p>
                   </div>
-                </CardContent>
-                <CardFooter className="justify-end p-2 sm:p-4">
-                  <Button variant="outline" onClick={() => setOpenPO(null)}>Close</Button>
-                </CardFooter>
-              </Card>
+                  <Button
+                    variant="outline"
+                    onClick={() => setOpenPO(null)}
+                    className="h-8 w-8 p-0 rounded-full border-gray-300 text-gray-600 
+             hover:bg-gray-100 hover:text-red-600 hover:border-red-300 
+             transition-all duration-200 flex items-center justify-center"
+                    title="Close"
+                  >
+                    ✕
+                  </Button>
+
+                </div>
+
+                {/* BODY - Scrollable */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                  {/* General Information */}
+                  <div className="bg-white rounded-lg shadow p-5 space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+                      General Information
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="text-sm">
+                        <span className="font-medium text-gray-600">Title:</span>{' '}
+                        <span className="text-gray-800">{openPO.title}</span>
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium text-gray-600">College:</span>{' '}
+                        <span className="text-gray-800">{openPO.college}</span>
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium text-gray-600">Requested Amount:</span>{' '}
+                        <span className="text-blue-700 font-bold">
+                          ₹{openPO.amount.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="text-sm flex items-center gap-2">
+                        <span className="font-medium text-gray-600">Status:</span>
+                        <Badge
+                          className={`${openPO.status === 'Approved'
+                            ? 'bg-green-100 text-green-700 border-green-200'
+                            : openPO.status === 'Pending'
+                              ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                              : 'bg-gray-100 text-gray-700 border-gray-200'
+                            }`}
+                        >
+                          {openPO.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="bg-white rounded-lg shadow p-5">
+                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+                      Actions
+                    </h3>
+                    <div className="flex flex-col sm:flex-row gap-3 pt-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => setOpenVendorChart(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Vendor Comparison Chart
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setOpenPODoc(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Final PO Document
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Ordered Items */}
+                  {openPO.items?.length > 0 && (
+                    <div className="bg-white rounded-lg shadow p-5">
+                      <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+                        Ordered Items
+                      </h3>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full border mt-3 text-sm">
+                          <thead className="bg-gray-50 text-gray-600 text-left">
+                            <tr>
+                              <th className="px-3 py-2 border">Item</th>
+                              <th className="px-3 py-2 border">Quantity</th>
+                              <th className="px-3 py-2 border">Make</th>
+                              <th className="px-3 py-2 border">Approx. Value</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {openPO.items.map((item: any, i: number) => (
+                              <tr
+                                key={i}
+                                className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                              >
+                                <td className="px-3 py-2 border">{item.itemName}</td>
+                                <td className="px-3 py-2 border">{item.quantity}</td>
+                                <td className="px-3 py-2 border">{item.make}</td>
+                                <td className="px-3 py-2 border">
+                                  ₹{item.approxValue.toLocaleString()}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* FOOTER - Sticky */}
+                <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end gap-3">
+                  <Button variant="outline" onClick={() => setOpenPO(null)}>
+                    Close
+                  </Button>
+                </div>
+              </div>
             )}
           </DialogContent>
         </Dialog>
 
         {/* Vendor Comparison Chart Modal */}
         <Dialog open={openVendorChart} onOpenChange={setOpenVendorChart}>
-          <DialogContent className="max-w-full w-[98vw] sm:max-w-[90vw] overflow-y-auto p-0">
-            {/* Sticky top bar for mobile close button */}
-            <div className="sticky top-0 z-10 bg-white flex justify-end sm:hidden border-b p-2">
-              <Button size="sm" variant="outline" onClick={() => setOpenVendorChart(false)}>
-                Close
-              </Button>
+          <DialogContent
+            className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 bg-gray-100 overflow-y-auto"
+          >
+            {/* Header (scrolls with content) */}
+            <div className="bg-white border-b shadow-sm px-4 py-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+                Vendor Comparison Chart
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500">
+                Preview of the vendor comparison chart for this PO.
+              </p>
             </div>
-            <DialogHeader className="hidden sm:block">
-              <DialogTitle>Vendor Comparison Chart</DialogTitle>
-              <DialogDescription>Preview of the vendor comparison chart for this PO.</DialogDescription>
-            </DialogHeader>
-            <div className="max-h-[80vh] overflow-auto px-0 sm:px-0 text-center text-gray-500 py-4 sm:py-8">
-              <div className="w-max min-w-full">
+
+            {/* Chart Content */}
+            <div className="px-4 sm:px-6 py-4 sm:py-6">
+              <div className="w-full max-w-6xl mx-auto bg-white shadow rounded-lg p-4 sm:p-6">
                 <ComparisonChartReport />
               </div>
             </div>
-            <DialogFooter className="hidden sm:flex">
-              <Button variant="outline" onClick={() => setOpenVendorChart(false)}>Close</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
 
-        {/* Final PO Document Modal */}
-        <Dialog open={openPODoc} onOpenChange={setOpenPODoc}>
-          <DialogContent className="max-w-full w-[98vw] sm:max-w-5xl overflow-y-auto p-0">
-            {/* Sticky top bar for mobile close button */}
-            <div className="sticky top-0 z-10 bg-white flex justify-end sm:hidden border-b p-2">
-              <Button size="sm" variant="outline" onClick={() => setOpenPODoc(false)}>
+            {/* Footer (scrolls with content) */}
+            <div className="bg-white border-t shadow-inner px-4 py-3 flex justify-end">
+              <Button variant="outline" onClick={() => setOpenVendorChart(false)}>
                 Close
               </Button>
             </div>
-            <DialogHeader className="hidden sm:block">
-              <DialogTitle>Final Purchase Order Document</DialogTitle>
-              <DialogDescription>Preview of the final PO document for this order.</DialogDescription>
-            </DialogHeader>
-            <div className="max-h-[80vh] overflow-auto px-0 sm:px-0 py-4 sm:py-8">
-              <div className="w-max min-w-full">
+          </DialogContent>
+        </Dialog>
+
+
+        {/* Final PO Document Modal */}
+        <Dialog open={openPODoc} onOpenChange={setOpenPODoc}>
+          <DialogContent
+            className="w-screen h-screen max-w-none max-h-none rounded-none 
+               shadow-none p-0 bg-gray-100 overflow-y-auto"
+          >
+            {/* Header (scrolls with content) */}
+            <div className="bg-white border-b shadow-sm px-4 py-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+                Final Purchase Order Document
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500">
+                Preview of the final PO document for this order.
+              </p>
+            </div>
+
+            {/* Document Section */}
+            <div className="px-4 sm:px-6 py-4 sm:py-6">
+              <div className="w-full max-w-5xl mx-auto bg-white shadow rounded-lg p-4 sm:p-6">
                 <PurchaseOrderPage />
               </div>
             </div>
-            <DialogFooter className="hidden sm:flex">
-              <Button variant="outline" onClick={() => setOpenPODoc(false)}>Close</Button>
-            </DialogFooter>
+
+            {/* Footer (scrolls with content) */}
+            <div className="bg-white border-t shadow-inner px-4 py-3 flex justify-end">
+              <Button variant="outline" onClick={() => setOpenPODoc(false)}>
+                Close
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
+
       </div>
     </DashboardLayout>
   );

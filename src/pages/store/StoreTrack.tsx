@@ -1,13 +1,38 @@
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Package, Plus, History, Eye } from 'lucide-react';
@@ -133,39 +158,52 @@ const StoreTrack: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'fully_received': return 'bg-green-100 text-green-800';
-      case 'partially_received': return 'bg-yellow-100 text-yellow-800';
-      case 'not_received': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'fully_received':
+        return 'bg-green-100 text-green-800';
+      case 'partially_received':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'not_received':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'fully_received': return 'Fully Received';
-      case 'partially_received': return 'Partially Received';
-      case 'not_received': return 'Not Received';
-      default: return status;
+      case 'fully_received':
+        return 'Fully Received';
+      case 'partially_received':
+        return 'Partially Received';
+      case 'not_received':
+        return 'Not Received';
+      default:
+        return status;
     }
   };
 
   const handleLogDelivery = () => {
     if (!formData.quantity || formData.quantity <= 0) {
       toast({
-        title: "Validation Error",
-        description: "Please enter a valid quantity",
-        variant: "destructive"
+        title: 'Validation Error',
+        description: 'Please enter a valid quantity',
+        variant: 'destructive'
       });
       return;
     }
 
     if (selectedIndent) {
       const newQuantity = selectedIndent.quantityDelivered + formData.quantity;
-      const newStatus = newQuantity >= selectedIndent.quantityRequested ? 'fully_received' : 'partially_received';
+      const newStatus =
+        newQuantity >= selectedIndent.quantityRequested
+          ? 'fully_received'
+          : 'partially_received';
 
       toast({
-        title: "Delivery Logged",
-        description: `Delivery has been successfully logged. New status: ${getStatusText(newStatus)}`
+        title: 'Delivery Logged',
+        description: `Delivery successfully logged. Status updated to ${getStatusText(
+          newStatus
+        )}`
       });
 
       setIsModalOpen(false);
@@ -178,19 +216,17 @@ const StoreTrack: React.FC = () => {
   };
 
   const handleStatusChange = (indent: IndentDelivery, newStatus: string) => {
-    // Update the indent's status in the local state
-    const updatedIndent = { ...indent, status: newStatus as IndentDelivery['status'] };
-    setSelectedIndent(updatedIndent);
-    
+    setSelectedIndent({ ...indent, status: newStatus as IndentDelivery['status'] });
     toast({
-      title: "Status Updated",
-      description: `Delivery status updated to ${getStatusText(newStatus)}`
+      title: 'Status Updated',
+      description: `Status updated to ${getStatusText(newStatus)}`
     });
   };
 
-  const filteredIndents = indents.filter(indent => {
-    const matchesSearch = indent.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         indent.department.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredIndents = indents.filter((indent) => {
+    const matchesSearch =
+      indent.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      indent.department.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || indent.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -201,12 +237,14 @@ const StoreTrack: React.FC = () => {
         title="Delivery Tracking"
         subtitle="Track delivery status of approved indents"
       />
-      
+
       <div className="p-6">
         <Card>
           <CardHeader>
-            <CardTitle>Delivery Status</CardTitle>
-            <CardDescription>Track and manage deliveries for approved indents</CardDescription>
+            <CardTitle className="text-xl font-semibold">Delivery Status</CardTitle>
+            <CardDescription>
+              Track and manage deliveries for approved indents
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {/* Filters */}
@@ -233,7 +271,7 @@ const StoreTrack: React.FC = () => {
               </Select>
             </div>
 
-            {/* Delivery Table */}
+            {/* Table */}
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -260,17 +298,23 @@ const StoreTrack: React.FC = () => {
                       <TableCell>
                         <Select
                           value={indent.status}
-                          onValueChange={(value) => handleStatusChange(indent, value)}
+                          onValueChange={(value) =>
+                            handleStatusChange(indent, value)
+                          }
                           disabled={indent.status === 'fully_received'}
                         >
-                          <SelectTrigger className={getStatusColor(indent.status)}>
+                          <SelectTrigger
+                            className={`${getStatusColor(indent.status)} rounded-md`}
+                          >
                             <SelectValue>
                               {getStatusText(indent.status)}
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="not_received">Not Received</SelectItem>
-                            <SelectItem value="partially_received">Partially Received</SelectItem>
+                            <SelectItem value="partially_received">
+                              Partially Received
+                            </SelectItem>
                             <SelectItem value="fully_received">Fully Received</SelectItem>
                           </SelectContent>
                         </Select>
@@ -289,15 +333,14 @@ const StoreTrack: React.FC = () => {
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </Button>
-                          
+
+                          {/* Full Screen Log Delivery */}
                           {indent.status !== 'fully_received' && (
-                            <Dialog 
-                              open={isModalOpen && selectedIndent?.id === indent.id} 
+                            <Dialog
+                              open={isModalOpen && selectedIndent?.id === indent.id}
                               onOpenChange={(open) => {
                                 setIsModalOpen(open);
-                                if (!open) {
-                                  setSelectedIndent(null);
-                                }
+                                if (!open) setSelectedIndent(null);
                               }}
                             >
                               <DialogTrigger asChild>
@@ -313,49 +356,73 @@ const StoreTrack: React.FC = () => {
                                   Log Delivery
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Log Delivery</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4 py-4">
-                                  <div className="space-y-2">
-                                    <Label htmlFor="date">Delivery Date</Label>
-                                    <Input
-                                      id="date"
-                                      type="date"
-                                      value={formData.date}
-                                      onChange={(e) => setFormData({...formData, date: e.target.value})}
-                                    />
-                                  </div>
-                                  
-                                  <div className="space-y-2">
-                                    <Label htmlFor="quantity">Quantity Delivered</Label>
-                                    <Input
-                                      id="quantity"
-                                      type="number"
-                                      value={formData.quantity}
-                                      onChange={(e) => setFormData({...formData, quantity: parseInt(e.target.value)})}
-                                      placeholder="Enter quantity"
-                                    />
-                                  </div>
-                                  
-                                  <div className="space-y-2">
-                                    <Label htmlFor="remarks">Remarks</Label>
-                                    <Textarea
-                                      id="remarks"
-                                      value={formData.remarks}
-                                      onChange={(e) => setFormData({...formData, remarks: e.target.value})}
-                                      placeholder="Enter any remarks about the delivery"
-                                    />
+
+                              {/* FULL-SCREEN MODAL */}
+                              <DialogContent className="w-full h-screen max-w-none p-0 bg-gray-50 flex flex-col">
+                                {/* HEADER */}
+                                <div className="flex items-center justify-between px-10 py-5 bg-white border-b shadow-sm">
+                                  <DialogTitle className="text-2xl font-semibold text-gray-800">
+                                    Log Delivery – {indent.title}
+                                  </DialogTitle>
+                                </div>
+
+                                {/* BODY */}
+                                <div className="flex-1 overflow-y-auto px-10 py-8 flex justify-center">
+                                  <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-sm border space-y-6">
+                                    <div className="space-y-2">
+                                      <Label className="font-medium text-gray-700">Delivery Date</Label>
+                                      <Input
+                                        type="date"
+                                        value={formData.date}
+                                        onChange={(e) =>
+                                          setFormData({ ...formData, date: e.target.value })
+                                        }
+                                        className="h-12 rounded-lg"
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label className="font-medium text-gray-700">Quantity Delivered</Label>
+                                      <Input
+                                        type="number"
+                                        value={formData.quantity}
+                                        onChange={(e) =>
+                                          setFormData({
+                                            ...formData,
+                                            quantity: parseInt(e.target.value)
+                                          })
+                                        }
+                                        placeholder="Enter quantity"
+                                        className="h-12 rounded-lg"
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label className="font-medium text-gray-700">Remarks</Label>
+                                      <Textarea
+                                        value={formData.remarks}
+                                        onChange={(e) =>
+                                          setFormData({ ...formData, remarks: e.target.value })
+                                        }
+                                        rows={5}
+                                        placeholder="Enter any remarks about the delivery"
+                                        className="rounded-lg"
+                                      />
+                                    </div>
                                   </div>
                                 </div>
-                                
-                                <div className="flex justify-end space-x-2">
-                                  <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+
+                                {/* FOOTER */}
+                                <div className="flex justify-end gap-4 px-10 py-5 bg-white border-t shadow-inner">
+                                  <Button
+                                    variant="outline"
+                                    className="h-11 px-6 rounded-lg"
+                                    onClick={() => setIsModalOpen(false)}
+                                  >
                                     Cancel
                                   </Button>
-                                  <Button 
-                                    className="bg-dpu-red hover:bg-dpu-red-dark text-white"
+                                  <Button
+                                    className="h-11 px-8 rounded-lg bg-dpu-red text-white hover:bg-dpu-red-dark shadow-md hover:shadow-lg transition-all duration-200"
                                     onClick={handleLogDelivery}
                                   >
                                     Log Delivery
@@ -363,20 +430,84 @@ const StoreTrack: React.FC = () => {
                                 </div>
                               </DialogContent>
                             </Dialog>
+
                           )}
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedIndent(indent);
-                              setShowHistoryModal(true);
+
+                          {/* Full Screen View History */}
+                          <Dialog
+                            open={showHistoryModal && selectedIndent?.id === indent.id}
+                            onOpenChange={(open) => {
+                              setShowHistoryModal(open);
+                              if (!open) setSelectedIndent(null);
                             }}
                           >
-                            <History className="h-4 w-4 mr-2" />
-                            View History
-                          </Button>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedIndent(indent);
+                                }}
+                              >
+                                <History className="h-4 w-4 mr-2" />
+                                View History
+                              </Button>
+                            </DialogTrigger>
+
+                            {/* FULL-SCREEN MODAL */}
+                            <DialogContent className="w-full h-screen max-w-none p-0 bg-gray-50 flex flex-col">
+                              {/* HEADER */}
+                              <div className="flex items-center justify-between px-10 py-5 bg-white border-b shadow-sm">
+                                <DialogTitle className="text-2xl font-semibold text-gray-800">
+                                  Delivery History – {indent.title}
+                                </DialogTitle>
+                              </div>
+
+                              {/* BODY */}
+                              <div className="flex-1 overflow-y-auto px-10 py-8 flex justify-center">
+                                <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-sm border space-y-6">
+                                  <div className="flex items-center justify-between border-b pb-4">
+                                    <div>
+                                      <h3 className="font-semibold text-lg">{indent.title}</h3>
+                                      <p className="text-sm text-gray-500">{indent.department}</p>
+                                    </div>
+                                    <Badge className={getStatusColor(indent.status)}>
+                                      {getStatusText(indent.status)}
+                                    </Badge>
+                                  </div>
+
+                                  <div className="space-y-4">
+                                    {indent.deliveryLogs.map((log, index) => (
+                                      <div
+                                        key={index}
+                                        className="border rounded-lg p-4 bg-gray-50"
+                                      >
+                                        <div className="flex justify-between mb-2">
+                                          <span className="font-medium">{log.date}</span>
+                                          <span className="text-sm text-gray-500">
+                                            Quantity: {log.quantity}
+                                          </span>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{log.remarks}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* FOOTER */}
+                              <div className="flex justify-end px-10 py-5 bg-white border-t shadow-inner">
+                                <Button
+                                  variant="outline"
+                                  className="h-11 px-6 rounded-lg"
+                                  onClick={() => setShowHistoryModal(false)}
+                                >
+                                  Close
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -384,51 +515,6 @@ const StoreTrack: React.FC = () => {
                 </TableBody>
               </Table>
             </div>
-
-            {/* Delivery History Modal */}
-            <Dialog 
-              open={showHistoryModal} 
-              onOpenChange={(open) => {
-                setShowHistoryModal(open);
-                if (!open) {
-                  setSelectedIndent(null);
-                }
-              }}
-            >
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delivery History</DialogTitle>
-                </DialogHeader>
-                {selectedIndent && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">{selectedIndent.title}</h3>
-                        <p className="text-sm text-gray-500">{selectedIndent.department}</p>
-                      </div>
-                      <Badge className={getStatusColor(selectedIndent.status)}>
-                        {getStatusText(selectedIndent.status)}
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Delivery Logs</h4>
-                      <div className="space-y-4">
-                        {selectedIndent.deliveryLogs.map((log, index) => (
-                          <div key={index} className="border rounded-lg p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="font-medium">{log.date}</span>
-                              <span className="text-sm text-gray-500">Quantity: {log.quantity}</span>
-                            </div>
-                            <p className="text-sm text-gray-600">{log.remarks}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </DialogContent>
-            </Dialog>
 
             {/* Indent Details Modal */}
             <IndentDetailsModal
@@ -444,4 +530,4 @@ const StoreTrack: React.FC = () => {
   );
 };
 
-export default StoreTrack; 
+export default StoreTrack;

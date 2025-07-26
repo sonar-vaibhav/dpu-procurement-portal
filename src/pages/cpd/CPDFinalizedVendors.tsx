@@ -1,10 +1,28 @@
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +44,8 @@ const finalizedPOs = [
       department: 'Electronics',
       budgetHead: 'Lab Infrastructure',
       priority: 'medium',
-      justification: 'Upgrading computer lab with latest hardware for student projects.',
+      justification:
+        'Upgrading computer lab with latest hardware for student projects.',
       requestedBy: 'Prof. Sarah Johnson',
       items: [
         {
@@ -58,7 +77,8 @@ const finalizedPOs = [
       department: 'Computer Science',
       budgetHead: 'Equipment Purchase',
       priority: 'high',
-      justification: 'Required for advanced research in computer vision and image processing.',
+      justification:
+        'Required for advanced research in computer vision and image processing.',
       requestedBy: 'Dr. John Smith',
       items: [
         {
@@ -90,7 +110,8 @@ const finalizedPOs = [
       department: 'Administration',
       budgetHead: 'Office Supplies',
       priority: 'low',
-      justification: 'Monthly office stationery requirements for all departments.',
+      justification:
+        'Monthly office stationery requirements for all departments.',
       requestedBy: 'Admin Office',
       items: [
         {
@@ -113,6 +134,22 @@ const CPDFinalizedVendors: React.FC = () => {
   const [openIndent, setOpenIndent] = useState<string | null>(null);
   const [selectedIndent, setSelectedIndent] = useState<any>(null);
 
+  const getPriorityBadge = (priority: string) => {
+    const styles: Record<string, string> = {
+      high: 'border-red-200 text-red-600',
+      medium: 'border-yellow-200 text-yellow-600',
+      low: 'border-green-200 text-green-600'
+    };
+    return (
+      <Badge
+        variant="outline"
+        className={styles[priority] || 'border-gray-200 text-gray-600'}
+      >
+        {priority.toUpperCase()}
+      </Badge>
+    );
+  };
+
   return (
     <DashboardLayout>
       <PageHeader
@@ -122,7 +159,9 @@ const CPDFinalizedVendors: React.FC = () => {
       <div className="p-6">
         <Card className="shadow-xl border-0">
           <CardHeader className="bg-gradient-to-r from-dpu-red to-dpu-red-dark rounded-t-lg p-6">
-            <CardTitle className="text-white text-lg">Accepted Purchase Orders</CardTitle>
+            <CardTitle className="text-white text-lg">
+              Accepted Purchase Orders
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="border rounded-lg overflow-x-auto">
@@ -134,55 +173,85 @@ const CPDFinalizedVendors: React.FC = () => {
                     <TableHead>Department</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Accepted Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {finalizedPOs.map((po, idx) => (
-                    <TableRow key={po.poId} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <TableRow
+                      key={po.poId}
+                      className={
+                        idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      }
+                    >
                       <TableCell>
                         <div>
                           <div className="font-medium">{po.indentTitle}</div>
                           <div className="text-sm text-gray-500 flex items-center gap-2">
                             {po.indent.id} • {po.indent.date}
-                            <Badge variant="outline" className={
-                              po.indent.priority === 'high' ? 'border-red-200 text-red-600' :
-                              po.indent.priority === 'medium' ? 'border-yellow-200 text-yellow-600' :
-                              'border-green-200 text-green-600'
-                            }>
-                              {po.indent.priority.toUpperCase()}
-                            </Badge>
+                            {getPriorityBadge(po.indent.priority)}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-sm">{po.vendorName}</div>
+                        <div className="font-medium text-sm">
+                          {po.vendorName}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">{po.indentDepartment}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge className="bg-green-100 text-green-800">Accepted by Vendor</Badge>
+                        <Badge className="bg-green-100 text-green-800">
+                          Accepted by Vendor
+                        </Badge>
                       </TableCell>
                       <TableCell>{po.acceptedDate}</TableCell>
-                      <TableCell className="space-x-2">
-                        <Button size="sm" variant="outline" onClick={() => setOpenPO(po.poId)}>
+                      <TableCell className="text-right space-x-2">
+                        {/* View PO Modal */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setOpenPO(po.poId)}
+                        >
                           View PO
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => { setSelectedIndent(po.indent); setOpenIndent(po.poId); }}>
-                          View Indent
-                        </Button>
-                        <Dialog open={openPO === po.poId} onOpenChange={v => !v && setOpenPO(null)}>
-                          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>Purchase Order</DialogTitle>
-                              <DialogDescription>Preview of the finalized Purchase Order</DialogDescription>
+                        <Dialog
+                          open={openPO === po.poId}
+                          onOpenChange={(v) => !v && setOpenPO(null)}
+                        >
+                          <DialogContent className="w-screen h-screen max-w-none max-h-none rounded-none shadow-none p-6 overflow-y-auto bg-gray-50">
+                            <DialogHeader className="mb-4">
+                              <DialogTitle className="text-2xl font-bold">
+                                Purchase Order - {po.poId}
+                              </DialogTitle>
+                              <DialogDescription className="text-gray-600">
+                                Preview of the finalized Purchase Order
+                              </DialogDescription>
                             </DialogHeader>
-                            <div className="max-h-[70vh] overflow-y-auto">
+
+                            <div className="pb-6">
                               <PurchaseOrderPage />
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                              <Button variant="outline" onClick={() => setOpenPO(null)}>
+                                Close
+                              </Button>
                             </div>
                           </DialogContent>
                         </Dialog>
+                        {/* View Indent Modal */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedIndent(po.indent);
+                            setOpenIndent(po.poId);
+                          }}
+                        >
+                          View Indent
+                        </Button>
                         <IndentDetailsModal
                           isOpen={openIndent === po.poId}
                           onClose={() => setOpenIndent(null)}
@@ -206,4 +275,4 @@ const CPDFinalizedVendors: React.FC = () => {
   );
 };
 
-export default CPDFinalizedVendors; 
+export default CPDFinalizedVendors;

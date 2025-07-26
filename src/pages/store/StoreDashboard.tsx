@@ -223,36 +223,78 @@ const StoreDashboard: React.FC = () => {
       </div>
 
       <Dialog open={showReturnModal} onOpenChange={setShowReturnModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Return Indent for Information</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="returnReason">Reason for Return</Label>
-              <Select value={returnReason} onValueChange={setReturnReason}>
-                <SelectTrigger><SelectValue placeholder="Select reason" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="stock_available">Stock Already Available</SelectItem>
-                  <SelectItem value="more_info">Need More Information</SelectItem>
-                  <SelectItem value="specifications">Specifications Unclear</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="returnRemarks">Remarks</Label>
-              <Textarea
-                id="returnRemarks"
-                value={returnRemarks}
-                onChange={(e) => setReturnRemarks(e.target.value)}
-                placeholder="Enter detailed remarks for return..."
-              />
+        <DialogContent className="w-full h-screen max-w-none p-0 bg-gray-50 flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between px-10 py-5 bg-white shadow-md border-b">
+            <DialogTitle className="text-2xl font-semibold text-gray-800">
+              Return Indent for Information
+            </DialogTitle>
+          </div>
+
+          {/* Body */}
+          <div className="flex-1 overflow-y-auto px-10 py-8 flex justify-center">
+            <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-sm border space-y-6">
+              {/* Reason for Return */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="returnReason"
+                  className="text-lg font-medium text-gray-700"
+                >
+                  Reason for Return <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={returnReason}
+                  onValueChange={setReturnReason}
+                >
+                  <SelectTrigger className="h-12 text-base rounded-lg border-gray-300 focus:ring-2 focus:ring-dpu-red focus:border-dpu-red">
+                    <SelectValue placeholder="Select reason" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="stock_available">
+                      Stock Already Available
+                    </SelectItem>
+                    <SelectItem value="more_info">Need More Information</SelectItem>
+                    <SelectItem value="specifications">
+                      Specifications Unclear
+                    </SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Remarks */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="returnRemarks"
+                  className="text-lg font-medium text-gray-700"
+                >
+                  Remarks
+                </Label>
+                <Textarea
+                  id="returnRemarks"
+                  value={returnRemarks}
+                  onChange={(e) => setReturnRemarks(e.target.value)}
+                  placeholder="Enter detailed remarks for return..."
+                  rows={6}
+                  className="text-base rounded-lg border-gray-300 focus:ring-2 focus:ring-dpu-red focus:border-dpu-red"
+                />
+              </div>
             </div>
           </div>
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setShowReturnModal(false)}>Cancel</Button>
-            <Button className="bg-dpu-red hover:bg-dpu-red-dark text-white" onClick={handleReturnForInfo}>
+
+          {/* Footer */}
+          <div className="flex justify-end gap-4 px-10 py-5 bg-white border-t shadow-inner">
+            <Button
+              variant="outline"
+              className="h-11 px-6 text-gray-700 border-gray-300 rounded-lg hover:bg-gray-100"
+              onClick={() => setShowReturnModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="h-11 px-8 rounded-lg bg-dpu-red text-white hover:bg-dpu-red-dark shadow-md hover:shadow-lg transition-all duration-200 focus:ring-4 focus:ring-dpu-red/40"
+              onClick={handleReturnForInfo}
+            >
               Return Indent
             </Button>
           </div>

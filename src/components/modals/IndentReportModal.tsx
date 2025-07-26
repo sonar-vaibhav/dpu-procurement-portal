@@ -10,13 +10,17 @@ interface IndentReportModalProps {
 
 const IndentReportModal: React.FC<IndentReportModalProps> = ({ isOpen, onClose, indent }) => {
   if (!indent) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Indent Report</DialogTitle>
+      <DialogContent className="w-screen max-w-5xl max-h-[90vh] overflow-y-auto bg-gray-50">
+     
+        <DialogHeader className="pb-4 border-b">
+          <DialogTitle className="text-xl font-semibold">Indent Report</DialogTitle>
         </DialogHeader>
-        <div className="py-2">
+
+     
+        <div className="py-4">
           <IndentReport indentData={indent} />
         </div>
       </DialogContent>
@@ -24,4 +28,4 @@ const IndentReportModal: React.FC<IndentReportModalProps> = ({ isOpen, onClose, 
   );
 };
 
-export default IndentReportModal; 
+export default IndentReportModal;

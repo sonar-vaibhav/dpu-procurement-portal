@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -20,19 +26,22 @@ const RejectionRemarksModal: React.FC<RejectionRemarksModalProps> = ({
   const [remarks, setRemarks] = useState('');
 
   const handleSubmit = () => {
+    if (!remarks.trim()) return;
     onConfirm(remarks);
     setRemarks('');
+    onClose(); 
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Rejection Remarks</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">Rejection Remarks</DialogTitle>
           <DialogDescription>
-            Please provide remarks for rejecting indent {indentId}
+            Please provide remarks for rejecting indent <strong>{indentId}</strong>.
           </DialogDescription>
         </DialogHeader>
+
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="remarks">Remarks</Label>
@@ -42,14 +51,16 @@ const RejectionRemarksModal: React.FC<RejectionRemarksModalProps> = ({
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="Enter your remarks for rejection..."
               rows={4}
+              className="rounded-md"
             />
           </div>
         </div>
-        <div className="flex justify-end space-x-2">
+
+        <div className="flex justify-end gap-3 pt-2 border-t">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
+          <Button
             className="bg-dpu-red hover:bg-dpu-red-dark text-white"
             onClick={handleSubmit}
             disabled={!remarks.trim()}
@@ -62,4 +73,4 @@ const RejectionRemarksModal: React.FC<RejectionRemarksModalProps> = ({
   );
 };
 
-export default RejectionRemarksModal; 
+export default RejectionRemarksModal;

@@ -28,7 +28,7 @@ interface IndentItem {
   quantity: string;
   uom: string;
   stockInHand: string;
-  similarItem: string; // "yes" or "no"
+  similarItem: string;
   approxValue: string;
   description: string;
   vendorQuotationFile?: File | null;
@@ -127,7 +127,11 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
     setItems(updatedItems);
   };
 
-  const handleFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>, field: 'imageFile' | 'catalogFile' | 'vendorQuotationFile') => {
+  const handleFileChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: 'imageFile' | 'catalogFile' | 'vendorQuotationFile'
+  ) => {
     const file = e.target.files ? e.target.files[0] : null;
     const updatedItems = [...items];
     (updatedItems[index] as any)[field] = file;
@@ -165,82 +169,109 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create New Purchase Indent</DialogTitle>
-          <DialogDescription>
+      <DialogContent
+        className="w-screen h-screen max-w-none max-h-none rounded-none 
+        shadow-none px-3 py-3 md:px-10 md:py-8 overflow-y-auto bg-gray-50"
+      >
+        <DialogHeader
+          className="bg-gray-50 pb-4 border-b shadow-sm flex flex-col gap-1"
+        >
+          <DialogTitle className="text-2xl font-bold text-gray-800">
+            Create New Purchase Indent
+          </DialogTitle>
+          <DialogDescription className="text-gray-600">
             Fill in the details for your procurement request
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6 pt-4 pb-24 md:pb-10"
+        >
           {/* Institute Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Institute Name *</Label>
-              <Input
-                value={formData.instituteName}
-                onChange={e =>
-                  setFormData({ ...formData, instituteName: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Department/Lab *</Label>
-              <Input
-                value={formData.department}
-                onChange={e =>
-                  setFormData({ ...formData, department: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Material Type</Label>
-              <Select
-                value={formData.materialType}
-                onValueChange={value =>
-                  setFormData({ ...formData, materialType: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select material type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="equipment">Equipment</SelectItem>
-                  <SelectItem value="consumables">Consumables</SelectItem>
-                  <SelectItem value="software">Software</SelectItem>
-                  <SelectItem value="services">Services</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Contact No.</Label>
-              <Input
-                value={formData.contactNo}
-                onChange={e =>
-                  setFormData({ ...formData, contactNo: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Intercom No.</Label>
-              <Input
-                value={formData.intercomNo}
-                onChange={e =>
-                  setFormData({ ...formData, intercomNo: e.target.value })
-                }
-              />
+          <div className="bg-white shadow rounded-lg p-4 space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">
+              Institute Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Institute Name *</Label>
+                <Input
+                  value={formData.instituteName}
+                  onChange={e =>
+                    setFormData({ ...formData, instituteName: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Department/Lab *</Label>
+                <Input
+                  value={formData.department}
+                  onChange={e =>
+                    setFormData({ ...formData, department: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Material Type</Label>
+                <Select
+                  value={formData.materialType}
+                  onValueChange={value =>
+                    setFormData({ ...formData, materialType: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select material type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="equipment">Equipment</SelectItem>
+                    <SelectItem value="consumables">Consumables</SelectItem>
+                    <SelectItem value="software">Software</SelectItem>
+                    <SelectItem value="services">Services</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Contact No.</Label>
+                <Input
+                  value={formData.contactNo}
+                  onChange={e =>
+                    setFormData({ ...formData, contactNo: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Intercom No.</Label>
+                <Input
+                  value={formData.intercomNo}
+                  onChange={e =>
+                    setFormData({ ...formData, intercomNo: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Budget Head</Label>
+                <Input
+                  value={formData.budgetHead}
+                  onChange={e =>
+                    setFormData({ ...formData, budgetHead: e.target.value })
+                  }
+                />
+              </div>
             </div>
           </div>
 
           {/* Items */}
-          <div className="space-y-4">
+          <div className="bg-white shadow rounded-lg p-4 space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Items Required</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Items Required
+              </h3>
               <Button type="button" onClick={addItem} variant="outline">
-                Add Item
+                + Add Item
               </Button>
             </div>
 
@@ -265,8 +296,9 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                   )}
                 </div>
 
+                {/* Make, Specs, Stock, ItemName */}
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  <div className="space-y-2 col-span-1">
+                  <div className="space-y-2">
                     <Label>Make / Manufacturer</Label>
                     <Select
                       value={item.make}
@@ -296,8 +328,7 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       />
                     )}
                   </div>
-
-                  <div className="space-y-2 col-span-2">
+                  <div className="space-y-2 md:col-span-2">
                     <Label>Specifications</Label>
                     <Input
                       value={item.specs}
@@ -308,8 +339,7 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       required
                     />
                   </div>
-
-                  <div className="space-y-2 col-span-1">
+                  <div className="space-y-2">
                     <Label>Stock in Hand</Label>
                     <Input
                       value={item.stockInHand}
@@ -319,8 +349,7 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       placeholder="Available stock"
                     />
                   </div>
-
-                  <div className="space-y-2 col-span-1">
+                  <div className="space-y-2">
                     <Label>Item Name *</Label>
                     <Input
                       value={item.itemName}
@@ -332,6 +361,7 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                   </div>
                 </div>
 
+                {/* Quantity & UOM */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Quantity *</Label>
@@ -389,7 +419,7 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                   />
                 </div>
 
-                {/* Similar item & Quotation below description */}
+                {/* Similar Item, Vendor Quotation, Image, Catalog */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                   <div className="space-y-2">
                     <Label>Similar Item Purchased?</Label>
@@ -402,8 +432,8 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                             updateItem(index, 'similarItem', opt)
                           }
                           className={`px-4 py-1 rounded-full border ${item.similarItem === opt
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white text-gray-800'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-white text-gray-800'
                             }`}
                         >
                           {opt.charAt(0).toUpperCase() + opt.slice(1)}
@@ -411,13 +441,14 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       ))}
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <Label>Vendor Quotation</Label>
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
-                      onChange={e => handleFileChange(index, e, 'vendorQuotationFile')}
+                      onChange={e =>
+                        handleFileChange(index, e, 'vendorQuotationFile')
+                      }
                     />
                     {item.vendorQuotationFile && (
                       <p className="text-sm text-gray-600 mt-1 truncate">
@@ -425,21 +456,14 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       </p>
                     )}
                   </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs text-gray-500 font-medium">
-                      Note: If the product is not listed, please upload the image and catalog.
-                    </Label>
-                  </div>
-                  
-                  <div className="space-y-2"></div>
-
                   <div className="space-y-2">
                     <Label>Upload Image</Label>
                     <Input
                       type="file"
                       accept="image/*"
-                      onChange={e => handleFileChange(index, e, 'imageFile')}
+                      onChange={e =>
+                        handleFileChange(index, e, 'imageFile')
+                      }
                     />
                     {item.imageFile && (
                       <p className="text-sm text-gray-600 mt-1 truncate">
@@ -447,14 +471,14 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       </p>
                     )}
                   </div>
-
-
                   <div className="space-y-2">
                     <Label>Upload Catalog</Label>
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx"
-                      onChange={e => handleFileChange(index, e, 'catalogFile')}
+                      onChange={e =>
+                        handleFileChange(index, e, 'catalogFile')
+                      }
                     />
                     {item.catalogFile && (
                       <p className="text-sm text-gray-600 mt-1 truncate">
@@ -462,59 +486,65 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       </p>
                     )}
                   </div>
-
                 </div>
               </div>
             ))}
           </div>
 
           {/* Timeline & Budget */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white shadow rounded-lg p-4 space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">
+              Timeline & Budget
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Timeline for Delivery</Label>
+                <Input
+                  value={formData.timeline}
+                  onChange={e =>
+                    setFormData({ ...formData, timeline: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Budget Provision</Label>
+                <Select
+                  value={formData.budgetProvision}
+                  onValueChange={value =>
+                    setFormData({ ...formData, budgetProvision: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yes">Yes</SelectItem>
+                    <SelectItem value="no">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             <div className="space-y-2">
-              <Label>Timeline for Delivery</Label>
-              <Input
-                value={formData.timeline}
+              <Label>Urgent Reason (if any)</Label>
+              <Textarea
+                value={formData.urgentReason}
                 onChange={e =>
-                  setFormData({ ...formData, timeline: e.target.value })
+                  setFormData({ ...formData, urgentReason: e.target.value })
                 }
+                rows={2}
               />
             </div>
-            <div className="space-y-2">
-              <Label>Budget Provision</Label>
-              <Select
-                value={formData.budgetProvision}
-                onValueChange={value =>
-                  setFormData({ ...formData, budgetProvision: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Yes</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
-          {/* Urgency Reason */}
-          <div className="space-y-2">
-            <Label>Urgent Reason (if any)</Label>
-            <Textarea
-              value={formData.urgentReason}
-              onChange={e =>
-                setFormData({ ...formData, urgentReason: e.target.value })
-              }
-              rows={2}
-            />
-          </div>
-
-          <div className="flex justify-end gap-4">
+          {/* Sticky Footer */}
+          <div className="sticky bottom-0 bg-gray-50 pt-4 pb-2 flex justify-end gap-4 border-t">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-dpu-red text-white hover:bg-dpu-red-dark">
+            <Button
+              type="submit"
+              className="bg-dpu-red text-white hover:bg-dpu-red-dark"
+            >
               Submit Indent
             </Button>
           </div>
