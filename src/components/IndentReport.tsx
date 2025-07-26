@@ -59,7 +59,7 @@ const IndentReport: React.FC<IndentReportProps> = ({ indentData }) => {
         {/* Header Section */}
         <div className="flex items-center mb-4">
           <img
-            src="/dpu_logo.png"
+            src="../../public/dpu_logo.png"
             alt="DPU Logo"
             className="h-12 mr-4"
             style={{ objectFit: 'contain' }}

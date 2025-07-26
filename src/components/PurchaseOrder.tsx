@@ -184,7 +184,12 @@ const PurchaseOrderPage: React.FC = () => {
           <div className="w-full border border-gray-400 bg-white">
             {/* Top line */}
             <div className="border-b border-gray-400 flex items-center px-2 pt-2 pb-1">
-              <div className="font-extrabold text-3xl text-red-800 tracking-widest pl-2 pr-8" style={{fontFamily:'serif'}}>DYP DPU</div>
+              <img
+                src="/dpu_logo.png"
+                alt="DPU Logo"
+                className="h-12 pl-2 pr-8"
+                style={{ objectFit: 'contain' }}
+              />
               <div className="flex-1 flex flex-col items-center">
                 <div className="text-xs font-medium text-gray-700">{workOrderData.subject}</div>
                 <div className="font-bold text-lg leading-tight text-black text-center mt-1">{workOrderData.society}</div>
