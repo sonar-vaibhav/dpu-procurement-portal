@@ -153,7 +153,7 @@ const VendorQuotes: React.FC = () => {
                   <TableHead>Original Price</TableHead>
                   <TableHead>Final Price</TableHead>
                   <TableHead>Delivery</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Quote Status</TableHead>
                   <TableHead>Submitted</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -183,15 +183,6 @@ const VendorQuotes: React.FC = () => {
                     <TableCell>{quote.submittedDate}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        {quote.status === 'pending' && (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => navigate(`/vendor/revise/${quote.enquiryId}`)}
-                          >
-                            Revise
-                          </Button>
-                        )}
                         <Button 
                           size="sm" 
                           variant="ghost"

@@ -34,7 +34,7 @@ import ManagementProfile from '@/pages/management/ManagementProfile';
 import VendorDashboard from '@/pages/vendor/VendorDashboard';
 import VendorEnquiries from '@/pages/vendor/VendorEnquiries';
 import VendorRespond from '@/pages/vendor/VendorRespond';
-import VendorRevise from '@/pages/vendor/VendorRevise';
+
 import VendorQuotes from '@/pages/vendor/VendorQuotes';
 import VendorQuoteDetails from '@/pages/vendor/VendorQuoteDetails';
 import VendorProfile from '@/pages/vendor/VendorProfile';
@@ -214,7 +214,7 @@ const App: React.FC = () => {
                 <Route index element={<VendorDashboard />} />
                 <Route path="enquiries" element={<VendorEnquiries />} />
                 <Route path="respond/:enquiryId" element={<VendorRespond />} />
-                <Route path="revise/:enquiryId" element={<VendorRevise />} />
+
                 <Route path="quotes" element={<VendorQuotes />} />
                 <Route path="quotes/:quoteId" element={<VendorQuoteDetails />} />
                 <Route path="profile" element={<VendorProfile />} />

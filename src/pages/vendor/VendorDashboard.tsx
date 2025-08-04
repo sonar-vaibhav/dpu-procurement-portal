@@ -175,16 +175,7 @@ const VendorDashboard: React.FC = () => {
                             Respond
                           </Button>
                         )}
-                        {enquiry.status === 'responded' && (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => navigate(`/vendor/revise/${enquiry.id}`)}
-                            className="hover:bg-gray-50"
-                          >
-                            Revise
-                          </Button>
-                        )}
+
                       </div>
                     </div>
                     

@@ -27,7 +27,7 @@ const workOrderData = {
   },
   woNo: '009 & 010',
   indentNo: '009 & 010',
-  quotationNo: '121/PECPL/RO/6/25',
+  quotationNo: '121/PECPL',
   department: 'Maintenance',
   materialType: 'RO Plant Cleaning & Servicing',
   woDate: '03/04/2025',
@@ -57,9 +57,9 @@ const workOrderData = {
 function numberToWords(num: number) {
   // Simple number to words for demo (for INR)
   // For real use, use a library or more robust function
-  const a = [ '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-    'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen' ];
-  const b = [ '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety' ];
+  const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+    'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
   if (num === 0) return 'Zero';
   if (num < 20) return a[num];
   if (num < 100) return b[Math.floor(num / 10)] + (num % 10 ? ' ' + a[num % 10] : '');
@@ -94,12 +94,12 @@ const PurchaseOrderPage: React.FC = () => {
   const handleDownloadPDF = () => {
     if (!printRef.current) return;
     const opt = {
-      margin:      [10, 0, 0, 0],
-      filename:    'WorkOrder.pdf',
-      image:       { type: 'jpeg', quality: 0.98 },
+      margin: [10, 0, 0, 0],
+      filename: 'WorkOrder.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:   { mode: ['css', 'legacy'] }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
     };
     html2pdf().set(opt).from(printRef.current).save();
   };
@@ -177,9 +177,18 @@ const PurchaseOrderPage: React.FC = () => {
           Download Work Order as PDF
         </button>
       )}
-      <div ref={printRef} className="w-[210mm] bg-white text-black text-[13px] font-sans print:w-full print:h-auto print:overflow-visible print:static print:block">
+      <div ref={printRef} className="w-[210mm] bg-white text-black text-[13px] font-sans print:w-full print:h-auto print:overflow-visible print:static print:block relative">
         {/* Page 1 */}
-        <div className="wo-page w-full min-h-[297mm] px-10 py-8 flex flex-col justify-between">
+        <div className="wo-page w-full min-h-[297mm] px-10 py-8 flex flex-col justify-between relative">
+          {/* Watermark for vendor users - Page 1 */}
+          {user && user.role && user.role.trim().toLowerCase() === USER_ROLES.VENDOR && (
+            <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
+              <div className="transform -rotate-45 text-red-500 text-6xl font-bold opacity-20 select-none">
+                NOT FINAL PO
+              </div>
+            </div>
+          )}
+
           {/* Header */}
           <div className="w-full border border-gray-400 bg-white">
             {/* Top line */}
@@ -205,8 +214,9 @@ const PurchaseOrderPage: React.FC = () => {
             </div>
             {/* Work Order Info Grid */}
             <div className="border-t border-gray-400 grid grid-cols-2 text-[15px]">
+
               {/* Vendor Details (left) */}
-              <div className="p-2 border-r border-gray-400">
+              <div className="p-2 pr-0 border-r border-gray-400">
                 <div><span className="font-bold">M/s.</span> {isCPD && editMode ? <input className="border px-1" value={form.vendor.name} onChange={e => handleVendorField('name', e.target.value)} /> : form.vendor.name}</div>
                 <div>{isCPD && editMode ? <input className="border px-1 w-full" value={form.vendor.address} onChange={e => handleVendorField('address', e.target.value)} /> : form.vendor.address}</div>
                 <div><span className="font-bold">Contact Person: </span> {isCPD && editMode ? <input className="border px-1" value={form.vendor.contactPerson} onChange={e => handleVendorField('contactPerson', e.target.value)} /> : form.vendor.contactPerson}</div>
@@ -215,17 +225,54 @@ const PurchaseOrderPage: React.FC = () => {
                 <div><span className="font-bold">PAN No.: </span> {isCPD && editMode ? <input className="border px-1" value={form.vendor.pan} onChange={e => handleVendorField('pan', e.target.value)} /> : form.vendor.pan}</div>
                 <div><span className="font-bold">GST No.: </span> {isCPD && editMode ? <input className="border px-1" value={form.vendor.gst} onChange={e => handleVendorField('gst', e.target.value)} /> : form.vendor.gst}</div>
               </div>
+
               {/* Work Order Details (right) */}
-              <div className="p-2 grid grid-cols-2 gap-x-2 gap-y-1">
-                <div className="font-bold">Date :</div><div>{isCPD && editMode ? <input className="border px-1" value={form.woDate} onChange={e => handleField('woDate', e.target.value)} /> : form.woDate}</div>
-                <div className="font-bold">W.O. No. :</div><div>{isCPD && editMode ? <input className="border px-1" value={form.woNo} onChange={e => handleField('woNo', e.target.value)} /> : form.woNo}</div>
-                <div className="font-bold">Indent No. :</div><div>{isCPD && editMode ? <input className="border px-1" value={form.indentNo} onChange={e => handleField('indentNo', e.target.value)} /> : form.indentNo}</div>
-                <div className="font-bold">Quotation No. :</div><div>{isCPD && editMode ? <input className="border px-1" value={form.quotationNo} onChange={e => handleField('quotationNo', e.target.value)} /> : form.quotationNo}</div>
-                <div className="font-bold">Date :</div><div>{isCPD && editMode ? <input className="border px-1" value={form.quotationDate} onChange={e => handleField('quotationDate', e.target.value)} /> : form.quotationDate}</div>
-                <div className="font-bold">Department :</div><div>{isCPD && editMode ? <input className="border px-1" value={form.department} onChange={e => handleField('department', e.target.value)} /> : form.department}</div>
-                <div className="font-bold">Material Type :</div><div>{isCPD && editMode ? <input className="border px-1" value={form.materialType} onChange={e => handleField('materialType', e.target.value)} /> : form.materialType}</div>
+              <div className="p-2 grid grid-cols-1 gap-y-1">
+                <div>
+                  <span className="font-bold">Indent No. : </span>
+                  <span>{isCPD && editMode ? <input className="border px-1" value={form.indentNo} onChange={e => handleField('indentNo', e.target.value)} /> : form.indentNo}</span>
+                </div>
+
+                <div className="grid grid-cols-4 gap-y-1">
+                  <span className="font-bold">W.O. No. : </span>
+                  <span>{isCPD && editMode ? <input className="border px-1" value={form.woNo} onChange={e => handleField('woNo', e.target.value)} /> : form.woNo}</span>
+
+                  <span className="font-bold">W.O.Date : </span>
+                  <span>{isCPD && editMode ? <input className="border px-1" value={form.woDate} onChange={e => handleField('woDate', e.target.value)} /> : form.woDate}</span>
+                </div>
+
+                <div className="grid grid-cols-[auto_1fr_auto_1fr] items-center gap-x-1">
+                  <span className="font-bold">Quotation No. :</span>
+                  <span>
+                    {isCPD && editMode ? (
+                      <input className="border px-1 py-0.5 w-full" value={form.quotationNo} onChange={e => handleField('quotationNo', e.target.value)} />
+                    ) : (
+                      form.quotationNo
+                    )}
+                  </span>
+                  <span className="font-bold">Quotation Date :</span>
+                  <span>
+                    {isCPD && editMode ? (
+                      <input className="border px-1 py-0.5 w-full" value={form.quotationDate} onChange={e => handleField('quotationDate', e.target.value)} />
+                    ) : (
+                      form.quotationDate
+                    )}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-bold">Department : </span>
+                  <span>{isCPD && editMode ? <input className="border px-1" value={form.department} onChange={e => handleField('department', e.target.value)} /> : form.department}</span>
+                </div>
+                <div>
+                  <span className="font-bold">Material Type : </span>
+                  <span>{isCPD && editMode ? <input className="border px-1" value={form.materialType} onChange={e => handleField('materialType', e.target.value)} /> : form.materialType}</span>
+                </div>
               </div>
+
+
             </div>
+
           </div>
           {/* Item Table */}
           {/* Two lines above the table */}
@@ -255,25 +302,25 @@ const PurchaseOrderPage: React.FC = () => {
               {form.items.map((item, idx) => (
                 <tr key={idx}>
                   <td className="border border-gray-400 px-2 py-1 text-center">{isCPD && editMode ? <input className="border px-1 w-10" value={item.sr} onChange={e => handleItemField(idx, 'sr', e.target.value)} /> : item.sr}</td>
-                <td className="border border-gray-400 px-2 py-1">
+                  <td className="border border-gray-400 px-2 py-1">
                     {isCPD && editMode ? (
                       <>
                         <input className="border px-1 font-bold w-full" value={item.description} onChange={e => handleItemField(idx, 'description', e.target.value)} />
-                        <br/>
+                        <br />
                         <input className="border px-1 pl-4 block w-full" value={item.make} onChange={e => handleItemField(idx, 'make', e.target.value)} />
                       </>
                     ) : (
                       <>
-                        <span className="font-bold">{item.description}</span><br/>
+                        <span className="font-bold">{item.description}</span><br />
                         <span className="pl-4 block">Make : {item.make}</span>
                       </>
                     )}
-                </td>
+                  </td>
                   <td className="border border-gray-400 px-2 py-1 text-center">{isCPD && editMode ? <input className="border px-1 w-12" value={item.unit} onChange={e => handleItemField(idx, 'unit', e.target.value)} /> : item.unit}</td>
                   <td className="border border-gray-400 px-2 py-1 text-center">{isCPD && editMode ? <input className="border px-1 w-12" value={item.qty} onChange={e => handleItemField(idx, 'qty', e.target.value)} /> : item.qty}</td>
                   <td className="border border-gray-400 px-2 py-1 text-right">{isCPD && editMode ? <input className="border px-1 w-16 text-right" value={item.rate} onChange={e => handleItemField(idx, 'rate', e.target.value)} /> : item.rate}</td>
                   <td className="border border-gray-400 px-2 py-1 text-right">{isCPD && editMode ? <input className="border px-1 w-20 text-right" value={item.value} onChange={e => handleItemField(idx, 'value', e.target.value)} /> : item.value}</td>
-              </tr>
+                </tr>
               ))}
               {/* Totals and GST rows */}
               <tr className="font-bold">
@@ -293,18 +340,26 @@ const PurchaseOrderPage: React.FC = () => {
           {/* Amount in words below the table */}
           <div className="mt-1 text-[15px] font-bold">(INR in Words : {numberToWords(grandTotal)} only)</div>
           {/* Detailed Terms Block (matches second image) */}
-          <div className="mt-6 border border-gray-400 pdf-page-break">
-            <div className="p-2 text-[15px]">
-            <ol className="list-decimal ml-6 text-[15px]">
-              <li className="avoid-break">The amount value is rounded at nearest amount.</li>
-              <li className="avoid-break">Please see overleaf for standard Terms and Conditions.</li>
-              <div className="font-bold mb-1">M/s. {form.vendor.name}</div>
-              <div className="flex flex-row justify-between mb-1">
-                <div className="font-bold">W.O. No. :</div>
-                <div className="font-bold">Date :</div>
-                <div className="font-bold">Grand Total: <span className="font-bold">{grandTotal.toLocaleString()}</span></div>
+          <div className="mt-6 border border-gray-400 pdf-page-break relative">
+            {/* Watermark for vendor users - Terms Section */}
+            {user && user.role && user.role.trim().toLowerCase() === USER_ROLES.VENDOR && (
+              <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
+                <div className="transform -rotate-45 text-red-500 text-4xl font-bold opacity-20 select-none">
+                  NOT FINAL PO
+                </div>
               </div>
-              <div className="font-bold mb-1">(INR in Words : {numberToWords(grandTotal)} only)</div>
+            )}
+            <div className="p-2 text-[15px]">
+              <ol className="list-decimal ml-6 text-[15px]">
+                <li className="avoid-break">The amount value is rounded at nearest amount.</li>
+                <li className="avoid-break">Please see overleaf for standard Terms and Conditions.</li>
+                <div className="font-bold mb-1">M/s. {form.vendor.name}</div>
+                <div className="flex flex-row justify-between mb-1">
+                  <div className="font-bold">W.O. No. :</div>
+                  <div className="font-bold">Date :</div>
+                  <div className="font-bold">Grand Total: <span className="font-bold">{grandTotal.toLocaleString()}</span></div>
+                </div>
+                <div className="font-bold mb-1">(INR in Words : {numberToWords(grandTotal)} only)</div>
                 <li className="avoid-break">The rates mentioned in the Purchase/Work Order shall be firm for all supplies including the extension of time, any granted and will not be subject to any fluctuation due to increasing in the cost of materials, labour, taxes, octroi, or any other new taxes, levies, etc.</li>
                 <li className="avoid-break">You shall execute the work as per instructions given by the College Authority.</li>
                 <li className="avoid-break">You will be fully responsible for the safety of the workforce employed by you at the above site and we shall not entertain any claim from you or your workers towards compensation for injury or damages while working at the above site.</li>

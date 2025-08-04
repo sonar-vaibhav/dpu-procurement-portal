@@ -18,6 +18,11 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import { X, ChevronsUpDown, Check } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 interface RegisterVendorModalProps {
   isOpen: boolean;
@@ -33,7 +38,7 @@ const RegisterVendorModal: React.FC<RegisterVendorModalProps> = ({
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
-    category: '',
+    categories: [] as string[],
     contactPerson: '',
     phone: '',
     email: '',
@@ -55,15 +60,33 @@ const RegisterVendorModal: React.FC<RegisterVendorModalProps> = ({
     'Construction Materials'
   ];
 
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleCategoryToggle = (category: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      categories: prev.categories.includes(category)
+        ? prev.categories.filter(c => c !== category)
+        : [...prev.categories, category]
+    }));
+  };
+
+  const handleCategoryRemove = (categoryToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      categories: prev.categories.filter(c => c !== categoryToRemove)
+    }));
+  };
+
   const handleSubmit = () => {
-    if (!formData.name || !formData.category || !formData.contactPerson || !formData.phone || !formData.email) {
+    if (!formData.name || formData.categories.length === 0 || !formData.contactPerson || !formData.phone || !formData.email) {
       toast({
         title: 'Error',
-        description: 'Please fill in all required fields',
+        description: 'Please fill in all required fields including at least one category',
         variant: 'destructive'
       });
       return;
@@ -87,7 +110,7 @@ const RegisterVendorModal: React.FC<RegisterVendorModalProps> = ({
 
     setFormData({
       name: '',
-      category: '',
+      categories: [],
       contactPerson: '',
       phone: '',
       email: '',
@@ -108,7 +131,7 @@ const RegisterVendorModal: React.FC<RegisterVendorModalProps> = ({
         shadow-none px-3 py-3 md:px-10 md:py-8 overflow-y-auto bg-gray-50"
       >
         {/* Sticky Header */}
-        <DialogHeader className="sticky top-0 bg-gray-50 z-10 pb-4 border-b">
+        <DialogHeader className="bg-gray-50 z-10 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold">
             Register New Vendor
           </DialogTitle>
@@ -136,22 +159,70 @@ const RegisterVendorModal: React.FC<RegisterVendorModalProps> = ({
                 />
               </div>
               <div className="space-y-2">
-                <Label>Category *</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value) => handleInputChange('category', value)}
-                >
-                  <SelectTrigger className="h-12 rounded-lg">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Categories *</Label>
+                <div className="space-y-2">
+                  {/* Selected Categories Display */}
+                  {formData.categories.length > 0 && (
+                    <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-gray-50">
+                      {formData.categories.map((category) => (
+                        <Badge
+                          key={category}
+                          variant="secondary"
+                          className="flex items-center gap-1 px-2 py-1"
+                        >
+                          {category}
+                          <button
+                            type="button"
+                            onClick={() => handleCategoryRemove(category)}
+                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Category Selection Dropdown */}
+                  <Popover open={categoryDropdownOpen} onOpenChange={setCategoryDropdownOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={categoryDropdownOpen}
+                        className="h-12 w-full justify-between rounded-lg"
+                      >
+                        {formData.categories.length === 0 
+                          ? "Select categories" 
+                          : `${formData.categories.length} category${formData.categories.length > 1 ? 'ies' : 'y'} selected`
+                        }
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search categories..." />
+                        <CommandList>
+                          <CommandEmpty>No category found.</CommandEmpty>
+                          <CommandGroup>
+                            {categories.map((category) => (
+                              <CommandItem
+                                key={category}
+                                onSelect={() => handleCategoryToggle(category)}
+                                className="flex items-center justify-between"
+                              >
+                                <span>{category}</span>
+                                {formData.categories.includes(category) && (
+                                  <Check className="h-4 w-4 text-green-600" />
+                                )}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
             </div>
 
@@ -242,10 +313,8 @@ const RegisterVendorModal: React.FC<RegisterVendorModalProps> = ({
                 className="rounded-lg"
               />
             </div>
-          </div>
 
           {/* Sticky Footer */}
-          <div className="sticky bottom-0 bg-gray-50 pt-4 pb-2 flex justify-end gap-4 border-t">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
@@ -257,6 +326,7 @@ const RegisterVendorModal: React.FC<RegisterVendorModalProps> = ({
               Register Vendor
             </Button>
           </div>
+
         </form>
       </DialogContent>
     </Dialog>

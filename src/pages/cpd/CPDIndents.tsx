@@ -13,12 +13,19 @@ import PurchaseOrderPage from '@/components/PurchaseOrder';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import IndentReportModal from '@/components/modals/IndentReportModal';
 import ComparisonChartReport from '@/components/ComparisonChartReport';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const CPDIndents: React.FC = () => {
   const { toast } = useToast();
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterCollege, setFilterCollege] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [collegeSearchOpen, setCollegeSearchOpen] = useState(false);
+  const [collegeSearchValue, setCollegeSearchValue] = useState('');
   const [selectedIndent, setSelectedIndent] = useState(null);
   const [isIndentModalOpen, setIsIndentModalOpen] = useState(false);
   const [showPOModal, setShowPOModal] = useState(false);
@@ -35,6 +42,7 @@ const CPDIndents: React.FC = () => {
       category: 'Laboratory',
       requester: 'Dr. John Smith - Computer Science',
       department: 'Computer Science',
+      college: 'Dr. D. Y. Patil Institute of Technology',
       status: 'not_forwarded',
       priority: 'high',
       amount: '₹2,50,000',
@@ -49,6 +57,7 @@ const CPDIndents: React.FC = () => {
           description: 'High-resolution digital microscope for research',
           quantity: '2',
           make: 'Olympus',
+          modelNo: 'OM-1234',
           uom: 'Pieces',
           stockInHand: '0',
           approxValue: '125000',
@@ -62,6 +71,7 @@ const CPDIndents: React.FC = () => {
       category: 'IT Equipment',
       requester: 'Prof. Sarah Johnson - Electronics',
       department: 'Electronics',
+      college: 'Dr. D. Y. Patil College of Engineering',
       status: 'assigned',
       priority: 'medium',
       amount: '₹1,80,000',
@@ -76,6 +86,7 @@ const CPDIndents: React.FC = () => {
           description: 'High-performance desktop computers',
           quantity: '10',
           make: 'Dell',
+          modelNo: 'DE-1234',
           uom: 'Pieces',
           stockInHand: '2',
           approxValue: '180000',
@@ -89,6 +100,7 @@ const CPDIndents: React.FC = () => {
       category: 'Stationery',
       requester: 'Admin Office',
       department: 'Administration',
+      college: 'Dr. D. Y. Patil Institute of Technology',
       status: 'in_progress',
       priority: 'low',
       amount: '₹25,000',
@@ -103,6 +115,7 @@ const CPDIndents: React.FC = () => {
           description: 'Various office stationery items',
           quantity: '1',
           make: 'Multiple',
+          modelNo: 'ESP-420',
           uom: 'Lot',
           stockInHand: '0',
           approxValue: '25000',
@@ -116,6 +129,7 @@ const CPDIndents: React.FC = () => {
       category: 'Laboratory',
       requester: 'Dr. Priya Patel - Chemistry',
       department: 'Chemistry',
+      college: 'Dr. D. Y. Patil College of Engineering',
       status: 'completed',
       priority: 'medium',
       amount: '₹75,000',
@@ -130,6 +144,7 @@ const CPDIndents: React.FC = () => {
           description: 'Various research grade chemicals',
           quantity: '1',
           make: 'Multiple',
+          modelNo: 'ESP-124',
           uom: 'Lot',
           stockInHand: '0',
           approxValue: '75000',
@@ -143,6 +158,7 @@ const CPDIndents: React.FC = () => {
       category: 'IT Equipment',
       requester: 'Prof. Anil Mehra - Electronics',
       department: 'Electronics',
+      college: 'Dr. D. Y. Patil Institute of Technology',
       status: 'pending_indent_assignment',
       priority: 'medium',
       amount: '₹90,000',
@@ -157,6 +173,7 @@ const CPDIndents: React.FC = () => {
           description: 'Full HD projector for large hall',
           quantity: '1',
           make: 'Epson',
+          modelNo: 'EP-1234',
           uom: 'Piece',
           stockInHand: '0',
           approxValue: '90000',
@@ -164,31 +181,7 @@ const CPDIndents: React.FC = () => {
         }
       ]
     },
-    {
-      id: 'CPD001',
-      title: 'CPD Test Indent',
-      status: 'pending_cpd',
-      date: '2024-07-10',
-      amount: 15000,
-      department: 'CPD',
-      budgetHead: 'General',
-      priority: 'High',
-      justification: 'Test justification for CPD.',
-      requestedBy: 'CPD User',
-      items: [
-        {
-          itemName: 'Test Item',
-          description: 'Test Description',
-          quantity: '2',
-          make: 'TestMake',
-          uom: 'pcs',
-          stockInHand: '5',
-          approxValue: '15000',
-          purpose: 'Testing',
-        },
-      ],
-      approvalTrail: ['User', 'HOD', 'CPD'],
-    },
+    
   ];
 
   const purchaseOfficers = [
@@ -197,6 +190,19 @@ const CPDIndents: React.FC = () => {
     'Amit Patel',
     'Sunita Verma',
     'Karan Singh'
+  ];
+
+  const availableColleges = [
+    'Dr. D. Y. Patil Institute of Technology',
+    'Dr. D. Y. Patil College of Engineering',
+    'Dr. D. Y. Patil Medical College',
+    'Dr. D. Y. Patil Dental College',
+    'Dr. D. Y. Patil College of Nursing',
+    'Dr. D. Y. Patil College of Pharmacy',
+    'Dr. D. Y. Patil College of Architecture',
+    'Dr. D. Y. Patil College of Commerce',
+    'Dr. D. Y. Patil College of Arts',
+    'Dr. D. Y. Patil College of Science'
   ];
 
   const handleAssignOfficer = (indentId: string, officerName: string) => {
@@ -238,12 +244,13 @@ const CPDIndents: React.FC = () => {
   const filteredIndents = indents.filter(indent => {
     const matchesCategory = filterCategory === 'all' || indent.category === filterCategory;
     const matchesStatus = filterStatus === 'all' || indent.status === filterStatus;
+    const matchesCollege = filterCollege === 'all' || indent.college === filterCollege;
     const matchesSearch = searchTerm === '' || 
       indent.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       indent.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       indent.requester.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesCategory && matchesStatus && matchesSearch;
+    return matchesCategory && matchesStatus && matchesCollege && matchesSearch;
   });
 
   const getStatusBadge = (status: string) => {
@@ -323,6 +330,66 @@ const CPDIndents: React.FC = () => {
                   <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
               </Select>
+              
+              <Popover open={collegeSearchOpen} onOpenChange={setCollegeSearchOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={collegeSearchOpen}
+                    className="md:w-48 justify-between"
+                  >
+                    {filterCollege === 'all' 
+                      ? "Filter by College" 
+                      : filterCollege
+                    }
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="md:w-48 p-0">
+                  <Command>
+                    <CommandInput placeholder="Search colleges..." />
+                    <CommandList>
+                      <CommandEmpty>No college found.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="all"
+                          onSelect={() => {
+                            setFilterCollege('all');
+                            setCollegeSearchOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              filterCollege === 'all' ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          All Colleges
+                        </CommandItem>
+                        {availableColleges.map((college) => (
+                          <CommandItem
+                            key={college}
+                            value={college}
+                            onSelect={() => {
+                              setFilterCollege(college);
+                              setCollegeSearchOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                filterCollege === college ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {college}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Indents Table */}
@@ -349,6 +416,7 @@ const CPDIndents: React.FC = () => {
                             {indent.id} • {indent.dateReceived}
                             {getPriorityBadge(indent.priority)}
                           </div>
+                          
                         </div>
                       </TableCell>
                       <TableCell>
@@ -356,8 +424,11 @@ const CPDIndents: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium text-sm">{indent.requester ? indent.requester.split(' - ')[0] : '-'}</div>
+                          <div className="font-medium text-xs">{indent.requester ? indent.requester.split(' - ')[0] : '-'}</div>
                           <div className="text-xs text-gray-500">{indent.department}</div>
+                          <div className="text-xs mt-1">
+                            {indent.college}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className='text-xs'>
@@ -506,6 +577,7 @@ const CPDIndents: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+      
       {/* Indent Details Modal */}
       <IndentDetailsModal
         isOpen={isIndentModalOpen}

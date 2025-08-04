@@ -51,6 +51,11 @@ const VendorEnquiries: React.FC = () => {
   ];
 
   const filteredEnquiries = enquiries.filter(enquiry => {
+    // Only show pending enquiries (not responded yet)
+    if (enquiry.status !== 'pending') {
+      return false;
+    }
+    
     const matchesSearch = enquiry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          enquiry.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || enquiry.status === statusFilter;
@@ -78,15 +83,15 @@ const VendorEnquiries: React.FC = () => {
   return (
     <DashboardLayout>
       <PageHeader
-        title="New Enquiries"
-        subtitle="Respond to purchase enquiries from institutions"
+        title="Pending Enquiries"
+        subtitle="Respond to new purchase enquiries from institutions"
       />
       
       <div className="p-6">
         <Card>
           <CardHeader>
-            <CardTitle>Enquiry Management</CardTitle>
-            <CardDescription>View and respond to new enquiries</CardDescription>
+            <CardTitle>Pending Enquiry Management</CardTitle>
+            <CardDescription>View and respond to pending enquiries</CardDescription>
             
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-4 mt-4">
@@ -96,17 +101,6 @@ const VendorEnquiries: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="sm:max-w-xs"
               />
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="sm:max-w-xs">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="responded">Responded</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </CardHeader>
           
@@ -149,23 +143,13 @@ const VendorEnquiries: React.FC = () => {
                     </div>
                     
                     <div className="flex space-x-2">
-                      {enquiry.status === 'pending' ? (
-                        <Button 
-                          size="sm" 
-                          onClick={() => navigate(`/vendor/respond/${enquiry.id}`)}
-                          className="dpu-button-primary"
-                        >
-                          Respond
-                        </Button>
-                      ) : (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => navigate(`/vendor/revise/${enquiry.id}`)}
-                        >
-                          Revise Quote
-                        </Button>
-                      )}
+                      <Button 
+                        size="sm" 
+                        onClick={() => navigate(`/vendor/respond/${enquiry.id}`)}
+                        className="dpu-button-primary"
+                      >
+                        Respond
+                      </Button>
                     </div>
                   </div>
                 </div>
