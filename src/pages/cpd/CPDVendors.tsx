@@ -325,7 +325,7 @@ const CPDVendors: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <span className="font-medium">Financial Year:</span>
                   <select
-                    className="border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-dpu-red bg-white text-gray-900"
+                    className="border border-gray-300 rounded px-2 py-1 bg-white text-gray-900"
                     value={selectedYear}
                     onChange={e => setSelectedYear(e.target.value)}
                   >

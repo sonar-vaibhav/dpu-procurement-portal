@@ -6,6 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { X, ChevronsUpDown, Check } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 const CATEGORIES = [
   'Laboratory',
@@ -36,29 +40,46 @@ const CPDOfficers: React.FC = () => {
     contact: '',
     email: '',
     password: '',
-    category: '',
+    categories: [] as string[],
     designation: '',
     department: '',
     notes: '',
   });
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleCategoryToggle = (category: string) => {
+    setForm(prev => ({
+      ...prev,
+      categories: prev.categories.includes(category)
+        ? prev.categories.filter(c => c !== category)
+        : [...prev.categories, category]
+    }));
+  };
+
+  const handleCategoryRemove = (categoryToRemove: string) => {
+    setForm(prev => ({
+      ...prev,
+      categories: prev.categories.filter(c => c !== categoryToRemove)
+    }));
+  };
+
   const handleAddOfficer = (e: React.FormEvent) => {
     e.preventDefault();
     // Minimal validation
-    if (!form.name || !form.contact || !form.email || !form.password || !form.category) {
-      setError('Please fill all required fields.');
+    if (!form.name || !form.contact || !form.email || !form.password || form.categories.length === 0) {
+      setError('Please fill all required fields including at least one category.');
       return;
     }
     setOfficers(prev => [
       ...prev,
       { ...form, id: Date.now().toString() }
     ]);
-    setForm({ name: '', contact: '', email: '', password: '', category: '', designation: '', department: '', notes: '' });
+    setForm({ name: '', contact: '', email: '', password: '', categories: [], designation: '', department: '', notes: '' });
     setError('');
   };
 
@@ -97,17 +118,70 @@ const CPDOfficers: React.FC = () => {
                   <Input value={form.password} onChange={e => handleChange('password', e.target.value)} required type="password" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Category *</label>
-                  <Select value={form.category} onValueChange={v => handleChange('category', v)} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CATEGORIES.map(cat => (
-                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <label className="block text-sm font-medium mb-1">Categories *</label>
+                  <div className="space-y-2">
+                    {/* Selected Categories Display */}
+                    {form.categories.length > 0 && (
+                      <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-gray-50">
+                        {form.categories.map((category) => (
+                          <Badge
+                            key={category}
+                            variant="secondary"
+                            className="flex items-center gap-1 px-2 py-1"
+                          >
+                            {category}
+                            <button
+                              type="button"
+                              onClick={() => handleCategoryRemove(category)}
+                              className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Category Selection Dropdown */}
+                    <Popover open={categoryDropdownOpen} onOpenChange={setCategoryDropdownOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={categoryDropdownOpen}
+                          className="w-full justify-between"
+                        >
+                          {form.categories.length === 0 
+                            ? "Select categories" 
+                            : `${form.categories.length} category${form.categories.length > 1 ? 'ies' : 'y'} selected`
+                          }
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput placeholder="Search categories..." />
+                          <CommandList>
+                            <CommandEmpty>No category found.</CommandEmpty>
+                            <CommandGroup>
+                              {CATEGORIES.map((category) => (
+                                <CommandItem
+                                  key={category}
+                                  onSelect={() => handleCategoryToggle(category)}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span>{category}</span>
+                                  {form.categories.includes(category) && (
+                                    <Check className="h-4 w-4 text-green-600" />
+                                  )}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Designation</label>
@@ -157,7 +231,7 @@ const CPDOfficers: React.FC = () => {
                       <th className="px-3 py-2 text-left font-semibold">Name</th>
                       <th className="px-3 py-2 text-left font-semibold">Contact</th>
                       <th className="px-3 py-2 text-left font-semibold">Email</th>
-                      <th className="px-3 py-2 text-left font-semibold">Category</th>
+                      <th className="px-3 py-2 text-left font-semibold">Categories</th>
                       <th className="px-3 py-2 text-left font-semibold">Designation</th>
                       <th className="px-3 py-2 text-left font-semibold">Department</th>
                       <th className="px-3 py-2 text-left font-semibold">Notes</th>
@@ -170,7 +244,19 @@ const CPDOfficers: React.FC = () => {
                         <td className="px-3 py-2 font-medium text-gray-900">{officer.name}</td>
                         <td className="px-3 py-2">{officer.contact}</td>
                         <td className="px-3 py-2">{officer.email}</td>
-                        <td className="px-3 py-2"><Badge variant="outline">{officer.category}</Badge></td>
+                        <td className="px-3 py-2">
+                          <div className="flex flex-wrap gap-1">
+                            {officer.categories && officer.categories.length > 0 ? (
+                              officer.categories.map((category: string, index: number) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {category}
+                                </Badge>
+                              ))
+                            ) : (
+                              <span className="text-gray-400 text-xs">No categories</span>
+                            )}
+                          </div>
+                        </td>
                         <td className="px-3 py-2">{officer.designation}</td>
                         <td className="px-3 py-2">{officer.department}</td>
                         <td className="px-3 py-2 text-xs text-gray-500">{officer.notes}</td>
