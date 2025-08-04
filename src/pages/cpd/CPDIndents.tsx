@@ -12,28 +12,18 @@ import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import IndentReportModal from '@/components/modals/IndentReportModal';
-import ComparisonChartReport from '@/components/ComparisonChartReport';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check, ChevronsUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 const CPDIndents: React.FC = () => {
   const { toast } = useToast();
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [filterCollege, setFilterCollege] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [collegeSearchOpen, setCollegeSearchOpen] = useState(false);
-  const [collegeSearchValue, setCollegeSearchValue] = useState('');
   const [selectedIndent, setSelectedIndent] = useState(null);
   const [isIndentModalOpen, setIsIndentModalOpen] = useState(false);
   const [showPOModal, setShowPOModal] = useState(false);
   const [selectedPOIndent, setSelectedPOIndent] = useState(null);
   const [isIndentReportOpen, setIsIndentReportOpen] = useState(false);
   const [selectedIndentForReport, setSelectedIndentForReport] = useState(null);
-  const [showComparisonChart, setShowComparisonChart] = useState(false);
-  const [selectedIndentForComparison, setSelectedIndentForComparison] = useState(null);
 
   const indents = [
     {
@@ -42,7 +32,6 @@ const CPDIndents: React.FC = () => {
       category: 'Laboratory',
       requester: 'Dr. John Smith - Computer Science',
       department: 'Computer Science',
-      college: 'Dr. D. Y. Patil Institute of Technology',
       status: 'not_forwarded',
       priority: 'high',
       amount: '₹2,50,000',
@@ -57,7 +46,6 @@ const CPDIndents: React.FC = () => {
           description: 'High-resolution digital microscope for research',
           quantity: '2',
           make: 'Olympus',
-          modelNo: 'OM-1234',
           uom: 'Pieces',
           stockInHand: '0',
           approxValue: '125000',
@@ -71,7 +59,6 @@ const CPDIndents: React.FC = () => {
       category: 'IT Equipment',
       requester: 'Prof. Sarah Johnson - Electronics',
       department: 'Electronics',
-      college: 'Dr. D. Y. Patil College of Engineering',
       status: 'assigned',
       priority: 'medium',
       amount: '₹1,80,000',
@@ -86,7 +73,6 @@ const CPDIndents: React.FC = () => {
           description: 'High-performance desktop computers',
           quantity: '10',
           make: 'Dell',
-          modelNo: 'DE-1234',
           uom: 'Pieces',
           stockInHand: '2',
           approxValue: '180000',
@@ -100,7 +86,6 @@ const CPDIndents: React.FC = () => {
       category: 'Stationery',
       requester: 'Admin Office',
       department: 'Administration',
-      college: 'Dr. D. Y. Patil Institute of Technology',
       status: 'in_progress',
       priority: 'low',
       amount: '₹25,000',
@@ -115,7 +100,6 @@ const CPDIndents: React.FC = () => {
           description: 'Various office stationery items',
           quantity: '1',
           make: 'Multiple',
-          modelNo: 'ESP-420',
           uom: 'Lot',
           stockInHand: '0',
           approxValue: '25000',
@@ -129,7 +113,6 @@ const CPDIndents: React.FC = () => {
       category: 'Laboratory',
       requester: 'Dr. Priya Patel - Chemistry',
       department: 'Chemistry',
-      college: 'Dr. D. Y. Patil College of Engineering',
       status: 'completed',
       priority: 'medium',
       amount: '₹75,000',
@@ -144,7 +127,6 @@ const CPDIndents: React.FC = () => {
           description: 'Various research grade chemicals',
           quantity: '1',
           make: 'Multiple',
-          modelNo: 'ESP-124',
           uom: 'Lot',
           stockInHand: '0',
           approxValue: '75000',
@@ -158,7 +140,6 @@ const CPDIndents: React.FC = () => {
       category: 'IT Equipment',
       requester: 'Prof. Anil Mehra - Electronics',
       department: 'Electronics',
-      college: 'Dr. D. Y. Patil Institute of Technology',
       status: 'pending_indent_assignment',
       priority: 'medium',
       amount: '₹90,000',
@@ -173,7 +154,6 @@ const CPDIndents: React.FC = () => {
           description: 'Full HD projector for large hall',
           quantity: '1',
           make: 'Epson',
-          modelNo: 'EP-1234',
           uom: 'Piece',
           stockInHand: '0',
           approxValue: '90000',
@@ -181,7 +161,31 @@ const CPDIndents: React.FC = () => {
         }
       ]
     },
-    
+    {
+      id: 'CPD001',
+      title: 'CPD Test Indent',
+      status: 'pending_cpd',
+      date: '2024-07-10',
+      amount: 15000,
+      department: 'CPD',
+      budgetHead: 'General',
+      priority: 'High',
+      justification: 'Test justification for CPD.',
+      requestedBy: 'CPD User',
+      items: [
+        {
+          itemName: 'Test Item',
+          description: 'Test Description',
+          quantity: '2',
+          make: 'TestMake',
+          uom: 'pcs',
+          stockInHand: '5',
+          approxValue: '15000',
+          purpose: 'Testing',
+        },
+      ],
+      approvalTrail: ['User', 'HOD', 'CPD'],
+    },
   ];
 
   const purchaseOfficers = [
@@ -190,19 +194,6 @@ const CPDIndents: React.FC = () => {
     'Amit Patel',
     'Sunita Verma',
     'Karan Singh'
-  ];
-
-  const availableColleges = [
-    'Dr. D. Y. Patil Institute of Technology',
-    'Dr. D. Y. Patil College of Engineering',
-    'Dr. D. Y. Patil Medical College',
-    'Dr. D. Y. Patil Dental College',
-    'Dr. D. Y. Patil College of Nursing',
-    'Dr. D. Y. Patil College of Pharmacy',
-    'Dr. D. Y. Patil College of Architecture',
-    'Dr. D. Y. Patil College of Commerce',
-    'Dr. D. Y. Patil College of Arts',
-    'Dr. D. Y. Patil College of Science'
   ];
 
   const handleAssignOfficer = (indentId: string, officerName: string) => {
@@ -236,21 +227,15 @@ const CPDIndents: React.FC = () => {
     });
   };
 
-  const handleViewComparisonChart = (indent: any) => {
-    setSelectedIndentForComparison(indent);
-    setShowComparisonChart(true);
-  };
-
   const filteredIndents = indents.filter(indent => {
     const matchesCategory = filterCategory === 'all' || indent.category === filterCategory;
     const matchesStatus = filterStatus === 'all' || indent.status === filterStatus;
-    const matchesCollege = filterCollege === 'all' || indent.college === filterCollege;
     const matchesSearch = searchTerm === '' || 
       indent.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       indent.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       indent.requester.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesCategory && matchesStatus && matchesCollege && matchesSearch;
+    return matchesCategory && matchesStatus && matchesSearch;
   });
 
   const getStatusBadge = (status: string) => {
@@ -330,80 +315,20 @@ const CPDIndents: React.FC = () => {
                   <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
               </Select>
-              
-              <Popover open={collegeSearchOpen} onOpenChange={setCollegeSearchOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={collegeSearchOpen}
-                    className="md:w-48 justify-between"
-                  >
-                    {filterCollege === 'all' 
-                      ? "Filter by College" 
-                      : filterCollege
-                    }
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="md:w-48 p-0">
-                  <Command>
-                    <CommandInput placeholder="Search colleges..." />
-                    <CommandList>
-                      <CommandEmpty>No college found.</CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem
-                          value="all"
-                          onSelect={() => {
-                            setFilterCollege('all');
-                            setCollegeSearchOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              filterCollege === 'all' ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          All Colleges
-                        </CommandItem>
-                        {availableColleges.map((college) => (
-                          <CommandItem
-                            key={college}
-                            value={college}
-                            onSelect={() => {
-                              setFilterCollege(college);
-                              setCollegeSearchOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                filterCollege === college ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {college}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
             </div>
 
             {/* Indents Table */}
-            <div className="border rounded-lg overflow-x-auto">
+            <div className="border rounded-lg">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[200px]">Indent Details</TableHead>
-                    <TableHead className="min-w-[120px]">Category</TableHead>
-                    <TableHead className="min-w-[150px]">Requester</TableHead>
-                    <TableHead className="min-w-[140px]">Status</TableHead>
-                    <TableHead className="min-w-[100px]">Amount</TableHead>
-                    <TableHead className="min-w-[120px]">Assigned To</TableHead>
-                    <TableHead className="min-w-[200px]">Actions</TableHead>
+                    <TableHead>Indent Details</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Requester</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Assigned To</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -412,11 +337,10 @@ const CPDIndents: React.FC = () => {
                       <TableCell>
                         <div>
                           <div className="font-medium">{indent.title}</div>
-                          <div className="text-sm text-gray-500 flex items-center gap-2 flex-wrap">
+                          <div className="text-sm text-gray-500 flex items-center gap-2">
                             {indent.id} • {indent.dateReceived}
                             {getPriorityBadge(indent.priority)}
                           </div>
-                          
                         </div>
                       </TableCell>
                       <TableCell>
@@ -424,11 +348,8 @@ const CPDIndents: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium text-xs">{indent.requester ? indent.requester.split(' - ')[0] : '-'}</div>
+                          <div className="font-medium text-sm">{indent.requester ? indent.requester.split(' - ')[0] : '-'}</div>
                           <div className="text-xs text-gray-500">{indent.department}</div>
-                          <div className="text-xs mt-1">
-                            {indent.college}
-                          </div>
                         </div>
                       </TableCell>
                       <TableCell className='text-xs'>
@@ -447,7 +368,7 @@ const CPDIndents: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-2">
                           {/* Workflow: Assign to officer, View, Forward to management */}
                           {indent.status === 'pending_indent_assignment' && (
                             <Select onValueChange={(value) => handleAssignOfficer(indent.id, value)}>
@@ -492,15 +413,6 @@ const CPDIndents: React.FC = () => {
                               >
                                 View PO
                               </Button>
-                              {/* button to open comaprision chart */}
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleViewComparisonChart(indent)}
-                              >
-                                View Comparison Chart
-                              </Button>
-                              
                               <Button
                                 variant="default"
                                 size="sm"
@@ -536,48 +448,6 @@ const CPDIndents: React.FC = () => {
         </Card>
       </div>
 
-      {/* Comparison Chart Modal */}
-      <Dialog open={showComparisonChart} onOpenChange={setShowComparisonChart}>
-        <DialogContent
-          className="w-screen h-screen max-w-none max-h-none rounded-none 
-               shadow-none p-0 overflow-y-auto bg-gray-100"
-        >
-          <div className="h-full flex flex-col">
-            <div className="sticky top-0 z-20 bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Vendor Comparison Chart
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Detailed vendor comparison for indent {selectedIndentForComparison?.id}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9 w-9 p-0 rounded-full border-gray-300 text-gray-600 
-                     hover:bg-gray-100 hover:text-red-600 hover:border-red-300"
-                onClick={() => setShowComparisonChart(false)}
-              >
-                ✕
-              </Button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="bg-white rounded-lg shadow p-5">
-                <ComparisonChartReport />
-              </div>
-            </div>
-
-            <div className="sticky bottom-0 bg-white border-t shadow-inner px-6 py-4 flex justify-end">
-              <Button variant="outline" onClick={() => setShowComparisonChart(false)}>
-                Close
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
       {/* Indent Details Modal */}
       <IndentDetailsModal
         isOpen={isIndentModalOpen}

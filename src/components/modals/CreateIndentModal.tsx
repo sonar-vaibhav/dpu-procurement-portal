@@ -119,7 +119,7 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
     if (field === 'vendorQuotationFile') {
       updatedItems[index].vendorQuotationFile = value;
     } else {
-      updatedItems[index][field] = value;
+      (updatedItems[index] as any)[field] = value;
     }
     if (field === 'make' && value !== 'Other') {
       updatedItems[index].customMake = '';
@@ -170,11 +170,13 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
+        // MODIFIED: Changed to a flex column layout
         className="w-screen h-screen max-w-none max-h-none rounded-none 
-        shadow-none px-3 py-3 md:px-10 md:py-8 overflow-y-auto bg-gray-50"
+                   shadow-none p-0 flex flex-col bg-gray-50"
       >
         <DialogHeader
-          className="bg-gray-50 pb-4 border-b shadow-sm flex flex-col gap-1"
+          // MODIFIED: Adjusted padding and ensured it doesn't shrink
+          className="bg-gray-50 px-3 py-3 md:px-10 md:py-4 border-b shadow-sm flex-shrink-0"
         >
           <DialogTitle className="text-2xl font-bold text-gray-800">
             Create New Purchase Indent
@@ -184,360 +186,365 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 pt-4 pb-24 md:pb-10"
+          // MODIFIED: Made form a flex container that fills remaining space
+          className="flex-1 flex flex-col overflow-y-hidden"
         >
-          {/* Institute Details */}
-          <div className="bg-white shadow rounded-lg p-4 space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Institute Details
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Institute Name *</Label>
-                <Input
-                  value={formData.instituteName}
-                  onChange={e =>
-                    setFormData({ ...formData, instituteName: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Department/Lab *</Label>
-                <Input
-                  value={formData.department}
-                  onChange={e =>
-                    setFormData({ ...formData, department: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Material Type</Label>
-                <Select
-                  value={formData.materialType}
-                  onValueChange={value =>
-                    setFormData({ ...formData, materialType: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select material type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="equipment">Equipment</SelectItem>
-                    <SelectItem value="consumables">Consumables</SelectItem>
-                    <SelectItem value="software">Software</SelectItem>
-                    <SelectItem value="services">Services</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Contact No.</Label>
-                <Input
-                  value={formData.contactNo}
-                  onChange={e =>
-                    setFormData({ ...formData, contactNo: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Intercom No.</Label>
-                <Input
-                  value={formData.intercomNo}
-                  onChange={e =>
-                    setFormData({ ...formData, intercomNo: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Budget Head</Label>
-                <Input
-                  value={formData.budgetHead}
-                  onChange={e =>
-                    setFormData({ ...formData, budgetHead: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Items */}
-          <div className="bg-white shadow rounded-lg p-4 space-y-6">
-            <div className="flex items-center justify-between">
+          {/* This new div holds all the scrollable content */}
+          <div className="flex-1 overflow-y-auto p-3 md:p-10 space-y-6">
+            {/* Institute Details */}
+            <div className="bg-white shadow rounded-lg p-4 space-y-4">
               <h3 className="text-lg font-semibold text-gray-800">
-                Items Required
+                Institute Details
               </h3>
-              <Button type="button" onClick={addItem} variant="outline">
-                + Add Item
-              </Button>
-            </div>
-
-            {items.map((item, index) => (
-              <div
-                key={index}
-                className="border border-gray-300 rounded-lg p-4 space-y-4"
-              >
-                <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-gray-900">
-                    Item {index + 1}
-                  </h4>
-                  {items.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeItem(index)}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </div>
-
-                {/* Make, Specs, Stock, ItemName */}
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  <div className="space-y-2">
-                    <Label>Make / Manufacturer</Label>
-                    <Select
-                      value={item.make}
-                      onValueChange={value =>
-                        updateItem(index, 'make', value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Make" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {popularMakes.map(make => (
-                          <SelectItem key={make} value={make}>
-                            {make}
-                          </SelectItem>
-                        ))}
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {item.make === 'Other' && (
-                      <Input
-                        placeholder="Add new Make"
-                        value={item.customMake}
-                        onChange={e =>
-                          updateItem(index, 'customMake', e.target.value)
-                        }
-                      />
-                    )}
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <Label>Specifications</Label>
-                    <Input
-                      value={item.specs}
-                      onChange={e =>
-                        updateItem(index, 'specs', e.target.value)
-                      }
-                      placeholder="Enter specification"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Stock in Hand</Label>
-                    <Input
-                      value={item.stockInHand}
-                      onChange={e =>
-                        updateItem(index, 'stockInHand', e.target.value)
-                      }
-                      placeholder="Available stock"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Item Name *</Label>
-                    <Input
-                      value={item.itemName}
-                      onChange={e =>
-                        updateItem(index, 'itemName', e.target.value)
-                      }
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Quantity & UOM */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Quantity *</Label>
-                    <Input
-                      type="number"
-                      value={item.quantity}
-                      onChange={e =>
-                        updateItem(index, 'quantity', e.target.value)
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Unit of Measurement</Label>
-                    <Select
-                      value={item.uom}
-                      onValueChange={value =>
-                        updateItem(index, 'uom', value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select UOM" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="nos">Nos</SelectItem>
-                        <SelectItem value="kg">Kg</SelectItem>
-                        <SelectItem value="ltr">Ltr</SelectItem>
-                        <SelectItem value="mtr">Mtr</SelectItem>
-                        <SelectItem value="pcs">Pcs</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Approximate Value *</Label>
+                  <Label>Institute Name *</Label>
                   <Input
-                    type="number"
-                    value={item.approxValue}
+                    value={formData.instituteName}
                     onChange={e =>
-                      updateItem(index, 'approxValue', e.target.value)
+                      setFormData({ ...formData, instituteName: e.target.value })
                     }
                     required
                   />
                 </div>
-
                 <div className="space-y-2">
-                  <Label>Description</Label>
-                  <Textarea
-                    value={item.description}
+                  <Label>Department/Lab *</Label>
+                  <Input
+                    value={formData.department}
                     onChange={e =>
-                      updateItem(index, 'description', e.target.value)
+                      setFormData({ ...formData, department: e.target.value })
                     }
-                    rows={2}
+                    required
                   />
                 </div>
-
-                {/* Similar Item, Vendor Quotation, Image, Catalog */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                  <div className="space-y-2">
-                    <Label>Similar Item Purchased?</Label>
-                    <div className="flex gap-4">
-                      {['yes', 'no'].map(opt => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() =>
-                            updateItem(index, 'similarItem', opt)
-                          }
-                          className={`px-4 py-1 rounded-full border ${item.similarItem === opt
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-white text-gray-800'
-                            }`}
-                        >
-                          {opt.charAt(0).toUpperCase() + opt.slice(1)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Vendor Quotation</Label>
-                    <Input
-                      type="file"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
-                      onChange={e =>
-                        handleFileChange(index, e, 'vendorQuotationFile')
-                      }
-                    />
-                    {item.vendorQuotationFile && (
-                      <p className="text-sm text-gray-600 mt-1 truncate">
-                        {item.vendorQuotationFile.name}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Upload Image</Label>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={e =>
-                        handleFileChange(index, e, 'imageFile')
-                      }
-                    />
-                    {item.imageFile && (
-                      <p className="text-sm text-gray-600 mt-1 truncate">
-                        {item.imageFile.name}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Upload Catalog</Label>
-                    <Input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      onChange={e =>
-                        handleFileChange(index, e, 'catalogFile')
-                      }
-                    />
-                    {item.catalogFile && (
-                      <p className="text-sm text-gray-600 mt-1 truncate">
-                        {item.catalogFile.name}
-                      </p>
-                    )}
-                  </div>
+                <div className="space-y-2">
+                  <Label>Material Type</Label>
+                  <Select
+                    value={formData.materialType}
+                    onValueChange={value =>
+                      setFormData({ ...formData, materialType: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select material type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="equipment">Equipment</SelectItem>
+                      <SelectItem value="consumables">Consumables</SelectItem>
+                      <SelectItem value="software">Software</SelectItem>
+                      <SelectItem value="services">Services</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Contact No.</Label>
+                  <Input
+                    value={formData.contactNo}
+                    onChange={e =>
+                      setFormData({ ...formData, contactNo: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Intercom No.</Label>
+                  <Input
+                    value={formData.intercomNo}
+                    onChange={e =>
+                      setFormData({ ...formData, intercomNo: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Budget Head</Label>
+                  <Input
+                    value={formData.budgetHead}
+                    onChange={e =>
+                      setFormData({ ...formData, budgetHead: e.target.value })
+                    }
+                  />
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
 
-          {/* Timeline & Budget */}
-          <div className="bg-white shadow rounded-lg p-4 space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Timeline & Budget
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Items */}
+            <div className="bg-white shadow rounded-lg p-4 space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Items Required
+                </h3>
+                <Button type="button" onClick={addItem} variant="outline">
+                  + Add Item
+                </Button>
+              </div>
+
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-300 rounded-lg p-4 space-y-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-gray-900">
+                      Item {index + 1}
+                    </h4>
+                    {items.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeItem(index)}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Make, Specs, Stock, ItemName */}
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    
+                    <div className="space-y-2">
+                      <Label>Item Name *</Label>
+                      <Input
+                        value={item.itemName}
+                        onChange={e =>
+                          updateItem(index, 'itemName', e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Stock in Hand</Label>
+                      <Input
+                        value={item.stockInHand}
+                        onChange={e =>
+                          updateItem(index, 'stockInHand', e.target.value)
+                        }
+                        placeholder="Available stock"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Approximate Value *</Label>
+                      <Input
+                        type="number"
+                        value={item.approxValue}
+                        onChange={e =>
+                          updateItem(index, 'approxValue', e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Quantity *</Label>
+                      <Input
+                        type="number"
+                        value={item.quantity}
+                        onChange={e =>
+                          updateItem(index, 'quantity', e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Unit of Measurement</Label>
+                        <Select
+                          value={item.uom}
+                          onValueChange={value =>
+                            updateItem(index, 'uom', value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select UOM" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="nos">Nos</SelectItem>
+                            <SelectItem value="kg">Kg</SelectItem>
+                            <SelectItem value="ltr">Ltr</SelectItem>
+                            <SelectItem value="mtr">Mtr</SelectItem>
+                            <SelectItem value="pcs">Pcs</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                  </div>
+
+              
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                      <Label>Make / Manufacturer</Label>
+                      <Select
+                        value={item.make}
+                        onValueChange={value =>
+                          updateItem(index, 'make', value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Make" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {popularMakes.map(make => (
+                            <SelectItem key={make} value={make}>
+                              {make}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {item.make === 'Other' && (
+                        <Input
+                          placeholder="Add new Make"
+                          value={item.customMake}
+                          onChange={e =>
+                            updateItem(index, 'customMake', e.target.value)
+                          }
+                        />
+                      )}
+                    </div>
+                    <div className="space-y-2 md:col-span-1">
+                      <Label>Specifications</Label>
+                      <Input
+                        value={item.specs}
+                        onChange={e =>
+                          updateItem(index, 'specs', e.target.value)
+                        }
+                        placeholder="Enter specification"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Textarea
+                      value={item.description}
+                      onChange={e =>
+                        updateItem(index, 'description', e.target.value)
+                      }
+                      rows={2}
+                    />
+                  </div>
+
+                  {/* Similar Item, Vendor Quotation, Image, Catalog */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div className="space-y-2">
+                      <Label>Similar Item Purchased?</Label>
+                      <div className="flex gap-4">
+                        {['yes', 'no'].map(opt => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() =>
+                              updateItem(index, 'similarItem', opt)
+                            }
+                            className={`px-4 py-1 rounded-full border ${item.similarItem === opt
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-white text-gray-800'
+                              }`}
+                          >
+                            {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Vendor Quotation</Label>
+                      <Input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
+                        onChange={e =>
+                          handleFileChange(index, e, 'vendorQuotationFile')
+                        }
+                      />
+                      {item.vendorQuotationFile && (
+                        <p className="text-sm text-gray-600 mt-1 truncate">
+                          {item.vendorQuotationFile.name}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Upload Image</Label>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={e =>
+                          handleFileChange(index, e, 'imageFile')
+                        }
+                      />
+                      {item.imageFile && (
+                        <p className="text-sm text-gray-600 mt-1 truncate">
+                          {item.imageFile.name}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Upload Catalog</Label>
+                      <Input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        onChange={e =>
+                          handleFileChange(index, e, 'catalogFile')
+                        }
+                      />
+                      {item.catalogFile && (
+                        <p className="text-sm text-gray-600 mt-1 truncate">
+                          {item.catalogFile.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Timeline & Budget */}
+            <div className="bg-white shadow rounded-lg p-4 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Timeline & Budget
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Timeline for Delivery</Label>
+                  <Input
+                    value={formData.timeline}
+                    onChange={e =>
+                      setFormData({ ...formData, timeline: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Budget Provision</Label>
+                  <Select
+                    value={formData.budgetProvision}
+                    onValueChange={value =>
+                      setFormData({ ...formData, budgetProvision: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label>Timeline for Delivery</Label>
-                <Input
-                  value={formData.timeline}
+                <Label>Urgent Reason (if any)</Label>
+                <Textarea
+                  value={formData.urgentReason}
                   onChange={e =>
-                    setFormData({ ...formData, timeline: e.target.value })
+                    setFormData({ ...formData, urgentReason: e.target.value })
                   }
+                  rows={2}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Budget Provision</Label>
-                <Select
-                  value={formData.budgetProvision}
-                  onValueChange={value =>
-                    setFormData({ ...formData, budgetProvision: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="yes">Yes</SelectItem>
-                    <SelectItem value="no">No</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Urgent Reason (if any)</Label>
-              <Textarea
-                value={formData.urgentReason}
-                onChange={e =>
-                  setFormData({ ...formData, urgentReason: e.target.value })
-                }
-                rows={2}
-              />
             </div>
           </div>
 
-          {/* Sticky Footer */}
-          <div className="sticky bottom-0 bg-gray-50 pt-4 pb-2 flex justify-end gap-4 border-t">
+          {/* This is the new sticky footer, outside the scrollable area */}
+          <div className="flex-shrink-0 bg-gray-50 px-3 md:px-10 py-4 flex justify-end gap-4 border-t">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>

@@ -108,7 +108,7 @@ const ManagementDashboard: React.FC = () => {
       if (item.status === 'Approved') {
         acc.approved.count++;
         acc.approved.amount += item.amount;
-      } else if (item.status === 'Rejected') {
+      } else if (item.status === 'Not Approved') {
         acc.rejected.count++;
         acc.rejected.amount += item.amount;
       } else {
@@ -132,7 +132,7 @@ const ManagementDashboard: React.FC = () => {
         if (item.status === 'Approved') {
           acc.approved.count++;
           acc.approved.amount += item.amount;
-        } else if (item.status === 'Rejected') {
+        } else if (item.status === 'Not Approved') {
           acc.rejected.count++;
           acc.rejected.amount += item.amount;
         } else {
@@ -148,7 +148,7 @@ const ManagementDashboard: React.FC = () => {
       }
     );
 
-  const handleStatusUpdate = (id: string, type: 'indent' | 'po', status: 'Approved' | 'Rejected') => {
+  const handleStatusUpdate = (id: string, type: 'indent' | 'po', status: 'Approved' | 'Not Approved') => {
     const updater = type === 'indent' ? setIndents : setPurchaseOrders;
     updater(prev =>
       prev.map(group => ({
@@ -199,8 +199,8 @@ const ManagementDashboard: React.FC = () => {
 
   const handleReject = (indentId: string) => {
     toast({
-      title: "Procurement Rejected",
-      description: `Indent ${indentId} has been rejected at final stage`,
+      title: "Procurement Not Approved",
+      description: `Indent ${indentId} has been not approve at final stage`,
       variant: "destructive",
     });
   };
@@ -257,7 +257,7 @@ const ManagementDashboard: React.FC = () => {
                 <Card className="bg-red-50 border border-red-200 shadow-none p-0">
                   <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
                     <div>
-                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Rejected</CardTitle>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Not Approved</CardTitle>
                       <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{summary.rejected.count}</div>
                       <div className="text-xs md:text-sm text-gray-500">Amount: ₹{summary.rejected.amount.toLocaleString()}</div>
                     </div>
@@ -314,12 +314,12 @@ const ManagementDashboard: React.FC = () => {
                                   <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'indent', 'Approved')} title="Approve">
                                     <CheckCircle className="w-7 h-7 text-green-600" />
                                   </Button>
-                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'indent', 'Rejected')} title="Reject">
+                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'indent', 'Not Approved')} title="Not Approved">
                                     <XCircle className="w-7 h-7 text-red-600" />
                                   </Button>
                                 </>
                               )}
-                              {item.status === 'Rejected' && (
+                              {item.status === 'Not Approved' && (
                                 <Button size="sm" variant="outline" className="ml-2 text-green-700 border-green-300 hover:bg-green-50" onClick={() => handleStatusUpdate(item.id, 'indent', 'Approved')} title="Re-Approve">
                                   Re-Approve
                                 </Button>
@@ -363,7 +363,7 @@ const ManagementDashboard: React.FC = () => {
                 <Card className="bg-red-50 border border-red-200 shadow-none p-0">
                   <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
                     <div>
-                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Rejected</CardTitle>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Not Approved</CardTitle>
                       <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{poSummary.rejected.count}</div>
                       <div className="text-xs md:text-sm text-gray-500">Amount: ₹{poSummary.rejected.amount.toLocaleString()}</div>
                     </div>
@@ -420,12 +420,12 @@ const ManagementDashboard: React.FC = () => {
                                   <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'po', 'Approved')} title="Approve">
                                     <CheckCircle className="w-7 h-7 text-green-600" />
                                   </Button>
-                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'po', 'Rejected')} title="Reject">
+                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'po', 'Not Approved')} title="Not Approved">
                                     <XCircle className="w-7 h-7 text-red-600" />
                                   </Button>
                                 </>
                               )}
-                              {item.status === 'Rejected' && (
+                              {item.status === 'Not Approved' && (
                                 <Button size="sm" variant="outline" className="ml-2 text-green-700 border-green-300 hover:bg-green-50" onClick={() => handleStatusUpdate(item.id, 'po', 'Approved')} title="Re-Approve">
                                   Re-Approve
                                 </Button>
@@ -491,66 +491,39 @@ const ManagementDashboard: React.FC = () => {
 
                 {/* BODY - Scrollable */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                  {/* General Information */}
-                  <div className="bg-white rounded-lg shadow p-5 space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
-                      General Information
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-600">Title:</span>{' '}
-                        <span className="text-gray-800">{openPO.title}</span>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-600">College:</span>{' '}
-                        <span className="text-gray-800">{openPO.college}</span>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-600">Requested Amount:</span>{' '}
-                        <span className="text-blue-700 font-bold">
-                          ₹{openPO.amount.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="text-sm flex items-center gap-2">
-                        <span className="font-medium text-gray-600">Status:</span>
-                        <Badge
-                          className={`${openPO.status === 'Approved'
-                            ? 'bg-green-100 text-green-700 border-green-200'
-                            : openPO.status === 'Pending'
-                              ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
-                              : 'bg-gray-100 text-gray-700 border-gray-200'
-                            }`}
-                        >
-                          {openPO.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="bg-white rounded-lg shadow p-5">
-                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
-                      Actions
-                    </h3>
-                    <div className="flex flex-col sm:flex-row gap-3 pt-3">
-                      <Button
-                        variant="outline"
-                        onClick={() => setOpenVendorChart(true)}
-                        className="flex items-center gap-2"
-                      >
-                        <FileText className="w-4 h-4" />
-                        Vendor Comparison Chart
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setOpenPODoc(true)}
-                        className="flex items-center gap-2"
-                      >
-                        <FileText className="w-4 h-4" />
-                        Final PO Document
-                      </Button>
-                    </div>
-                  </div>
+
+                 {/* Actions Section - Enhanced Official Look */}
+<div className="bg-slate-50 rounded-xl shadow-md border border-slate-200 p-6">
+  {/* Header with Icon */}
+  <div className="flex items-center border-b border-slate-300 pb-3 mb-5">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+    <h3 className="text-xl font-bold text-slate-800">
+      Actions
+    </h3>
+  </div>
+
+  {/* Button Grid */}
+  <div className="grid sm:grid-cols-2 gap-4">
+    <Button
+      onClick={() => setOpenVendorChart(true)}
+      className="group flex items-center justify-center gap-3 w-full bg-white text-slate-700 font-medium py-3 px-4 border border-slate-300 rounded-lg shadow-sm transition-all duration-200 ease-in-out hover:bg-slate-100 hover:border-slate-400 hover:-translate-y-0.5 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    >
+      <FileText className="w-5 h-5 text-slate-500 group-hover:text-blue-600 transition-colors" />
+      <span>Vendor Comparison Chart</span>
+    </Button>
+    
+    <Button
+      onClick={() => setOpenPODoc(true)}
+      className="group flex items-center justify-center gap-3 w-full bg-white text-slate-700 font-medium py-3 px-4 border border-slate-300 rounded-lg shadow-sm transition-all duration-200 ease-in-out hover:bg-slate-100 hover:border-slate-400 hover:-translate-y-0.5 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    >
+      <FileText className="w-5 h-5 text-slate-500 group-hover:text-blue-600 transition-colors" />
+      <span>Final PO Document</span>
+    </Button>
+  </div>
+</div>
 
                   {/* Ordered Items */}
                   {openPO.items?.length > 0 && (

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -119,33 +120,20 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
       <DialogContent
         className="
           w-screen h-screen 
-          max-w-screen max-h-none 
+          max-w-none max-h-none 
           rounded-none shadow-none 
-          p-0
-          overflow-hidden
+          p-4 sm:p-6 md:p-8 
+          overflow-y-auto 
           flex flex-col
-          bg-white
         "
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100vw',
-          height: '100vh',
-          margin: 0,
-          transform: 'none'
-        }}
       >
-        <DialogHeader className="border-b pb-3 px-6 py-4">
+        <DialogHeader className="border-b pb-3">
           <DialogTitle className="text-xl sm:text-2xl font-semibold">
             {indent.title}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto space-y-4 p-6 pb-20">
-
+        <div className="flex-1 overflow-y-auto space-y-4 mt-4 pb-20">
           {/* Status & Amount */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <Badge className={getStatusColor(indent.status)}>
@@ -178,11 +166,25 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
             <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
               <h3 className="font-medium mb-2">Request Details</h3>
               <div className="space-y-1 text-sm text-gray-700">
-                <p><span className="font-medium">Date:</span> {indent.date}</p>
-                <p><span className="font-medium">Department:</span> {indent.department}</p>
-                <p><span className="font-medium">Budget Head:</span> {indent.budgetHead}</p>
-                <p><span className="font-medium">Priority:</span> {indent.priority}</p>
-                <p><span className="font-medium">Requested By:</span> {indent.requestedBy}</p>
+                <p>
+                  <span className="font-medium">Date:</span> {indent.date}
+                </p>
+                <p>
+                  <span className="font-medium">Department:</span>{' '}
+                  {indent.department}
+                </p>
+                <p>
+                  <span className="font-medium">Budget Head:</span>{' '}
+                  {indent.budgetHead}
+                </p>
+                <p>
+                  <span className="font-medium">Priority:</span>{' '}
+                  {indent.priority}
+                </p>
+                <p>
+                  <span className="font-medium">Requested By:</span>{' '}
+                  {indent.requestedBy}
+                </p>
               </div>
             </div>
             <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
@@ -235,19 +237,30 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
         </div>
 
         {/* Sticky Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-6 flex justify-end space-x-2">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 flex justify-end space-x-2">
           {!showRejectionInput && canApprove() && (
             <>
-              <Button variant="outline" onClick={handleReject}>
-                Reject
-              </Button>
-              <Button onClick={handleApprove}>Approve</Button>
+              {/* MODIFIED: Reject button is now red */}
+              <Button
+  className="bg-red-600 text-white hover:bg-red-700 focus:ring-2  px-5 py-2 font-medium"
+  onClick={handleReject}
+>
+  Reject
+</Button>
+
+<Button
+  className="bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-300 rounded-md px-5 py-2 font-medium"
+  onClick={handleApprove}
+>
+  Approve
+</Button>
+
             </>
           )}
         </div>
 
         {showRejectionInput && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-6 space-y-3">
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 space-y-3">
             <div>
               <Label htmlFor="remarks">Rejection Remarks</Label>
               <Textarea
@@ -259,10 +272,17 @@ const IndentDetailsModal: React.FC<IndentDetailsModalProps> = ({
               />
             </div>
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setShowRejectionInput(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowRejectionInput(false)}
+              >
                 Cancel
               </Button>
-              <Button variant="destructive" onClick={handleReject}>
+              {/* MODIFIED: Confirm Rejection button is now red */}
+              <Button
+                className="bg-red-600 text-white hover:bg-red-700"
+                onClick={handleReject}
+              >
                 Confirm Rejection
               </Button>
             </div>
