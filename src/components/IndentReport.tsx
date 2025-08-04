@@ -15,8 +15,8 @@ const defaultIndentData = {
   indentNo: 'IND-001',
   date: '2024-06-20',
   items: [
-    { sr: 1, itemName: 'Projector', description: 'Full HD, 4000 lumens', make: 'Epson', modelNo: 'EP-1234', qty: 2, uom: 'Nos', stock: 0, similar: '-', value: '₹45,000' },
-    { sr: 2, itemName: 'Screen', description: '120 inch motorized', make: 'Elite', modelNo: 'EL-5678', qty: 1, uom: 'Nos', stock: 0, similar: '-', value: '₹12,000' },
+    { sr: 1, itemName: 'Projector', description: 'Full HD, 4000 lumens', make: 'Epson', qty: 2, uom: 'Nos', stock: 0, similar: '-', value: '₹45,000' },
+    { sr: 2, itemName: 'Screen', description: '120 inch motorized', make: 'Elite', qty: 1, uom: 'Nos', stock: 0, similar: '-', value: '₹12,000' },
   ],
   timeline: 'Within 2 weeks',
   urgentReason: '',
@@ -108,7 +108,6 @@ const IndentReport: React.FC<IndentReportProps> = ({ indentData }) => {
               <th className="border border-black px-2 py-2">Item Name</th>
               <th className="border border-black px-2 py-2">Description / Specification</th>
               <th className="border border-black px-2 py-2">Make</th>
-              <th className="border border-black px-2 py-2">Model No.</th>
               <th className="border border-black px-2 py-2">Quantity</th>
               <th className="border border-black px-2 py-2">UOM</th>
               <th className="border border-black px-2 py-2">Stock in Hand</th>
@@ -119,16 +118,15 @@ const IndentReport: React.FC<IndentReportProps> = ({ indentData }) => {
           <tbody>
             {data.items.map((item, idx) => (
               <tr key={item.sr} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                <td className="border border-black px-2 py-2 text-center">{idx + 1}</td>
+                <td className="border border-black px-2 py-2 text-center">{item.sr}</td>
                 <td className="border border-black px-2 py-2">{item.itemName}</td>
                 <td className="border border-black px-2 py-2">{item.description}</td>
                 <td className="border border-black px-2 py-2 text-center">{item.make}</td>
-                <td className="border border-black px-2 py-2 text-center">{item.modelNo}</td>
-                <td className="border border-black px-2 py-2 text-center">{item.quantity}</td>
+                <td className="border border-black px-2 py-2 text-center">{item.qty}</td>
                 <td className="border border-black px-2 py-2 text-center">{item.uom}</td>
-                <td className="border border-black px-2 py-2 text-center">{item.stockInHand}</td>
-                <td className="border border-black px-2 py-2 text-center">{item.similar || '-'}</td>
-                <td className="border border-black px-2 py-2 text-right">{item.approxValue || '-'}</td>
+                <td className="border border-black px-2 py-2 text-center">{item.stock}</td>
+                <td className="border border-black px-2 py-2">{item.similar}</td>
+                <td className="border border-black px-2 py-2 text-right">{item.value}</td>
               </tr>
             ))}
             {/* Add empty rows to keep fixed height */}
@@ -171,7 +169,7 @@ const IndentReport: React.FC<IndentReportProps> = ({ indentData }) => {
         </div>
 
         {/* Approval */}
-        <div className="flex justify-end text-center text-[14px] mt-8">
+        <div className="flex justify-end text-right text-[14px] mt-8">
           <div>
             <div className="font-bold">APPROVED / NOT APPROVED</div>
             <div style={{ height: '32px' }}></div>

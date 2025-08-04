@@ -13,7 +13,7 @@ const IndentReportModal: React.FC<IndentReportModalProps> = ({ isOpen, onClose, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-screen max-w-screen max-h-screen overflow-y-auto bg-gray-50">
+      <DialogContent className="w-screen max-w-5xl max-h-[90vh] overflow-y-auto bg-gray-50">
      
         <DialogHeader className="pb-4 border-b">
           <DialogTitle className="text-xl font-semibold">Indent Report</DialogTitle>

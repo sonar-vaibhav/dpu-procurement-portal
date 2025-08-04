@@ -228,11 +228,7 @@ const ComparisonChartReport: React.FC = () => {
                   <td className="border border-gray-400 px-1 py-1 text-right bg-gray-100" colSpan={4}>{row.label}</td>
                   {row.values.map((val, vIdx) => (
                     <td
-                      className={`border border-gray-400 px-1 py-1 ${
-                        row.label === 'Total' || row.label === 'GST [ Extra @18% ]' || row.label === 'Gross Total' 
-                          ? 'text-right' 
-                          : 'text-center'
-                      } bg-gray-100 ${
+                      className={`border border-gray-400 px-1 py-1 text-center bg-gray-100 ${
                         (selectedVendor === vIdx || selectedVendorIndex === vIdx) ? 'bg-yellow-300 font-bold border-2 border-yellow-500' : ''
                       }`}
                       colSpan={3}
@@ -308,7 +304,7 @@ const ComparisonChartReport: React.FC = () => {
           </div>
           <div className="text-right">
             <div>For DR. D. Y. PATIL UNITECH SOCIETY, PUNE</div>
-            <div style={{ height: '25px' }}></div>
+            <div style={{ height: '12px' }}></div>
             <div className="font-semibold">Secretary/Vice-Chairman/Chairman</div>
           </div>
         </div>
