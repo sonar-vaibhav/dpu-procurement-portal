@@ -2,7 +2,7 @@
 /* Metropolis Font Face Declarations */
 @font-face {
   font-family: 'Metropolis';
-  src: url('/metropolis.regular.otf') format('opentype');
+  src: url('/metropolis.light.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: 'Metropolis';
-  src: url('/metropolis.regular.otf') format('opentype');
+  src: url('/metropolis.medium.otf') format('opentype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -27,7 +27,7 @@
 
 @font-face {
   font-family: 'Metropolis';
-  src: url('/metropolis.regular.otf') format('opentype');
+  src: url('/metropolis.semi-bold.otf') format('opentype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -35,7 +35,7 @@
 
 @font-face {
   font-family: 'Metropolis';
-  src: url('/metropolis.regular.otf') format('opentype');
+  src: url('/metropolis.bold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -66,6 +66,7 @@
   font-display: swap;
 }
 */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
