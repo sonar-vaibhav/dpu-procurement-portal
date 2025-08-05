@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 import { useAuth } from '@/contexts/AuthContext';
 import { USER_ROLES } from '@/constants/roles';
 import { useToast } from '@/hooks/use-toast';
-import { downloadPDF, openPDFInNewTab } from './PurchaseOrderPDF';
 
 // Sample data
 const workOrderData = {
@@ -51,15 +52,6 @@ const workOrderData = {
   comparativeChart: 'Comparative Chart Placeholder',
   poDocument: 'PO Document Placeholder',
   gstPercent: 18,
-  tnc: {
-    gst: '@ 18%',
-    warranty: 'One Year',
-    loading: 'Inclusive',
-    pf: 'Inclusive',
-    schedule: 'Immediate',
-    at: 'Dr. DYP Institute of Technology, Pimpri',
-    payment: '100% After completion of work against Tax Invoice duly certified by the College Authority.'
-  }
 };
 
 function numberToWords(num: number) {
@@ -88,26 +80,55 @@ const PurchaseOrderPage: React.FC = () => {
   const [editMode, setEditMode] = React.useState(false);
   const [form, setForm] = React.useState(() => ({
     ...JSON.parse(JSON.stringify(workOrderData)),
+    tnc: {
+      gst: '@ 18%',
+      warranty: 'One Year',
+      loading: 'Inclusive',
+      pf: 'Inclusive',
+      schedule: 'Immediate',
+      at: 'Dr. DYP Institute of Technology, Pimpri',
+      payment: '100% After completion of work against Tax Invoice duly certified by the College Authority.'
+    }
   }));
 
-  const handleViewPDF = async () => {
-    try {
-      const showWatermark = user && user.role && user.role.trim().toLowerCase() === USER_ROLES.VENDOR;
-      await openPDFInNewTab(form, showWatermark);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast({ title: 'Error', description: 'Failed to generate PDF. Please try again.' });
-    }
+  const handleDownloadPDF = () => {
+    if (!printRef.current) return;
+    const opt = {
+      margin: [10, 0, 0, 0],
+      filename: 'WorkOrder.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+    
+    // Generate PDF and open in new tab instead of downloading
+    html2pdf().set(opt).from(printRef.current).outputPdf('blob').then((blob: Blob) => {
+      const url = URL.createObjectURL(blob);
+      const newWindow = window.open(url, '_blank');
+      if (newWindow) {
+        newWindow.focus();
+      }
+      // Clean up the URL after a delay to ensure it's loaded
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+    });
   };
 
-  const handleDownloadPDF = async () => {
-    try {
-      const showWatermark = user && user.role && user.role.trim().toLowerCase() === USER_ROLES.VENDOR;
-      await downloadPDF(form, 'WorkOrder.pdf', showWatermark);
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      toast({ title: 'Error', description: 'Failed to download PDF. Please try again.' });
-    }
+  const handleSavePDF = () => {
+    if (!printRef.current) return;
+    const opt = {
+      margin: [10, 0, 0, 0],
+      filename: 'WorkOrder.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+    
+    // Generate PDF and save directly to device
+    html2pdf().set(opt).from(printRef.current).save();
   };
 
   const handleAcceptPO = () => {
@@ -169,14 +190,14 @@ const PurchaseOrderPage: React.FC = () => {
           )}
           <button
             className="flex items-center gap-1 px-4 py-1 border border-gray-300 text-gray-800 bg-white rounded hover:bg-gray-100 focus:outline-none"
-            onClick={handleViewPDF}
+            onClick={handleDownloadPDF}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
             View PDF
           </button>
           <button
             className="flex items-center gap-1 px-4 py-1 border border-gray-300 text-gray-800 bg-white rounded hover:bg-gray-100 focus:outline-none"
-            onClick={handleDownloadPDF}
+            onClick={handleSavePDF}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
             Download PDF
@@ -186,14 +207,14 @@ const PurchaseOrderPage: React.FC = () => {
         <div className="flex gap-2 mb-6 print:hidden">
           <button
             className="flex items-center gap-1 px-4 py-1 border border-gray-300 text-gray-800 bg-white rounded hover:bg-gray-100 focus:outline-none"
-            onClick={handleViewPDF}
+            onClick={handleDownloadPDF}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
             View PDF
           </button>
           <button
             className="flex items-center gap-1 px-4 py-1 border border-gray-300 text-gray-800 bg-white rounded hover:bg-gray-100 focus:outline-none"
-            onClick={handleDownloadPDF}
+            onClick={handleSavePDF}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
             Download PDF
@@ -362,21 +383,8 @@ const PurchaseOrderPage: React.FC = () => {
           </table>
           {/* Amount in words below the table */}
           <div className="mt-1 text-[15px] font-bold">(INR in Words : {numberToWords(grandTotal)} only)</div>
-        </div>
-        
-        {/* Page 2 - Terms and Conditions */}
-        <div className="wo-page w-full min-h-[297mm] px-10 py-8 flex flex-col justify-between relative pdf-page-break">
-          {/* Watermark for vendor users - Page 2 */}
-          {user && user.role && user.role.trim().toLowerCase() === USER_ROLES.VENDOR && (
-            <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
-              <div className="transform -rotate-45 text-red-500 text-6xl font-bold opacity-20 select-none">
-                NOT FINAL PO
-              </div>
-            </div>
-          )}
-          
           {/* Detailed Terms Block (matches second image) */}
-          <div className="mt-6 border border-gray-400 relative">
+          <div className="mt-6 border border-gray-400 pdf-page-break relative">
             {/* Watermark for vendor users - Terms Section */}
             {user && user.role && user.role.trim().toLowerCase() === USER_ROLES.VENDOR && (
               <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
@@ -414,7 +422,7 @@ const PurchaseOrderPage: React.FC = () => {
               </div>
               <div className="mt-4 font-bold text-[15px]">Payment Terms : <span className="font-normal">{isCPD && editMode ? <input className="border px-1 w-full" value={form.tnc.payment} onChange={e => handleTncField('payment', e.target.value)} /> : form.tnc.payment}</span></div>
               
-              <div className="flex justify-between items-end mt-8 pt-8">
+              <div className="flex justify-between items-end mt-4">
                 <div className="flex flex-col items-center">
                   <div>Suraj Wangane</div>
                   <div className="text-sm">Prepared By</div>
@@ -426,6 +434,7 @@ const PurchaseOrderPage: React.FC = () => {
                 <div className="flex flex-col items-center">
                   <div className="font-bold">For DR. D. Y. PATIL UNITECH SOCIETY, PUNE</div>
                   <div>Dr. D. Y. Patil Institute of Technology</div>
+                  <br /> <br />
                   <div className="text-sm mt-2">Secretary/ Vice-Chairman/ Chairman</div>
                 </div>
               </div>
