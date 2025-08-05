@@ -12,8 +12,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, action }) => {
     <div className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-          {subtitle && <p className="text-gray-600 mt-1">{subtitle}</p>}
+          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+          {subtitle && <p className="text-gray-600 mt-1 font-normal">{subtitle}</p>}
         </div>
         {action && <div>{action}</div>}
       </div>

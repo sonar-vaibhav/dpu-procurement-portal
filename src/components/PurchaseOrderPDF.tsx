@@ -12,12 +12,21 @@ import {
 
 // Register fonts
 Font.register({
-  family: 'Helvetica',
+  family: 'Times-Roman',
   fonts: [
-    { src: 'https://fonts.gstatic.com/s/helveticaneue/v70/1Ptsg8zYS_SKggPNyC0IT4ttDfA.ttf', fontWeight: 'normal' },
-    { src: 'https://fonts.gstatic.com/s/helveticaneue/v70/1Ptsg8zYS_SKggPNyC0IT4ttDfB.ttf', fontWeight: 'bold' },
+    { src: 'https://fonts.gstatic.com/s/timesnewroman/v1/TimesNewRoman.ttf', fontWeight: 'normal' },
+    { src: 'https://fonts.gstatic.com/s/timesnewroman/v1/TimesNewRomanBold.ttf', fontWeight: 'bold' },
   ],
 });
+
+// Metropolis font 
+// Font.register({
+//   family: 'Metropolis',
+//   fonts: [
+//     { src: '/metropolis.thin.otf', fontWeight: 'normal' },
+//     { src: '/metropolis.regular.otf', fontWeight: 'bold' },
+//   ],
+// });
 
 // Create styles
 const styles = StyleSheet.create({
@@ -25,7 +34,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#ffffff',
     padding: 20,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Roman',
     fontSize: 10,
     paddingBottom: 60,
   },

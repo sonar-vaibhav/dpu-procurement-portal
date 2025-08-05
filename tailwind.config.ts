@@ -20,7 +20,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'inter': ['Inter', 'sans-serif'],
+				'metropolis': ['Metropolis', 'sans-serif'],
+				'inter': ['Inter', 'sans-serif'], // Keep for backward compatibility
 			},
 			colors: {
 				'dpu-red': 'var(--dpu-red)',
