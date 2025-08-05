@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Eye, FileText, ListChecks, ClipboardList, Hourglass, Building2, Coins, CheckCircle, XCircle } from 'lucide-react';
 import IndentDetailsModal from '@/components/modals/IndentDetailsModal';
+import IndentReportModal from '@/components/modals/IndentReportModal';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
 import ComparisonChartReport from '@/components/ComparisonChartReport';
 
@@ -96,6 +97,8 @@ const ManagementDashboard: React.FC = () => {
   const [openPO, setOpenPO] = useState<any | null>(null);
   const [openVendorChart, setOpenVendorChart] = useState(false);
   const [openPODoc, setOpenPODoc] = useState(false);
+  const [openRejectionModal, setOpenRejectionModal] = useState(false);
+  const [rejectionData, setRejectionData] = useState<{ id: string; type: 'indent' | 'po'; remarks: string } | null>(null);
 
   // Summary
   // Combine indents and POs for summary
@@ -148,13 +151,13 @@ const ManagementDashboard: React.FC = () => {
       }
     );
 
-  const handleStatusUpdate = (id: string, type: 'indent' | 'po', status: 'Approved' | 'Rejected') => {
+  const handleStatusUpdate = (id: string, type: 'indent' | 'po', status: 'Approved' | 'Rejected', remarks?: string) => {
     const updater = type === 'indent' ? setIndents : setPurchaseOrders;
     updater(prev =>
       prev.map(group => ({
         ...group,
         items: group.items.map(item =>
-          item.id === id ? { ...item, status } : item
+          item.id === id ? { ...item, status, rejectionRemarks: remarks } : item
         )
       }))
     );
@@ -162,6 +165,24 @@ const ManagementDashboard: React.FC = () => {
       title: `${type === 'indent' ? 'Indent' : 'PO'} ${status}`,
       description: `${type === 'indent' ? 'Indent' : 'PO'} ${id} has been ${status.toLowerCase()}.`
     });
+  };
+
+  const handleRejectClick = (id: string, type: 'indent' | 'po') => {
+    setRejectionData({ id, type, remarks: '' });
+    setOpenRejectionModal(true);
+  };
+
+  const handleRejectionSubmit = () => {
+    if (rejectionData) {
+      handleStatusUpdate(rejectionData.id, rejectionData.type, 'Rejected', rejectionData.remarks);
+      setOpenRejectionModal(false);
+      setRejectionData(null);
+    }
+  };
+
+  const handleRejectionCancel = () => {
+    setOpenRejectionModal(false);
+    setRejectionData(null);
   };
 
   // Handlers
@@ -257,7 +278,7 @@ const ManagementDashboard: React.FC = () => {
                 <Card className="bg-red-50 border border-red-200 shadow-none p-0">
                   <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
                     <div>
-                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Rejected</CardTitle>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Not Approved</CardTitle>
                       <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{summary.rejected.count}</div>
                       <div className="text-xs md:text-sm text-gray-500">Amount: ₹{summary.rejected.amount.toLocaleString()}</div>
                     </div>
@@ -314,7 +335,7 @@ const ManagementDashboard: React.FC = () => {
                                   <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'indent', 'Approved')} title="Approve">
                                     <CheckCircle className="w-7 h-7 text-green-600" />
                                   </Button>
-                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'indent', 'Rejected')} title="Reject">
+                                  <Button size="icon" variant="ghost" onClick={() => handleRejectClick(item.id, 'indent')} title="Reject">
                                     <XCircle className="w-7 h-7 text-red-600" />
                                   </Button>
                                 </>
@@ -363,7 +384,7 @@ const ManagementDashboard: React.FC = () => {
                 <Card className="bg-red-50 border border-red-200 shadow-none p-0">
                   <CardHeader className="flex flex-row items-start justify-between p-2 md:p-4 pb-1 md:pb-2">
                     <div>
-                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Rejected</CardTitle>
+                      <CardTitle className="text-sm md:text-base font-medium text-gray-800">Total Not Approved</CardTitle>
                       <div className="text-lg md:text-2xl font-bold mt-1 md:mt-2 mb-1">{poSummary.rejected.count}</div>
                       <div className="text-xs md:text-sm text-gray-500">Amount: ₹{poSummary.rejected.amount.toLocaleString()}</div>
                     </div>
@@ -420,7 +441,7 @@ const ManagementDashboard: React.FC = () => {
                                   <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'po', 'Approved')} title="Approve">
                                     <CheckCircle className="w-7 h-7 text-green-600" />
                                   </Button>
-                                  <Button size="icon" variant="ghost" onClick={() => handleStatusUpdate(item.id, 'po', 'Rejected')} title="Reject">
+                                  <Button size="icon" variant="ghost" onClick={() => handleRejectClick(item.id, 'po')} title="Reject">
                                     <XCircle className="w-7 h-7 text-red-600" />
                                   </Button>
                                 </>
@@ -449,10 +470,23 @@ const ManagementDashboard: React.FC = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Indent Detail Modal */}
+        {/* Indent Report Modal */}
         <Dialog open={!!openIndent} onOpenChange={v => !v && setOpenIndent(null)}>
-          <DialogContent className="max-w-full w-[95vw] sm:max-w-xl overflow-y-auto">
-            <IndentDetailsModal
+          <DialogContent
+            className="p-0 overflow-hidden flex flex-col bg-white"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100vw',
+              height: '100vh',
+              margin: 0,
+              transform: 'none'
+            }}
+          >
+            <IndentReportModal
               isOpen={!!openIndent}
               onClose={() => setOpenIndent(null)}
               indent={openIndent}
@@ -463,7 +497,7 @@ const ManagementDashboard: React.FC = () => {
         {/* PO Detail Modal */}
         <Dialog open={!!openPO} onOpenChange={(v) => !v && setOpenPO(null)}>
           <DialogContent
-            className="w-screen h-screen max-w-none max-h-none rounded-none 
+            className="w-fit h-fit max-w-none max-h-none rounded-none 
                shadow-none p-0 overflow-y-auto bg-gray-100"
           >
             {openPO && (
@@ -491,41 +525,7 @@ const ManagementDashboard: React.FC = () => {
 
                 {/* BODY - Scrollable */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                  {/* General Information */}
-                  <div className="bg-white rounded-lg shadow p-5 space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
-                      General Information
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-600">Title:</span>{' '}
-                        <span className="text-gray-800">{openPO.title}</span>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-600">College:</span>{' '}
-                        <span className="text-gray-800">{openPO.college}</span>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-600">Requested Amount:</span>{' '}
-                        <span className="text-blue-700 font-bold">
-                          ₹{openPO.amount.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="text-sm flex items-center gap-2">
-                        <span className="font-medium text-gray-600">Status:</span>
-                        <Badge
-                          className={`${openPO.status === 'Approved'
-                            ? 'bg-green-100 text-green-700 border-green-200'
-                            : openPO.status === 'Pending'
-                              ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
-                              : 'bg-gray-100 text-gray-700 border-gray-200'
-                            }`}
-                        >
-                          {openPO.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
+
 
                   {/* Actions */}
                   <div className="bg-white rounded-lg shadow p-5">
@@ -533,14 +533,8 @@ const ManagementDashboard: React.FC = () => {
                       Actions
                     </h3>
                     <div className="flex flex-col sm:flex-row gap-3 pt-3">
-                      <Button
-                        variant="outline"
-                        onClick={() => setOpenVendorChart(true)}
-                        className="flex items-center gap-2"
-                      >
-                        <FileText className="w-4 h-4" />
-                        Vendor Comparison Chart
-                      </Button>
+
+
                       <Button
                         variant="outline"
                         onClick={() => setOpenPODoc(true)}
@@ -548,6 +542,15 @@ const ManagementDashboard: React.FC = () => {
                       >
                         <FileText className="w-4 h-4" />
                         Final PO Document
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        onClick={() => setOpenVendorChart(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Vendor Comparison Chart
                       </Button>
                     </div>
                   </div>
@@ -662,6 +665,45 @@ const ManagementDashboard: React.FC = () => {
                 Close
               </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Rejection Remarks Modal */}
+        <Dialog open={openRejectionModal} onOpenChange={setOpenRejectionModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Rejection Remarks</DialogTitle>
+              <DialogDescription>
+                Please provide a reason for rejecting this {rejectionData?.type === 'indent' ? 'indent' : 'purchase order'}.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="remarks" className="text-sm font-medium">
+                  Remarks *
+                </label>
+                <textarea
+                  id="remarks"
+                  value={rejectionData?.remarks || ''}
+                  onChange={(e) => setRejectionData(prev => prev ? { ...prev, remarks: e.target.value } : null)}
+                  placeholder="Enter rejection reason..."
+                  className="w-full min-h-[100px] p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-transparent resize-none"
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter className="flex gap-2">
+              <Button variant="outline" onClick={handleRejectionCancel}>
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={handleRejectionSubmit}
+                disabled={!rejectionData?.remarks?.trim()}
+              >
+                Reject
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
 

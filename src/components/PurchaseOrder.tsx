@@ -81,7 +81,7 @@ const PurchaseOrderPage: React.FC = () => {
   const [form, setForm] = React.useState(() => ({
     ...JSON.parse(JSON.stringify(workOrderData)),
     tnc: {
-      gst: 'Extra As Above @ 18%',
+      gst: '@ 18%',
       warranty: 'One Year',
       loading: 'Inclusive',
       pf: 'Inclusive',
@@ -101,6 +101,33 @@ const PurchaseOrderPage: React.FC = () => {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'] }
     };
+    
+    // Generate PDF and open in new tab instead of downloading
+    html2pdf().set(opt).from(printRef.current).outputPdf('blob').then((blob: Blob) => {
+      const url = URL.createObjectURL(blob);
+      const newWindow = window.open(url, '_blank');
+      if (newWindow) {
+        newWindow.focus();
+      }
+      // Clean up the URL after a delay to ensure it's loaded
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+    });
+  };
+
+  const handleSavePDF = () => {
+    if (!printRef.current) return;
+    const opt = {
+      margin: [10, 0, 0, 0],
+      filename: 'WorkOrder.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+    
+    // Generate PDF and save directly to device
     html2pdf().set(opt).from(printRef.current).save();
   };
 
@@ -165,17 +192,34 @@ const PurchaseOrderPage: React.FC = () => {
             className="flex items-center gap-1 px-4 py-1 border border-gray-300 text-gray-800 bg-white rounded hover:bg-gray-100 focus:outline-none"
             onClick={handleDownloadPDF}
           >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            View PDF
+          </button>
+          <button
+            className="flex items-center gap-1 px-4 py-1 border border-gray-300 text-gray-800 bg-white rounded hover:bg-gray-100 focus:outline-none"
+            onClick={handleSavePDF}
+          >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-            Print
+            Download PDF
           </button>
         </div>
       ) : (
-        <button
-          className="mb-6 px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 print:hidden"
-          onClick={handleDownloadPDF}
-        >
-          Download Work Order as PDF
-        </button>
+        <div className="flex gap-2 mb-6 print:hidden">
+          <button
+            className="flex items-center gap-1 px-4 py-1 border border-gray-300 text-gray-800 bg-white rounded hover:bg-gray-100 focus:outline-none"
+            onClick={handleDownloadPDF}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            View PDF
+          </button>
+          <button
+            className="flex items-center gap-1 px-4 py-1 border border-gray-300 text-gray-800 bg-white rounded hover:bg-gray-100 focus:outline-none"
+            onClick={handleSavePDF}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+            Download PDF
+          </button>
+        </div>
       )}
       <div ref={printRef} className="w-[210mm] bg-white text-black text-[13px] font-sans print:w-full print:h-auto print:overflow-visible print:static print:block relative">
         {/* Page 1 */}
@@ -377,7 +421,8 @@ const PurchaseOrderPage: React.FC = () => {
                 <div><span className="font-bold">Work/ Service At</span> : {isCPD && editMode ? <input className="border px-1 w-full" value={form.tnc.at} onChange={e => handleTncField('at', e.target.value)} /> : form.tnc.at}</div>
               </div>
               <div className="mt-4 font-bold text-[15px]">Payment Terms : <span className="font-normal">{isCPD && editMode ? <input className="border px-1 w-full" value={form.tnc.payment} onChange={e => handleTncField('payment', e.target.value)} /> : form.tnc.payment}</span></div>
-              <div className="flex justify-between items-end mt-8 pt-8">
+              
+              <div className="flex justify-between items-end mt-4">
                 <div className="flex flex-col items-center">
                   <div>Suraj Wangane</div>
                   <div className="text-sm">Prepared By</div>
@@ -389,6 +434,7 @@ const PurchaseOrderPage: React.FC = () => {
                 <div className="flex flex-col items-center">
                   <div className="font-bold">For DR. D. Y. PATIL UNITECH SOCIETY, PUNE</div>
                   <div>Dr. D. Y. Patil Institute of Technology</div>
+                  <br /> <br />
                   <div className="text-sm mt-2">Secretary/ Vice-Chairman/ Chairman</div>
                 </div>
               </div>
