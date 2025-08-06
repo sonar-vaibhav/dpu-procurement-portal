@@ -54,7 +54,7 @@ const IndentReport: React.FC<IndentReportProps> = ({ indentData }) => {
       {/* Printable Report */}
       <div
         ref={printRef}
-        className="w-[280mm] bg-white text-black text-[14px] font-sans print:w-full p-8 border border-gray-400"
+        className="w-[280mm] bg-white text-black text-[14px] font-metropolis print:w-full p-8 border border-gray-400"
       >
         {/* Header Section */}
         <div className="flex items-center mb-4">

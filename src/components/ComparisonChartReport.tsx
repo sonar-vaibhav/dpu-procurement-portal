@@ -120,7 +120,7 @@ const ComparisonChartReport: React.FC = () => {
       >
         Download Comparison Chart as PDF
       </button>
-      <div ref={printRef} className="w-[277mm] bg-white text-black text-[13px] font-sans print:w-full p-0 m-0">
+      <div ref={printRef} className="w-[277mm] bg-white text-black text-[13px] font-metropolis print:w-full p-0 m-0">
         {/* Header Table */}
         <table className="w-full border border-black text-xs mb-2">
           <thead>

@@ -17,6 +17,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { COLLEGES, getCollegeNames } from '@/constants/colleges';
 
 const CPDIndents: React.FC = () => {
   const { toast } = useToast();
@@ -71,7 +72,7 @@ const CPDIndents: React.FC = () => {
       category: 'IT Equipment',
       requester: 'Prof. Sarah Johnson - Electronics',
       department: 'Electronics',
-      college: 'Dr. D. Y. Patil College of Engineering',
+      college: 'Dr. D. Y. Patil Institute of Pharmaceutical Sciences & Research',
       status: 'assigned',
       priority: 'medium',
       amount: '₹1,80,000',
@@ -129,7 +130,7 @@ const CPDIndents: React.FC = () => {
       category: 'Laboratory',
       requester: 'Dr. Priya Patel - Chemistry',
       department: 'Chemistry',
-      college: 'Dr. D. Y. Patil College of Engineering',
+      college: 'Dr. D.Y. Patil Arts, Commerce & Science College',
       status: 'completed',
       priority: 'medium',
       amount: '₹75,000',
@@ -181,7 +182,151 @@ const CPDIndents: React.FC = () => {
         }
       ]
     },
-    
+    {
+      id: 'IND006',
+      title: 'Legal Library Books',
+      category: 'Books',
+      requester: 'Prof. Rajesh Kumar - Law',
+      department: 'Law',
+      college: 'Dr. D. Y. Patil Law College',
+      status: 'assigned',
+      priority: 'medium',
+      amount: '₹1,20,000',
+      dateReceived: '2024-01-12',
+      assignedTo: 'Sunita Verma',
+      budgetHead: 'Library Resources',
+      justification: 'Latest legal reference books and journals for law students.',
+      requestedBy: 'Prof. Rajesh Kumar',
+      items: [
+        {
+          itemName: 'Legal Reference Books',
+          description: 'Latest legal books and journals',
+          quantity: '50',
+          make: 'Various Publishers',
+          modelNo: 'LB-2024',
+          uom: 'Books',
+          stockInHand: '0',
+          approxValue: '120000',
+          purpose: 'Academic'
+        }
+      ]
+    },
+    {
+      id: 'IND007',
+      title: 'Nursing Equipment',
+      category: 'Medical Equipment',
+      requester: 'Dr. Meera Patel - Nursing',
+      department: 'Nursing',
+      college: 'Dr. D. Y. Patil Institute of Nursing Education',
+      status: 'in_progress',
+      priority: 'high',
+      amount: '₹3,50,000',
+      dateReceived: '2024-01-11',
+      assignedTo: 'Karan Singh',
+      budgetHead: 'Medical Equipment',
+      justification: 'Essential nursing equipment for practical training.',
+      requestedBy: 'Dr. Meera Patel',
+      items: [
+        {
+          itemName: 'Nursing Equipment Set',
+          description: 'Complete nursing training equipment',
+          quantity: '1',
+          make: 'Medical Supplies Co.',
+          modelNo: 'NE-2024',
+          uom: 'Set',
+          stockInHand: '0',
+          approxValue: '350000',
+          purpose: 'Training'
+        }
+      ]
+    },
+    {
+      id: 'IND008',
+      title: 'Hotel Management Kitchen Equipment',
+      category: 'Kitchen Equipment',
+      requester: 'Chef Arjun Singh - HMCT',
+      department: 'Hotel Management',
+      college: 'Dr. D. Y. Patil Institute of Hotel Management & Catering Technology',
+      status: 'not_forwarded',
+      priority: 'medium',
+      amount: '₹4,20,000',
+      dateReceived: '2024-01-17',
+      assignedTo: null,
+      budgetHead: 'Kitchen Infrastructure',
+      justification: 'Professional kitchen equipment for culinary arts training.',
+      requestedBy: 'Chef Arjun Singh',
+      items: [
+        {
+          itemName: 'Kitchen Equipment',
+          description: 'Professional kitchen appliances and tools',
+          quantity: '1',
+          make: 'Kitchen Pro',
+          modelNo: 'KE-2024',
+          uom: 'Lot',
+          stockInHand: '0',
+          approxValue: '420000',
+          purpose: 'Training'
+        }
+      ]
+    },
+    {
+      id: 'IND009',
+      title: 'Business School Software Licenses',
+      category: 'Software',
+      requester: 'Prof. Anita Desai - B-School',
+      department: 'Business Administration',
+      college: 'Dr. D. Y. Patil B-School',
+      status: 'completed',
+      priority: 'high',
+      amount: '₹2,80,000',
+      dateReceived: '2024-01-09',
+      assignedTo: 'Amit Patel',
+      budgetHead: 'Software Licenses',
+      justification: 'Business analytics and management software for MBA students.',
+      requestedBy: 'Prof. Anita Desai',
+      items: [
+        {
+          itemName: 'Business Software Licenses',
+          description: 'SPSS, Tableau, and other business software',
+          quantity: '100',
+          make: 'Various Software Companies',
+          modelNo: 'SW-2024',
+          uom: 'Licenses',
+          stockInHand: '0',
+          approxValue: '280000',
+          purpose: 'Academic'
+        }
+      ]
+    },
+    {
+      id: 'IND010',
+      title: 'School Laboratory Equipment',
+      category: 'Laboratory',
+      requester: 'Mrs. Priya Sharma - Science',
+      department: 'Science',
+      college: 'Dr. D. Y. Patil Public School',
+      status: 'assigned',
+      priority: 'medium',
+      amount: '₹1,50,000',
+      dateReceived: '2024-01-13',
+      assignedTo: 'Rajesh Kumar',
+      budgetHead: 'School Equipment',
+      justification: 'Science laboratory equipment for school students.',
+      requestedBy: 'Mrs. Priya Sharma',
+      items: [
+        {
+          itemName: 'Science Lab Equipment',
+          description: 'Basic laboratory equipment for school',
+          quantity: '1',
+          make: 'Educational Supplies',
+          modelNo: 'SLE-2024',
+          uom: 'Set',
+          stockInHand: '0',
+          approxValue: '150000',
+          purpose: 'Teaching'
+        }
+      ]
+    }
   ];
 
   const purchaseOfficers = [
@@ -192,18 +337,7 @@ const CPDIndents: React.FC = () => {
     'Karan Singh'
   ];
 
-  const availableColleges = [
-    'Dr. D. Y. Patil Institute of Technology',
-    'Dr. D. Y. Patil College of Engineering',
-    'Dr. D. Y. Patil Medical College',
-    'Dr. D. Y. Patil Dental College',
-    'Dr. D. Y. Patil College of Nursing',
-    'Dr. D. Y. Patil College of Pharmacy',
-    'Dr. D. Y. Patil College of Architecture',
-    'Dr. D. Y. Patil College of Commerce',
-    'Dr. D. Y. Patil College of Arts',
-    'Dr. D. Y. Patil College of Science'
-  ];
+  const availableColleges = getCollegeNames();
 
   const handleAssignOfficer = (indentId: string, officerName: string) => {
     toast({
@@ -314,6 +448,10 @@ const CPDIndents: React.FC = () => {
                   <SelectItem value="Laboratory">Laboratory</SelectItem>
                   <SelectItem value="IT Equipment">IT Equipment</SelectItem>
                   <SelectItem value="Stationery">Stationery</SelectItem>
+                  <SelectItem value="Books">Books</SelectItem>
+                  <SelectItem value="Medical Equipment">Medical Equipment</SelectItem>
+                  <SelectItem value="Kitchen Equipment">Kitchen Equipment</SelectItem>
+                  <SelectItem value="Software">Software</SelectItem>
                   <SelectItem value="Furniture">Furniture</SelectItem>
                 </SelectContent>
               </Select>
@@ -337,7 +475,7 @@ const CPDIndents: React.FC = () => {
                     variant="outline"
                     role="combobox"
                     aria-expanded={collegeSearchOpen}
-                    className="md:w-48 justify-between"
+                    className="md:w-80 justify-between"
                   >
                     {filterCollege === 'all' 
                       ? "Filter by College" 
@@ -346,7 +484,7 @@ const CPDIndents: React.FC = () => {
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="md:w-48 p-0">
+                <PopoverContent className="md:w-80 p-0">
                   <Command>
                     <CommandInput placeholder="Search colleges..." />
                     <CommandList>
@@ -403,6 +541,7 @@ const CPDIndents: React.FC = () => {
                     <TableHead className="min-w-[140px]">Status</TableHead>
                     <TableHead className="min-w-[100px]">Amount</TableHead>
                     <TableHead className="min-w-[120px]">Assigned To</TableHead>
+                    <TableHead className="min-w-[320px]">College</TableHead>
                     <TableHead className="min-w-[200px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -445,6 +584,11 @@ const CPDIndents: React.FC = () => {
                         ) : (
                           <span className="text-gray-400">Not assigned</span>
                         )}
+                      </TableCell>
+                      <TableCell className="min-w-[320px]">
+                        <div className="break-words text-sm leading-tight">
+                          {indent.college}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2 flex-wrap">
