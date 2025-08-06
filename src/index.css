@@ -41,31 +41,6 @@
   font-display: swap;
 }
 
-/* To add more weights, place the font files in the public folder and uncomment below:
-@font-face {
-  font-family: 'Metropolis';
-  src: url('/metropolis.regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Metropolis';
-  src: url('/metropolis.medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Metropolis';
-  src: url('/metropolis.bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-*/
 
 @tailwind base;
 @tailwind components;

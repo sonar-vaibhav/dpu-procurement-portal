@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCollegeNames } from '@/constants/colleges';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
@@ -172,20 +174,15 @@ const Profile: React.FC = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="collegeName">College Name *</Label>
-                  <Select value={formData.collegeName} onValueChange={(value) => handleInputChange('collegeName', value)}>
-                    <SelectTrigger className={errors.collegeName ? 'border-red-500' : ''}>
-                      <SelectValue placeholder="Select college" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="engineering">DY Patil College of Engineering</SelectItem>
-                      <SelectItem value="management">DY Patil Institute of Management</SelectItem>
-                      <SelectItem value="pharmacy">DY Patil College of Pharmacy</SelectItem>
-                      <SelectItem value="architecture">DY Patil School of Architecture</SelectItem>
-                      <SelectItem value="biotechnology">DY Patil School of Biotechnology</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.collegeName && <p className="text-sm text-red-500">{errors.collegeName}</p>}
+                  <SearchableSelect
+                    label="College Name"
+                    placeholder="Search and select college..."
+                    value={formData.collegeName}
+                    onValueChange={(value) => handleInputChange('collegeName', value)}
+                    options={getCollegeNames()}
+                    required
+                    error={errors.collegeName}
+                  />
                 </div>
                 
                 <div className="space-y-2">

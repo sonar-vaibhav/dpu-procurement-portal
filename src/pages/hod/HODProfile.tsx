@@ -18,7 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useToast } from '@/hooks/use-toast';
+import { getCollegeNames } from '@/constants/colleges';
 
 const HODProfile: React.FC = () => {
   const { toast } = useToast();
@@ -112,28 +114,15 @@ const HODProfile: React.FC = () => {
 
               {/* College */}
               <div>
-                <Label htmlFor="college">College</Label>
-                <Select
+                <SearchableSelect
+                  label="College"
+                  placeholder="Search and select college..."
                   value={formData.college}
                   onValueChange={(value) =>
                     setFormData({ ...formData, college: value })
                   }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="DPU College of Engineering">
-                      DPU College of Engineering
-                    </SelectItem>
-                    <SelectItem value="DPU College of Science">
-                      DPU College of Science
-                    </SelectItem>
-                    <SelectItem value="DPU Business School">
-                      DPU Business School
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                  options={getCollegeNames()}
+                />
               </div>
 
               {/* Department */}

@@ -6,14 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { getCollegeNames } from '@/constants/colleges';
 
-const colleges = [
-  'All Colleges',
-  'Dr. D. Y. Patil Institute of Technology',
-  'DPU School of Management',
-  'DPU College of Pharmacy',
-  'DPU College of Architecture',
-];
+const colleges = ['All Colleges', ...getCollegeNames()];
 
 const allStockItems = [
   {

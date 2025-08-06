@@ -18,6 +18,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import ComparisonChartReport from '@/components/ComparisonChartReport';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
 import IndentReport from '@/components/IndentReport';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import { getCollegeNames } from '@/constants/colleges';
 
 interface AssignedIndent {
   id: string;
@@ -498,18 +500,17 @@ const OfficerIndents: React.FC = () => {
         {/* College Filter */}
         <div className="flex items-center space-x-2">
           <Label className="font-semibold">Search College:</Label>
-          <select
-            className="border-b-2 border-gray-400 focus:border-blue-500 outline-none p-1"
-            value={collegeFilter}
-            onChange={e => {
-              setCollegeFilter(e.target.value);
-              setDepartmentFilter('All'); // Reset dept when college changes
-            }}
-          >
-            {['All', ...Array.from(new Set(indents.map(i => i.college)))].map(col => (
-              <option key={col}>{col}</option>
-            ))}
-          </select>
+          <div className="w-64">
+            <SearchableSelect
+              placeholder="Search and select college..."
+              value={collegeFilter}
+              onValueChange={(value) => {
+                setCollegeFilter(value);
+                setDepartmentFilter('All'); // Reset dept when college changes
+              }}
+              options={['All', ...getCollegeNames()]}
+            />
+          </div>
         </div>
 
         <Card>

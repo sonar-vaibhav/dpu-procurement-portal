@@ -17,7 +17,9 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useToast } from '@/hooks/use-toast';
+import { getCollegeNames } from '@/constants/colleges';
 
 interface IndentItem {
   category: string;
@@ -196,12 +198,14 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Institute Name *</Label>
-                <Input
+                <SearchableSelect
+                  label="Institute Name"
+                  placeholder="Search and select institute..."
                   value={formData.instituteName}
-                  onChange={e =>
-                    setFormData({ ...formData, instituteName: e.target.value })
+                  onValueChange={value =>
+                    setFormData({ ...formData, instituteName: value })
                   }
+                  options={getCollegeNames()}
                   required
                 />
               </div>
