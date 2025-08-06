@@ -20,4 +20,18 @@ DPU Procurement System is a centralized web-based portal designed to streamline 
 - 🧾 Auto-generated Purchase Order PDFs with DPU branding using `jsPDF`
 - 📄 Organized item specifications: quantity, expected price, etc.
 - 📱 Fully responsive and intuitive frontend UI
+<<<<<<< HEAD
 - 📊 Planned: Admin dashboard with analytics and tracking
+=======
+- 📊 Planned: Admin dashboard with analytics and tracking
+
+---
+
+## 🧑‍💻 Tech Stack
+
+| Layer     | Technology        |
+|-----------|-------------------|
+| Frontend  | React.js, Tailwind CSS, Shadcn |
+| Backend   | .NET Core (API) |
+
+>>>>>>> 39d75ac6204f830b8f6f67ac6fd7e244e2ac4144
