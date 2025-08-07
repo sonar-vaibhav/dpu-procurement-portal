@@ -107,7 +107,8 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             placeholder={placeholder}
             value={getDisplayValue()}
             onChange={handleInputChange}
-            onFocus={handleInputFocus}
+            onFocus={() => {}} // No-op to prevent dropdown opening on focus
+            onClick={handleInputFocus} // Only open dropdown on click
             className={cn(
               "pr-10 cursor-pointer",
               error ? "border-red-500" : "",

@@ -158,12 +158,12 @@ const ComparisonChartReport: React.FC = () => {
                 <th rowSpan={2} className="border border-gray-400 px-1 py-1">Qty</th>
                 {comparisonData.estimates.map((est, idx) => (
                   <th
-                    className={`border border-gray-400 px-1 py-1 text-center cursor-pointer ${
+                    className={`border border-gray-400 px-1 py-1 text-center ${
                       (selectedVendor === idx || selectedVendorIndex === idx) ? 'bg-yellow-300 border-2 border-yellow-500 font-bold ring-2 ring-yellow-400' : ''
                     }`}
                     colSpan={3}
                     key={idx}
-                    onClick={() => handleVendorClick(idx)}
+                    // onClick={() => handleVendorClick(idx)}
                   >
                     Estimate {idx + 1}<br />
                     <span className="font-semibold">{est.vendor}</span><br />

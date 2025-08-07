@@ -74,16 +74,19 @@ function numberToWords(num: number) {
   return number.toString();
 }
 
-const PurchaseOrderPage: React.FC = () => {
+const PurchaseOrderPage: React.FC<{ showWatermark?: boolean }> = ({ showWatermark }) => {
   const printRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { toast } = useToast ? useToast() : { toast: (args: any) => alert(args.description) };
   const isCPD = user && user.role && user.role.trim().toLowerCase() === USER_ROLES.CPD;
+  const isOfficer = user && user.role && user.role.trim().toLowerCase() === USER_ROLES.OFFICER;
+  const isVendor = user && user.role === USER_ROLES.VENDOR;
+  const watermark = isVendor;
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState(() => JSON.parse(JSON.stringify(workOrderData)));
 
-  const handleViewPDF = async () => { await openPDFInNewTab(form); };
-  const handleDownloadPDF = async () => { await downloadPDF(form, 'WorkOrder.pdf'); };
+  const handleViewPDF = async () => { await openPDFInNewTab(form, watermark); };
+  const handleDownloadPDF = async () => { await downloadPDF(form, 'WorkOrder.pdf', watermark); };
   
   const handleFieldChange = (field: string, value: any) => {
     setForm(f => ({ ...f, [field]: value }));
@@ -196,13 +199,13 @@ const PurchaseOrderPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center w-full bg-gray-200 p-4 print:p-0 print:bg-white">
-      {isCPD && (
+      {(isCPD || isOfficer) && (
         <div className="flex gap-2 mb-4 print:hidden">
           {editMode ? (
             <>
               <button onClick={handleSave} className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600">
-                Save
-              </button>
+              Save
+            </button>
               <button onClick={handleCancel} className="px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600">
                 Cancel
               </button>
@@ -223,7 +226,29 @@ const PurchaseOrderPage: React.FC = () => {
 
       <div ref={printRef} className="w-[210mm] font-metropolis text-black">
         {/* Page 1 */}
-        <div className="page-container w-full min-h-[297mm] p-6 flex flex-col bg-white shadow-xl mb-4 print:shadow-none print:mb-0 ">
+        <div className="page-container w-full min-h-[297mm] p-6 flex flex-col bg-white shadow-xl mb-4 print:shadow-none print:mb-0 relative">
+          {watermark && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(-45deg)',
+                fontSize: 64,
+                color: '#ff0000',
+                opacity: 0.18,
+                fontWeight: 'bold',
+                fontFamily: 'Metropolis, sans-serif',
+                textAlign: 'center',
+                pointerEvents: 'none',
+                zIndex: 10,
+                width: '100%',
+                userSelect: 'none',
+              }}
+            >
+              NOT FINAL PO
+            </div>
+          )}
           <header className="flex items-center justify-between border-b-2 border-black pb-2">
             <img src="/dpu_logo.png" alt="DPU Logo" className="h-8" />
             <div className="text-center">
@@ -313,7 +338,7 @@ const PurchaseOrderPage: React.FC = () => {
                     'Work order for RO Plant Cleaning, Servicing, Supply & Installation of Spares Parts',
                     () => {}, // This is a static header, not editable
                     'font-bold text-left'
-                  )}
+                    )}
                 </td>
               </tr>
               {form.items.map((item, index) => (
@@ -383,7 +408,7 @@ const PurchaseOrderPage: React.FC = () => {
                       </button>
                     </td>
                   )}
-                </tr>
+              </tr>
               ))}
               {editMode && (
                 <tr>
@@ -462,6 +487,28 @@ const PurchaseOrderPage: React.FC = () => {
 
         {/* Page 2 */}
         <div className="page-container w-full min-h-[297mm] p-6 flex flex-col relative bg-white shadow-xl print:shadow-none">
+          {watermark && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(-45deg)',
+                fontSize: 64,
+                color: '#ff0000',
+                opacity: 0.18,
+                fontWeight: 'bold',
+                fontFamily: 'Metropolis, sans-serif',
+                textAlign: 'center',
+                pointerEvents: 'none',
+                zIndex: 10,
+                width: '100%',
+                userSelect: 'none',
+              }}
+            >
+              NOT FINAL PO
+            </div>
+          )}
           <div className="p-2 flex flex-col mt-5"
             style={{
               borderTop: 'none',
@@ -507,7 +554,7 @@ const PurchaseOrderPage: React.FC = () => {
               <p><b>P & F /Transportation</b> : {renderEditableField(form.tnc.pf, (value) => handleTncFieldChange('pf', value))}</p>
               <p><b>Work/ Service Schedule</b> : {renderEditableField(form.tnc.schedule, (value) => handleTncFieldChange('schedule', value))}</p>
               <p><b>Work/ Service At</b> : {renderEditableField(form.tnc.at, (value) => handleTncFieldChange('at', value))}</p>
-            </div>
+                </div>
 
             <hr className="border-t-2 border-black mt-7" />
 
@@ -523,13 +570,13 @@ const PurchaseOrderPage: React.FC = () => {
                   {renderEditableField(form.preparedBy, (value) => handleFieldChange('preparedBy', value))}
                 </p>
                 <p className="border-t-2 border-black mt-1 px-4">Prepared By</p>
-              </div>
+                </div>
               <div>
                 <p className="font-bold">
                   {renderEditableField(form.checkedBy, (value) => handleFieldChange('checkedBy', value))}
                 </p>
                 <p className="border-t-2 border-black mt-1 px-4">Checked By</p>
-              </div>
+                </div>
               <div>
                 <p className="font-bold pb-10">For {form.society}</p>
                 <p className="border-t-2 border-black mt-1 px-4">Secretary/ Vice-Chairman/ Chairman</p>
@@ -548,4 +595,4 @@ const PurchaseOrderPage: React.FC = () => {
   );
 };
 
-export default PurchaseOrderPage;
+export default PurchaseOrderPage; 

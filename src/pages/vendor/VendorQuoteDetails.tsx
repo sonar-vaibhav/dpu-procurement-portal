@@ -215,7 +215,7 @@ const VendorQuoteDetails: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Enquiry Details</CardTitle>
-                  <CardDescription>Original requirements from the department</CardDescription>
+              <CardDescription>Original requirements from the department</CardDescription>
                 </div>
                 {enquiryDetailsExpanded ? (
                   <ChevronDown className="h-5 w-5 text-gray-500" />
@@ -225,7 +225,7 @@ const VendorQuoteDetails: React.FC = () => {
               </div>
             </CardHeader>
             {enquiryDetailsExpanded && (
-              <CardContent className="space-y-4">
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm text-gray-500">Enquiry ID</span>
@@ -433,15 +433,15 @@ const VendorQuoteDetails: React.FC = () => {
                                      <span className="text-gray-500">Quantity:</span>
                                      <p className="font-medium">{item.quantity}</p>
                                    </div>
-                                   <div>
+                  <div>
                                      <span className="text-gray-500">Unit Price:</span>
                                      <p className="font-medium text-green-600">₹{parseFloat(item.unitPrice).toLocaleString()}</p>
-                                   </div>
-                                   <div>
+                  </div>
+                  <div>
                                      <span className="text-gray-500">Total Price:</span>
                                      <p className="font-medium text-green-600">₹{parseFloat(item.totalPrice).toLocaleString()}</p>
-                                   </div>
-                                   <div>
+                  </div>
+                  <div>
                                      <span className="text-gray-500">Specifications:</span>
                                      <p className="text-sm mt-1">{item.specifications}</p>
                                    </div>
@@ -490,8 +490,8 @@ const VendorQuoteDetails: React.FC = () => {
                                  <div>
                                    <span className="text-gray-500">Delivery Time:</span>
                                    <p className="font-medium">{quoteDetails.quotation?.deliveryTime}</p>
-                                 </div>
-                                 <div>
+                  </div>
+                  <div>
                                    <span className="text-gray-500">Warranty Period:</span>
                                    <p className="font-medium">{quoteDetails.quotation?.warrantyPeriod}</p>
                                  </div>
@@ -510,22 +510,22 @@ const VendorQuoteDetails: React.FC = () => {
                                <p className="text-sm">{quoteDetails.quotation?.additionalRemarks}</p>
                              </div>
                            </div>
-                        </div>
-                      </div>
+                  </div>
+                </div>
 
                       {/* Changes Summary */}
                       <div className="mt-6 bg-blue-50 p-4 rounded border border-blue-200">
                         <h6 className="font-medium text-blue-700 mb-3">Changes Summary</h6>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                          <div>
+                <div>
                             <span className="text-gray-500">Changes Date:</span>
                             <p className="font-medium">{quoteDetails.quotation.officerChanges.changesDate}</p>
-                          </div>
-                          <div>
+                </div>
+                <div>
                             <span className="text-gray-500">Changed By:</span>
                             <p className="font-medium">{quoteDetails.quotation.officerChanges.changesBy}</p>
-                          </div>
-                          <div>
+                </div>
+                <div>
                             <span className="text-gray-500">Status:</span>
                             <p className="font-medium text-yellow-600">Awaiting Vendor Approval</p>
                           </div>
@@ -535,7 +535,7 @@ const VendorQuoteDetails: React.FC = () => {
                           <p className="mt-1 text-sm">{quoteDetails.quotation.officerChanges.changesNotes}</p>
                         </div>
                       </div>
-                    </div>
+                </div>
                   </>
                 )}
 

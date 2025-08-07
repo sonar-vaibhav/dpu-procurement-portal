@@ -11,12 +11,18 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import PurchaseOrderPage from '@/components/PurchaseOrder';
 import { FileText, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { USER_ROLES } from '@/constants/roles';
+import { useToast } from '@/hooks/use-toast';
 
 const VendorQuotes: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [openPOFor, setOpenPOFor] = useState<string | null>(null);
+  const [poAccepted, setPoAccepted] = useState(false);
+  const { toast } = useToast();
 
   const quotes = [
     {
@@ -221,8 +227,27 @@ const VendorQuotes: React.FC = () => {
             <DialogDescription>Preview of the final Purchase Order for this quote.</DialogDescription>
           </DialogHeader>
           <div className="max-h-[70vh] overflow-y-auto">
-            <PurchaseOrderPage />
+            <PurchaseOrderPage showWatermark={user?.role === USER_ROLES.VENDOR} />
           </div>
+          {user?.role === USER_ROLES.VENDOR && (
+            <div className="flex justify-end mt-4">
+              {poAccepted ? (
+                <Button className="bg-green-600 text-white flex items-center" disabled>
+                  <CheckCircle className="w-4 h-4 mr-2" /> PO Accepted
+                </Button>
+              ) : (
+                <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                  setPoAccepted(true);
+                  toast({
+                    title: 'PO Accepted',
+                    description: 'You have acknowledged and accepted the Purchase Order.'
+                  });
+                }}>
+                  Accept PO
+                </Button>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </DashboardLayout>

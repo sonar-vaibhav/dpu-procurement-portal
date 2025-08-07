@@ -86,7 +86,6 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
 
   const addItem = () => {
     setItems([
-      ...items,
       {
         category: '',
         itemName: '',
@@ -102,7 +101,8 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
         vendorQuotationFile: null,
         imageFile: null,
         catalogFile: null
-      }
+      },
+      ...items
     ]);
   };
 
@@ -299,16 +299,30 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                     </Button>
                   )}
                 </div>
-
-                {/* Make, Specs, Stock, ItemName */}
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Item Name *</Label>
+                    <Input
+                      value={item.itemName}
+                      onChange={e => updateItem(index, 'itemName', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description / Specification</Label>
+                    <Textarea
+                      value={item.specs}
+                      onChange={e => updateItem(index, 'specs', e.target.value)}
+                      placeholder="Enter specification"
+                      required
+                      rows={2}
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label>Make / Manufacturer</Label>
                     <Select
                       value={item.make}
-                      onValueChange={value =>
-                        updateItem(index, 'make', value)
-                      }
+                      onValueChange={value => updateItem(index, 'make', value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select Make" />
@@ -326,65 +340,26 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       <Input
                         placeholder="Add new Make"
                         value={item.customMake}
-                        onChange={e =>
-                          updateItem(index, 'customMake', e.target.value)
-                        }
+                        onChange={e => updateItem(index, 'customMake', e.target.value)}
                       />
                     )}
                   </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <Label>Specifications</Label>
-                    <Input
-                      value={item.specs}
-                      onChange={e =>
-                        updateItem(index, 'specs', e.target.value)
-                      }
-                      placeholder="Enter specification"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Stock in Hand</Label>
-                    <Input
-                      value={item.stockInHand}
-                      onChange={e =>
-                        updateItem(index, 'stockInHand', e.target.value)
-                      }
-                      placeholder="Available stock"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Item Name *</Label>
-                    <Input
-                      value={item.itemName}
-                      onChange={e =>
-                        updateItem(index, 'itemName', e.target.value)
-                      }
-                      required
-                    />
-                  </div>
                 </div>
-
-                {/* Quantity & UOM */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
                   <div className="space-y-2">
                     <Label>Quantity *</Label>
                     <Input
                       type="number"
                       value={item.quantity}
-                      onChange={e =>
-                        updateItem(index, 'quantity', e.target.value)
-                      }
+                      onChange={e => updateItem(index, 'quantity', e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Unit of Measurement</Label>
+                    <Label>UOM</Label>
                     <Select
                       value={item.uom}
-                      onValueChange={value =>
-                        updateItem(index, 'uom', value)
-                      }
+                      onValueChange={value => updateItem(index, 'uom', value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select UOM" />
@@ -398,33 +373,25 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Stock in Hand</Label>
+                    <Input
+                      value={item.stockInHand}
+                      onChange={e => updateItem(index, 'stockInHand', e.target.value)}
+                      placeholder="Available stock"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Approximate Value *</Label>
+                    <Input
+                      type="number"
+                      value={item.approxValue}
+                      onChange={e => updateItem(index, 'approxValue', e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label>Approximate Value *</Label>
-                  <Input
-                    type="number"
-                    value={item.approxValue}
-                    onChange={e =>
-                      updateItem(index, 'approxValue', e.target.value)
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Description</Label>
-                  <Textarea
-                    value={item.description}
-                    onChange={e =>
-                      updateItem(index, 'description', e.target.value)
-                    }
-                    rows={2}
-                  />
-                </div>
-
-                {/* Similar Item, Vendor Quotation, Image, Catalog */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
                   <div className="space-y-2">
                     <Label>Similar Item Purchased?</Label>
                     <div className="flex gap-4">
@@ -432,13 +399,8 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                         <button
                           key={opt}
                           type="button"
-                          onClick={() =>
-                            updateItem(index, 'similarItem', opt)
-                          }
-                          className={`px-4 py-1 rounded-full border ${item.similarItem === opt
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-white text-gray-800'
-                            }`}
+                          onClick={() => updateItem(index, 'similarItem', opt)}
+                          className={`px-4 py-1 rounded-full border ${item.similarItem === opt ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'}`}
                         >
                           {opt.charAt(0).toUpperCase() + opt.slice(1)}
                         </button>
@@ -450,14 +412,10 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
-                      onChange={e =>
-                        handleFileChange(index, e, 'vendorQuotationFile')
-                      }
+                      onChange={e => handleFileChange(index, e, 'vendorQuotationFile')}
                     />
                     {item.vendorQuotationFile && (
-                      <p className="text-sm text-gray-600 mt-1 truncate">
-                        {item.vendorQuotationFile.name}
-                      </p>
+                      <p className="text-sm text-gray-600 mt-1 truncate">{item.vendorQuotationFile.name}</p>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -465,14 +423,10 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                     <Input
                       type="file"
                       accept="image/*"
-                      onChange={e =>
-                        handleFileChange(index, e, 'imageFile')
-                      }
+                      onChange={e => handleFileChange(index, e, 'imageFile')}
                     />
                     {item.imageFile && (
-                      <p className="text-sm text-gray-600 mt-1 truncate">
-                        {item.imageFile.name}
-                      </p>
+                      <p className="text-sm text-gray-600 mt-1 truncate">{item.imageFile.name}</p>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -480,14 +434,10 @@ const CreateIndentModal: React.FC<CreateIndentModalProps> = ({
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx"
-                      onChange={e =>
-                        handleFileChange(index, e, 'catalogFile')
-                      }
+                      onChange={e => handleFileChange(index, e, 'catalogFile')}
                     />
                     {item.catalogFile && (
-                      <p className="text-sm text-gray-600 mt-1 truncate">
-                        {item.catalogFile.name}
-                      </p>
+                      <p className="text-sm text-gray-600 mt-1 truncate">{item.catalogFile.name}</p>
                     )}
                   </div>
                 </div>

@@ -250,6 +250,10 @@ const styles = StyleSheet.create({
     color: '#ff0000',
     opacity: 0.2,
     fontWeight: 'bold',
+    fontFamily: 'Metropolis',
+    textAlign: 'center',
+    width: '100%',
+    zIndex: 1000,
   },
   pageContent: {
     flex: 1,
@@ -507,6 +511,7 @@ const PurchaseOrderPDF = ({
             <Text style={styles.termsItem}>2. Please see overleaf for standard Terms and Conditions.</Text>
             <Text style={styles.termsItem}>3. The rates mentioned in the Purchase/Work Order shall be firm for all supplies including the extension of time, any granted and will not be subject to any fluctuation due to increasing in the cost of materials, labour, taxes, octroi, or any other new taxes, levies, etc.</Text>
             <Text style={styles.termsItem}>4. You will be fully responsible for the safety of the workforce employed by you at the above site and we shall not entertain any claim from you or your workers towards compensation for injury or damages while working at the above site.</Text>
+            <Text style={styles.termsItem}>5. You shall execute the work as per instructions given by the College Authority.</Text>
 
 
             {/* Page Header for subsequent pages */}
@@ -525,7 +530,6 @@ const PurchaseOrderPDF = ({
               </View>
             </View>
 
-            <Text style={styles.termsItem}>5. You shall execute the work as per instructions given by the College Authority.</Text>
             <Text style={styles.termsItem}>6. You shall be under strict obligation and duty to obey all the Laws of the land, especially pertaining to the minimum wages, gratuity, provident fund, ESIC, labour laws, or any other requirements of the workers and such rules/ regulations, etc., as prohibitory laws e.g. minor child below 18 years restrained or women labour should not be permitted to work at night on the work, etc., licensing authorities rules and regulations, as per the provisions of legislations prevailing and applicable from time to time must be followed strictly and properly, without default.</Text>
             <Text style={styles.termsItem}>7. The actual quantity of work shall be measured by our College Authority in the presence of your representative.</Text>
             <Text style={styles.termsItem}>8. Material supplied by you shall be checked & validated by our Store Dept. Or Site Engg.</Text>

@@ -331,7 +331,7 @@ const CPDIndents: React.FC = () => {
 
   const purchaseOfficers = [
     'Rajesh Kumar',
-    'Priya Sharma', 
+    'Priya Sharma',
     'Amit Patel',
     'Sunita Verma',
     'Karan Singh'
@@ -379,11 +379,11 @@ const CPDIndents: React.FC = () => {
     const matchesCategory = filterCategory === 'all' || indent.category === filterCategory;
     const matchesStatus = filterStatus === 'all' || indent.status === filterStatus;
     const matchesCollege = filterCollege === 'all' || indent.college === filterCollege;
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       indent.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       indent.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       indent.requester.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     return matchesCategory && matchesStatus && matchesCollege && matchesSearch;
   });
 
@@ -394,7 +394,7 @@ const CPDIndents: React.FC = () => {
       'in_progress': 'bg-purple-100 text-purple-800',
       'completed': 'bg-green-100 text-green-800'
     };
-    
+
     return (
       <Badge className={statusColors[status as keyof typeof statusColors]}>
         {status.replace('_', ' ').toUpperCase()}
@@ -408,7 +408,7 @@ const CPDIndents: React.FC = () => {
       'medium': 'border-yellow-200 text-yellow-600',
       'low': 'border-green-200 text-green-600'
     };
-    
+
     return (
       <Badge variant="outline" className={priorityColors[priority as keyof typeof priorityColors]}>
         {priority.toUpperCase()}
@@ -422,7 +422,7 @@ const CPDIndents: React.FC = () => {
         title="All Indents"
         subtitle="Manage and assign indents to purchase officers"
       />
-      
+
       <div className="p-6">
         <Card>
           <CardHeader>
@@ -438,7 +438,7 @@ const CPDIndents: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="md:max-w-sm"
               />
-              
+
               <Select value={filterCategory} onValueChange={setFilterCategory}>
                 <SelectTrigger className="md:w-48">
                   <SelectValue placeholder="Filter by Category" />
@@ -455,7 +455,7 @@ const CPDIndents: React.FC = () => {
                   <SelectItem value="Furniture">Furniture</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger className="md:w-48">
                   <SelectValue placeholder="Filter by Status" />
@@ -468,7 +468,7 @@ const CPDIndents: React.FC = () => {
                   <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Popover open={collegeSearchOpen} onOpenChange={setCollegeSearchOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -477,8 +477,8 @@ const CPDIndents: React.FC = () => {
                     aria-expanded={collegeSearchOpen}
                     className="md:w-80 justify-between"
                   >
-                    {filterCollege === 'all' 
-                      ? "Filter by College" 
+                    {filterCollege === 'all'
+                      ? "Filter by College"
                       : filterCollege
                     }
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -537,11 +537,11 @@ const CPDIndents: React.FC = () => {
                   <TableRow>
                     <TableHead className="min-w-[200px]">Indent Details</TableHead>
                     <TableHead className="min-w-[120px]">Category</TableHead>
-                    <TableHead className="min-w-[150px]">Requester</TableHead>
+                    {/* <TableHead className="min-w-[150px]">Requester</TableHead> */}
+                    <TableHead className="min-w-[320px]">College</TableHead>
                     <TableHead className="min-w-[140px]">Status</TableHead>
                     <TableHead className="min-w-[100px]">Amount</TableHead>
                     <TableHead className="min-w-[120px]">Assigned To</TableHead>
-                    <TableHead className="min-w-[320px]">College</TableHead>
                     <TableHead className="min-w-[200px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -555,19 +555,24 @@ const CPDIndents: React.FC = () => {
                             {indent.id} • {indent.dateReceived}
                             {getPriorityBadge(indent.priority)}
                           </div>
-                          
+
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">{indent.category}</Badge>
                       </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <div>
                           <div className="font-medium text-xs">{indent.requester ? indent.requester.split(' - ')[0] : '-'}</div>
                           <div className="text-xs text-gray-500">{indent.department}</div>
                           <div className="text-xs mt-1">
                             {indent.college}
                           </div>
+                        </div>
+                      </TableCell> */}
+                      <TableCell className="min-w-[320px]">
+                        <div className="break-words text-sm leading-tight">
+                          {indent.college}
                         </div>
                       </TableCell>
                       <TableCell className='text-xs'>
@@ -585,11 +590,7 @@ const CPDIndents: React.FC = () => {
                           <span className="text-gray-400">Not assigned</span>
                         )}
                       </TableCell>
-                      <TableCell className="min-w-[320px]">
-                        <div className="break-words text-sm leading-tight">
-                          {indent.college}
-                        </div>
-                      </TableCell>
+
                       <TableCell>
                         <div className="flex gap-2 flex-wrap">
                           {/* Workflow: Assign to officer, View, Forward to management */}
@@ -620,8 +621,8 @@ const CPDIndents: React.FC = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-6.75A2.25 2.25 0 0 0 17.25 5.25h-10.5A2.25 2.25 0 0 0 4.5 7.5v9A2.25 2.25 0 0 0 6.75 18.75h10.5A2.25 2.25 0 0 0 19.5 16.5v-2.25M9 9.75h6m-6 3h6" />
                             </svg>
                           </button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => handleViewDetails(indent)}
                           >
@@ -644,7 +645,7 @@ const CPDIndents: React.FC = () => {
                               >
                                 View Comparison Chart
                               </Button>
-                              
+
                               <Button
                                 variant="default"
                                 size="sm"
@@ -655,8 +656,8 @@ const CPDIndents: React.FC = () => {
                             </>
                           )}
                           {indent.status === 'not_forwarded' && (
-                            <Button 
-                              variant="default" 
+                            <Button
+                              variant="default"
                               size="sm"
                               onClick={() => handleAcceptIndent(indent.id)}
                             >
@@ -721,7 +722,7 @@ const CPDIndents: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-      
+
       {/* Indent Details Modal */}
       <IndentDetailsModal
         isOpen={isIndentModalOpen}
@@ -731,7 +732,7 @@ const CPDIndents: React.FC = () => {
 
       {/* Purchase Order Modal */}
       <Dialog open={showPOModal} onOpenChange={setShowPOModal}>
-        <DialogContent className="max-w-5xl">
+        <DialogContent className="w-screen h-screen max-w-none max-h-none bg-gray-100">
           <DialogHeader>
             <DialogTitle>Purchase Order</DialogTitle>
           </DialogHeader>

@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
-interface QuotationItem {
+type QuotationItem = {
   itemName: string;
   make: string;
   model: string;
@@ -18,7 +18,8 @@ interface QuotationItem {
   quantity: string;
   unitPrice: string;
   totalPrice: string;
-}
+  gstPercentage: string;
+};
 
 const VendorRespond: React.FC = () => {
   const { enquiryId } = useParams();
@@ -26,9 +27,8 @@ const VendorRespond: React.FC = () => {
   const { toast } = useToast();
 
   const [quotationItems, setQuotationItems] = useState<QuotationItem[]>([
-    { itemName: '', make: '', model: '', specifications: '', quantity: '', unitPrice: '', totalPrice: '0' }
+    { itemName: '', make: '', model: '', specifications: '', quantity: '', unitPrice: '', totalPrice: '0', gstPercentage: '18' }
   ]);
-  const [gstPercentage, setGstPercentage] = useState('18');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [warrantyPeriod, setWarrantyPeriod] = useState('');
   const [transportationCharges, setTransportationCharges] = useState('');
@@ -64,9 +64,11 @@ const VendorRespond: React.FC = () => {
   };
 
   const calculateGSTAmount = () => {
-    const subtotal = calculateSubtotal();
-    const gstRate = parseFloat(gstPercentage) || 0;
-    return (subtotal * gstRate / 100).toFixed(2);
+    return quotationItems.reduce((sum, item) => {
+      const gstRate = parseFloat(item.gstPercentage) || 0;
+      const itemTotal = parseFloat(item.totalPrice) || 0;
+      return sum + (itemTotal * gstRate / 100);
+    }, 0).toFixed(2);
   };
 
   const calculateGrandTotal = () => {
@@ -93,7 +95,10 @@ const VendorRespond: React.FC = () => {
   };
 
   const addItem = () => {
-    setQuotationItems([...quotationItems, { itemName: '', make: '', model: '', specifications: '', quantity: '', unitPrice: '', totalPrice: '0' }]);
+    setQuotationItems([
+      { itemName: '', make: '', model: '', specifications: '', quantity: '', unitPrice: '', totalPrice: '0', gstPercentage: '18' },
+      ...quotationItems
+    ]);
   };
 
   const removeItem = (index: number) => {
@@ -210,7 +215,7 @@ const VendorRespond: React.FC = () => {
                           )}
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div>
                             <Label htmlFor={`itemName-${index}`}>Item Name *</Label>
                             <Input
@@ -267,8 +272,21 @@ const VendorRespond: React.FC = () => {
                             />
                           </div>
                           <div>
+                            <Label htmlFor={`gstPercentage-${index}`}>GST (%)</Label>
+                            <Input
+                              id={`gstPercentage-${index}`}
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={item.gstPercentage}
+                              onChange={e => handleItemChange(index, 'gstPercentage', e.target.value)}
+                              placeholder="GST %"
+                              required
+                            />
+                          </div>
+                          <div>
                             <Label>Total Price (₹)</Label>
-                            <div className="p-2 bg-white border rounded text-sm">
+                            <div className="p-2 bg-gray-50 border rounded text-sm">
                               ₹{item.totalPrice}
                             </div>
                           </div>
@@ -289,43 +307,7 @@ const VendorRespond: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Pricing Summary */}
-                <div className="border rounded-lg p-4">
-                  <h4 className="font-medium mb-3">Pricing Summary</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Subtotal (₹)</Label>
-                      <div className="p-2 bg-gray-50 border rounded text-sm">
-                        ₹{calculateSubtotal().toFixed(2)}
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="gstPercentage">GST Percentage (%)</Label>
-                      <Input
-                        id="gstPercentage"
-                        type="number"
-                        value={gstPercentage}
-                        onChange={(e) => setGstPercentage(e.target.value)}
-                        placeholder="0-100"
-                        min="0"
-                        max="100"
-                        step="0.01"
-                      />
-                    </div>
-                    <div>
-                      <Label>GST Amount (₹)</Label>
-                      <div className="p-2 bg-gray-50 border rounded text-sm">
-                        ₹{calculateGSTAmount()}
-                      </div>
-                    </div>
-                    <div>
-                      <Label>Grand Total (₹)</Label>
-                      <div className="p-2 bg-gray-50 border rounded text-sm">
-                        ₹{calculateGrandTotal()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                
 
                 {/* Additional Charges */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -352,6 +334,31 @@ const VendorRespond: React.FC = () => {
                       min="0"
                       step="0.01"
                     />
+                  </div>
+                </div>
+
+                {/* Pricing Summary */}
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium mb-3">Pricing Summary</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Subtotal (₹)</Label>
+                      <div className="p-2 bg-gray-50 border rounded text-sm">
+                        ₹{calculateSubtotal().toFixed(2)}
+                      </div>
+                    </div>
+                    <div>
+                      <Label>GST Amount (₹)</Label>
+                      <div className="p-2 bg-gray-50 border rounded text-sm">
+                        ₹{calculateGSTAmount()}
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Grand Total (₹)</Label>
+                      <div className="p-2 bg-gray-50 border rounded text-sm">
+                        ₹{calculateGrandTotal()}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
